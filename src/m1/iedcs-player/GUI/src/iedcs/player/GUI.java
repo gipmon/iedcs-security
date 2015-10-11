@@ -1,27 +1,24 @@
-package player;
+package iedcs.player;
 
 import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.JRadioButton;
-import javax.swing.JSplitPane;
 import java.awt.Button;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class gui extends JFrame{
+public class GUI extends JFrame{
 
 	private static final long serialVersionUID = 1L;
 	
 	public static void main(String[] args){
-		gui gui = new gui();
+		GUI gui = new GUI();
 		gui.setDefaultCloseOperation(3);
 		gui.setVisible(true);
 	}
 	
-	public gui(){
+	public GUI(){
 		setLocationByPlatform(true);
 	    setSize(487, 364);
 	    setTitle("IEDCS Player");
