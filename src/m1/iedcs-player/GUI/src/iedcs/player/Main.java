@@ -1,22 +1,25 @@
 package iedcs.player;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
-public class Main {
 
-	private JFrame frame;
+public class Main extends JFrame{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override public void run() {
 				try {
 					Main window = new Main();
-					window.frame.setVisible(true);
+					window.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -28,16 +31,10 @@ public class Main {
 	 * Create the application.
 	 */
 	public Main() {
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		super("IEDCS Player");
+		this.setVisible(true);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setSize(600, 400);
 	}
 
 }
