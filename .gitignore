@@ -1,31 +1,70 @@
-# OSX Finder turds
+# Vagrant #
+.vagrant
+
+# idea
+.idea
+*.pyc
+
+# Directories #
+/build/
+/bin/
+target/
+
+# OS Files #
 .DS_Store
 
-# Byte-compiled / optimized / DLL files
-*.py[cod]
-*.o
 *.class
 
-.idea/
+# Package Files #
+*.jar
+*.war
+*.ear
+*.db
 
-.vagrant/
+######################
+# Windows
+######################
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+######################
+# OSX
+######################
+
+.DS_Store
+.svn
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+
+######################
+# Eclipse
+######################
 
 *.pydevproject
+.project
 .metadata
-.gradle
-bin/
-tmp/
+bin/**
+tmp/**
+tmp/**/*
 *.tmp
 *.bak
 *.swp
 *~.nib
 local.properties
+.classpath
 .settings/
 .loadpath
-
-# Eclipse Core
-.project
-
+/src/main/resources/rebel.xml
 # External tool builders
 .externalToolBuilders/
 
@@ -35,17 +74,5 @@ local.properties
 # CDT-specific
 .cproject
 
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
-
-# Java annotation processor (APT)
-.factorypath
-
 # PDT-specific
 .buildpath
-
-# sbteclipse plugin
-.target
-
-# TeXlipse plugin
-.texlipse
