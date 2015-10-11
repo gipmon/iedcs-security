@@ -28,6 +28,7 @@ public class Main extends JFrame{
 	}
 
 	/**
+	 * *
 	 * Create the application.
 	 */
 	public Main() {
