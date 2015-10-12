@@ -65,7 +65,7 @@ class AccountChangePassword(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     """
     ## Change password
     - #### Method: **PUT**
-    - #### URL: **/api/v1/change/password/&lt;username&gt;/**
+    - #### URL: **/api/v1/change_password/&lt;username&gt;/**
     - #### Parameters: Password and confirm_password
     - #### Permissions: **Is Authenticated and Is Account Owner**
     """
@@ -79,7 +79,7 @@ class AccountChangePassword(mixins.UpdateModelMixin, viewsets.GenericViewSet):
     def update(self, request, *args, **kwargs):
         """
         B{Update} the password
-        B{URL:} ../api/v1/change/password/<username>/
+        B{URL:} ../api/v1/change_password/<username>/
 
         -> Permissions
         # update
