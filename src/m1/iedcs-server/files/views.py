@@ -11,9 +11,13 @@ class UserFiles(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def list(self, request, *args, **kwargs):
         """
-        B{List} the books
+        B{List} the user files
         B{URL:} ../api/v1/files/user/
         """
         files = get_list_or_404(File.objects.all(), buyer=request.user)
         serializer = self.serializer_class(files, many=True)
         return Response(serializer.data)
+
+
+class GetFile:
+    pass

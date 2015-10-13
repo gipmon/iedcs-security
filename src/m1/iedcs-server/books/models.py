@@ -11,3 +11,7 @@ class Book(models.Model):
     author = models.CharField(max_length=128, blank=False, validators=[MinLengthValidator(1)])
 
     original_file = models.FileField()
+
+    class Meta:
+        unique_together = ('name', 'production_date', 'author',)
+

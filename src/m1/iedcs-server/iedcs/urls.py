@@ -3,6 +3,7 @@ from django.views.generic.base import TemplateView
 
 from authentication.views import AccountViewSet, LoginView, LogoutView, AccountChangePassword, MyDetails
 from books.views import BooksViewSet
+from files.views import UserFiles
 
 from rest_framework import routers
 
@@ -12,9 +13,12 @@ router_base.register(r'accounts', AccountViewSet)
 router_base.register(r'change_password', AccountChangePassword)
 router_base.register(r'books', BooksViewSet)
 
+router_files = routers.SimpleRouter()
+router_files.register(r'user', UserFiles)
 
 urlpatterns = patterns('',
                        url(r'^api/v1/', include(router_base.urls)),
+                       url(r'^api/v1/files/', include(router_files.urls)),
                        url(r'^api/v1/me/$', MyDetails.as_view(), name="ME"),
 
                        url(r"api/v1/auth/login/$", LoginView.as_view(), name="login"),

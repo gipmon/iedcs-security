@@ -10,3 +10,6 @@ class File(models.Model):
     path = models.FileField()
     book = models.ForeignKey(Book, blank=False)
     buyer = models.ForeignKey(Account, blank=False)
+
+    class Meta:
+        unique_together = ('buyer', 'book',)
