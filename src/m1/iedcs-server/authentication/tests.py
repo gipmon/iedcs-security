@@ -16,8 +16,6 @@ class AuthenticationTestCase(TestCase):
 
     def test_create_account(self):
         user = Account.objects.get(email='test@test.com')
-        user.is_staff = True
-        user.save()
 
         client = APIClient()
         client.force_authenticate(user=user)

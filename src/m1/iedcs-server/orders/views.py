@@ -6,16 +6,20 @@ from rest_framework.response import Response
 from .models import Order, OrderBook
 from .serializers import OrderSerializer, MakeOrderSerializer
 from books.models import Book
+from rest_framework import permissions
 
 
 class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Order.objects.filter()
     serializer_class = OrderSerializer
 
+    def get_permissions(self):
+        return permissions.IsAuthenticated(),
+
     def list(self, request, *args, **kwargs):
         """
         B{List} the orders of the user
-        B{URL:} ../api/v1/order/
+        B{URL:} ../api/v1/orders/
         """
         #files = get_list_or_404(Order.objects.all(), buyer=request.user)
         #serializer = self.serializer_class(files, many=True)
@@ -25,7 +29,7 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
     def create(self, request, *args, **kwargs):
         """
         B{Create} an order
-        B{URL:} ../api/v1/order/
+        B{URL:} ../api/v1/orders/
 
         :type  books_identifier: str
         :param books_identifier: the books that the user wants to purchase
@@ -35,6 +39,8 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
         if serializer.is_valid():
             try:
                 user = request.user
+                print serializer
+                print serializer.validated_data
 
                 for book_identifier in serializer.validated_data['books_identifier']:
                     # verify if the book exists
@@ -57,13 +63,21 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
                         book = get_object_or_404(Book.objects.all(), identifier=book_identifier)
                         OrderBook.objects.create(order=order, book=book)
 
+                    class OrderSimplex:
+                        def __init__(self, identifier, buyer, books):
+                            self.identifier = identifier
+                            self.buyer = buyer
+                            self.books = books
+
+                    serializer = self.serializer_class(OrderSimplex(order.identifier, order.buyer,
+                                                                    order.orderbook_set.all()))
+
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
             except IntegrityError:
                 return Response({'status': 'Bad request',
                                  'message': 'The book couldn\'t be purchase!'},
                                 status=status.HTTP_400_BAD_REQUEST)
-
-            serializer = self.serializer_class(order)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response({'status': 'Bad Request',
                          'message': serializer.errors},
