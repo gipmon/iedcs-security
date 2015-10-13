@@ -9,3 +9,5 @@ class Book(models.Model):
     name = models.CharField(max_length=128, blank=False, validators=[MinLengthValidator(1)])
     production_date = models.DateField()
     author = models.CharField(max_length=128, blank=False, validators=[MinLengthValidator(1)])
+
+    original_file = models.FileField()

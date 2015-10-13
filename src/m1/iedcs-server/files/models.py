@@ -7,7 +7,6 @@ from books.models import Book
 
 class File(models.Model):
     identifier = models.CharField(max_length=128, default=uuid.uuid4, blank=False, unique=True)
-    path = models.FileField(upload_to="books/%Y/%m/%d")
+    path = models.FileField()
     book = models.ForeignKey(Book, blank=False)
     buyer = models.ForeignKey(Account, blank=False)
-
