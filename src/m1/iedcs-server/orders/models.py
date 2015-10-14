@@ -6,7 +6,7 @@ import uuid
 
 
 class Order(models.Model):
-    oder_identifier = models.CharField(max_length=128, default=uuid.uuid4, blank=False, unique=True)
+    identifier = models.CharField(max_length=128, default=uuid.uuid4, blank=False, unique=True)
     buyer = models.ForeignKey(Account, blank=False)
 
 
