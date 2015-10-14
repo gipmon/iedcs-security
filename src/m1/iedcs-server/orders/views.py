@@ -34,13 +34,16 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
         :type  books_identifier: str
         :param books_identifier: the books that the user wants to purchase
         """
-        serializer = MakeOrderSerializer(data=request.data)
+        if not request.POST:
+            return Response({'status': 'Bad Request',
+                             'message': ''},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = MakeOrderSerializer(data=request.POST)
 
         if serializer.is_valid():
             try:
                 user = request.user
-                print serializer
-                print serializer.validated_data
 
                 for book_identifier in serializer.validated_data['books_identifier']:
                     # verify if the book exists

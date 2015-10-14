@@ -22,14 +22,6 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ('identifier', 'buyer', 'books',)
 
 
-class MakeOrderSerializer(serializers.ModelSerializer):
-    books_identifier = serializers.ListField(child=serializers.CharField(), required=True, allow_null=False)
-
-    class Meta:
-        model = Order
-        fields = ('books_identifier',)
-
-
 class MakeOrderSerializer(serializers.BaseSerializer):
     def to_representation(self, instance):
         pass
@@ -41,23 +33,24 @@ class MakeOrderSerializer(serializers.BaseSerializer):
         pass
 
     def to_internal_value(self, data):
-        books_identifier = data.get('books_identifier')
+        book_identifier = []
 
-        # Perform the data validation.
-        if not books_identifier:
+        try:
+            for p in data.iterlists():
+                books_identifier = p[1]
+        except Exception, e:
             raise ValidationError({
-                'message': 'This field is required1.'
+                'message': 'This field is required0.'
             })
 
-        print books_identifier
-        
+        # Perform the data validation.
         if type(books_identifier) is not list:
             raise ValidationError({
                 'message': 'This field is required2.'
             })
 
         for book_identifier in books_identifier:
-            if type(book_identifier) is not str:
+            if type(book_identifier) is not unicode:
                 raise ValidationError({
                     'message': 'This field is required3.'
                 })
