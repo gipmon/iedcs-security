@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="webstore">
 
 <head>
 
@@ -9,7 +9,10 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Heroic Features - Start Bootstrap Template</title>
+    <base href="/" />
+
+
+    <title>Ebook Webstore</title>
 
     {% include 'home/stylesheets.html' %}
 
@@ -17,90 +20,134 @@
 </head>
 
 <body>
-
-    {% include 'home/header.html' %}
-
-    <!-- Page Content -->
-    <div class="container ng-view"  role="main">
-
-        <!-- Jumbotron Header -->
-        <header class="jumbotron hero-spacer">
-            <h1>A Warm Welcome!</h1>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsa, ipsam, eligendi, in quo sunt possimus non incidunt odit vero aliquid similique quaerat nam nobis illo aspernatur vitae fugiat numquam repellat.</p>
-            <p><a class="btn btn-primary btn-large">Call to action!</a>
-            </p>
-        </header>
-
-        <hr>
-
-        <!-- Title -->
-        <div class="row">
-            <div class="col-lg-12">
-                <h3>Latest Features</h3>
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" ng-controller="HeaderController as header" ng-show="loader.loading" ng-cloak>
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header" >
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"><i class="fa fa-book fa-3"></i> Ebook Webstore </a>
             </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" ng-show="header.logged" ng-cloak>
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#">Home</a>
+                    </li>
+                    <li>
+                        <a href="#">My Ebooks</a>
+                    </li>
+                    <li>
+                        <a href="#">My Orders</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right" ng-show="header.hide" ng-cloak>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b>Register</b> <span class="caret"></span></a>
+                        <ul id="register-dp" class="dropdown-menu">
+                            <li>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <form role="form" accept-charset="UTF-8" id="login-nav1">
+                                            <fieldset>
+                                                <div class="form-group">
+                                                    <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                                                    <input type="email" class="form-control" id="exampleInputEmail" placeholder="Email address" required ng-model="header.email">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="sr-only" for="username">Username</label>
+                                                    <input type="text" class="form-control" id="username" placeholder="Username" required ng-model="header.username">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="sr-only" for="first_name">First Name</label>
+                                                    <input type="text" class="form-control" id="first_name" placeholder="First Name" required ng-model="header.first_name">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="sr-only" for="last_name">Username</label>
+                                                    <input type="text" class="form-control" id="last_name" placeholder="Last Name" required ng-model="header.last_name">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="sr-only" for="exampleInputPassword">Password</label>
+                                                    <input type="password" class="form-control" id="exampleInputPassword" placeholder="Password" required ng-model="header.password">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="sr-only" for="confirmPassword">Password</label>
+                                                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required ng-model="header.confirm_password">
+                                                </div>
+                                                <div class="form-actions">
+                                                    <button type="submit" ng-click="header.register()" class="btn btn-primary btn-block">Sign up</button>
+                                                </div>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox"> keep me logged-in
+                                                    </label>
+                                                </div>
+                                            </fieldset>
+                                        </form>
+                                    </div>
+                                    <div class="bottom text-center">
+                                        New here ? <a href="#"><b>Join Us</b></a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
+                        <ul id="login-dp" class="dropdown-menu">
+                            <li>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <form class="form" role="form" accept-charset="UTF-8" id="login-nav">
+                                            <div class="form-group">
+                                                <label class="sr-only" for="exampleInputEmail2">Email address</label>
+                                                <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email address" required ng-model="header.email1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="sr-only" for="exampleInputPassword2">Password</label>
+                                                <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password" required ng-model="header.password1">
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" ng-click="header.login()" class="btn btn-primary btn-block">Sign in</button>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox"> keep me logged-in
+                                                </label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="bottom text-center">
+                                        New here ? <a href="#"><b>Join Us</b></a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right" ng-show="header.logged" ng-cloak>
+                    <li>
+                        <a href="#">Welcome {{user.first_name}} {{user.last_name}}!</a>
+                    </li>
+                    <li>
+                        <a href="#" ng-click="header.logout()"><i class="fa fa-sign-out"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
         </div>
-        <!-- /.row -->
+        <!-- /.container -->
+    </nav>
 
-        <!-- Page Features -->
-        <div class="row text-center">
-
-            <div class="col-md-3 col-sm-6 hero-feature">
-                <div class="thumbnail">
-                    <img src="http://placehold.it/800x500" alt="">
-                    <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-sm-6 hero-feature">
-                <div class="thumbnail">
-                    <img src="http://placehold.it/800x500" alt="">
-                    <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-sm-6 hero-feature">
-                <div class="thumbnail">
-                    <img src="http://placehold.it/800x500" alt="">
-                    <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-sm-6 hero-feature">
-                <div class="thumbnail">
-                    <img src="http://placehold.it/800x500" alt="">
-                    <div class="caption">
-                        <h3>Feature Label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.</p>
-                        <p>
-                            <a href="#" class="btn btn-primary">Buy Now!</a> <a href="#" class="btn btn-default">More Info</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <!-- /.row -->
-
+    <div class="container ng-view" role="main">
     </div>
-    <!-- /.container -->
 
     <div class="container">
         <hr>
@@ -114,7 +161,6 @@
             </div>
         </footer>
     </div>
-
     {% include 'home/javascripts.html' %}
 </body>
 
