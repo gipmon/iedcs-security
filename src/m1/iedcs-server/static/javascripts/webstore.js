@@ -5,7 +5,8 @@
         .module('webstore', [
             'webstore.config',
             'webstore.routes',
-            'webstore.authentication'
+            'webstore.authentication',
+            'webstore.website'
         ])
         .run(run);
 

@@ -9,9 +9,16 @@
 
     function config($routeProvider){
         $routeProvider.when('/home/',{
-            templateUrl: '/static/templates/index.html/'
+            controller: 'WebSiteController',
+            controllerAs: 'vm',
+            templateUrl: '/static/templates/home.html/'
+        }).when('/:identifier' ,{
+            controller: 'BookInfoController',
+            controllerAs: 'vm',
+            templateUrl: '/static/templates/bookInfo.html'
         }).when('/' ,{
-            controller: 'RegisterController',
+            controller: 'HeaderController',
+            controllerAs: 'vm',
             templateUrl: '/static/templates/index.html'
         }).otherwise('/');
     }

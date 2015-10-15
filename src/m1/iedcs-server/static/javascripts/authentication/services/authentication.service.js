@@ -61,19 +61,9 @@
         }
 
         function logout(){
-            return $http.post("api/v1/auth/logout/")
-                .then(logoutSuccessFn, logoutErrorFn);
+            return $http.post("api/v1/auth/logout/");
         }
 
-        function logoutSuccessFn(){
-            Authentication.unauthenticate();
-
-            window.location.assign("/");
-        }
-
-        function logoutErrorFn(){
-            console.error("Logout Failure!");
-        }
 
     }
 })();

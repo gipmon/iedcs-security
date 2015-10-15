@@ -5,19 +5,15 @@
         .module('webstore.authentication.controllers')
         .controller('HeaderController', HeaderController);
 
-    HeaderController.$inject = ['Authentication', '$scope', '$rootScope'];
+    HeaderController.$inject = ['Authentication', '$scope', 'WebSite', '$location'];
 
-    function HeaderController(Authentication, $scope, $rootScope){
+    function HeaderController(Authentication, $scope, WebSite, $location){
         var header = this;
+        var vm = this;
 
         header.login = login;
         header.register = register;
         header.logout = logout;
-        if(Authentication.isAuthenticated()) {
-            header.account = Authentication.getAuthenticatedAccount();
-
-        }
-
         activate();
 
         function activate(){
@@ -28,20 +24,40 @@
             header.registerError = false;
 
             if(Authentication.isAuthenticated()){
+                console.log("entrei");
                 header.account = Authentication.getAuthenticatedAccount();
                 document.getElementById("demo").innerHTML ="Welcome " + header.account.first_name + " " + header.account.last_name +"!";
-
                 header.logged = true;
                 header.hide = false;
-
+                vm.logged = true;
+                vm.hide = false;
 
             }else{
                 header.logged = false;
                 header.hide = true;
+                vm.logged = false;
+                vm.hide = true;
             }
-            $scope.loader = {
-                loading: true
-            };
+            WebSite.getAllBooks().then(getAllBooksSuccess, getAllBooksError);
+
+            function getAllBooksSuccess(data){
+                vm.books = data.data;
+                for(var i=0; i <vm.books.length; i++){
+                    if(vm.books[i].name.length >= 43){
+                        vm.books[i].name = vm.books[i].name.substring(0, 40) + "...";
+                    }
+                }
+                $scope.loader = {
+                    loading: true
+                };
+            }
+
+            function getAllBooksError(data){
+                console.error(data.data);
+                $scope.loader = {
+                    loading: true
+                };
+            }
 
 
         }
@@ -63,11 +79,14 @@
         function loginSuccess(data){
 
             Authentication.setAuthenticatedAccount(data.data);
-
-            activate();
             header.account = Authentication.getAuthenticatedAccount();
-            console.log(header.account);
-        }
+            document.getElementById("demo").innerHTML ="Welcome " + header.account.first_name + " " + header.account.last_name +"!";
+
+            $location.url('/home');
+            header.logged = true;
+            header.hide = false;
+            vm.logged = true;
+            vm.hide = false;        }
 
         function loginError(data){
             header.loginerror = true;
@@ -99,8 +118,18 @@
         }
 
         function logout(){
-            Authentication.logout();
-            activate();
+            Authentication.logout().then(logoutSuccessFn, logoutErrorFn);
+        }
+        function logoutSuccessFn() {
+            Authentication.unauthenticate();
+            $location.url('/');
+            header.logged = false;
+            header.hide = true;
+            vm.logged = false;
+            vm.hide = true;
+        }
+        function logoutErrorFn(){
+            console.error("Logout Failure!");
         }
 
     }
