@@ -5,10 +5,12 @@
         .module('webstore.website.controllers')
         .controller('BookInfoController', BookInfoController);
 
-    BookInfoController.$inject = ['WebSite', '$scope', 'Authentication', '$location', '$routeParams'];
+    BookInfoController.$inject = ['WebSite', '$scope', 'Authentication', '$routeParams'];
 
-    function BookInfoController(WebSite, $scope, Authentication, $location, $routeParams){
+    function BookInfoController(WebSite, $scope, Authentication, $routeParams){
         var vm = this;
+
+        vm.orderBook = orderBook;
 
         activate();
 
@@ -43,6 +45,19 @@
                 };
             }
 
+        }
+
+        function orderBook(){
+            WebSite.orderBook(vm.id).then(orderSuccess, orderError);
+
+            function orderSuccess(){
+
+            }
+
+            function orderError(data){
+                vm.buyError = true;
+                document.getElementById("buyError").innerHTML = data.data.message;
+            }
         }
     }
 

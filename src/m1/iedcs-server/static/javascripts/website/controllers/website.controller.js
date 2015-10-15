@@ -5,17 +5,20 @@
         .module('webstore.website.controllers')
         .controller('WebSiteController', WebSiteController);
 
-    WebSiteController.$inject = ['WebSite', '$scope', 'Authentication', '$location'];
+    WebSiteController.$inject = ['WebSite', '$scope', 'Authentication'];
 
-    function WebSiteController(WebSite, $scope, Authentication, $location){
+    function WebSiteController(WebSite, $scope, Authentication){
         var vm = this;
 
+        vm.orderBook = orderBook;
         activate();
 
         function activate(){
             $scope.loader = {
                 loading: false
             };
+            vm.buyError = false;
+
             WebSite.getAllBooks().then(getAllBooksSuccess, getAllBooksError);
 
             function getAllBooksSuccess(data){
@@ -47,6 +50,20 @@
                 $scope.loader = {
                     loading: true
                 };
+            }
+
+        }
+
+        function orderBook(identifier){
+            WebSite.orderBook(identifier).then(orderSuccess, orderError);
+
+            function orderSuccess(){
+
+            }
+
+            function orderError(data){
+                vm.buyError = true;
+                vm.id = identifier;
             }
 
         }

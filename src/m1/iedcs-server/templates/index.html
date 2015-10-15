@@ -39,7 +39,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav"  ng-show="header.logged" ng-cloak>
                     <li>
-                        <a href="#">Home</a>
+                        <a ng-if="header.logged" href="/home">Home</a>
                     </li>
                     <li>
                         <a href="#">My Ebooks</a>

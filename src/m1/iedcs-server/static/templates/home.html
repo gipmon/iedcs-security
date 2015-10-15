@@ -17,16 +17,34 @@
 <!-- Page Features -->
 <div class="row text-center" >
 
-    <div class="col-md-3 col-sm-6 hero-feature"  ng-repeat="(key, value) in vm.books" >
+    <div class="col-md-4 col-sm-6 hero-feature"  ng-repeat="(key, value) in vm.books" >
         <div class="thumbnail" >
-            <div class="caption" style="min-height: 150px">
-                <h4>{{value.name}}</h4>
-                <p>{{value.author}}</p>
+            <div class="caption">
+                <div style="min-height: 120px; max-height: 120px;" ng-if="vm.buyError && vm.id == value.identifier">
+                    <h4>{{value.name}}</h4>
+                    <p>{{value.author}}</p>
+                    <div class="alert alert-danger" style="margin-top: 2px" id="buyError" ng-if="vm.buyError && vm.id == value.identifier"><p>You already purchase this book!</small></div>
+
+                </div>
+                <div style="min-height: 130px; max-height: 130px;" ng-if="vm.buyError && vm.id != value.identifier">
+                    <h4>{{value.name}}</h4>
+                    <p>{{value.author}}</p>
+                    <div class="alert alert-danger" style="margin-top: 2px" id="buyError" ng-if="vm.buyError && vm.id == value.identifier"><p>You already purchase this book!</small></div>
+
+                </div>
+                <div style="min-height: 100px; max-height: 100px;" ng-if="vm.buyError == false">
+                    <h4>{{value.name}}</h4>
+                    <p>{{value.author}}</p>
+
+                </div>
+                <div>
+
+                    <a href="#" ng-click="vm.orderBook(value.identifier)" class="btn btn-primary">Buy Now!</a> <a href="/{{value.identifier}}/" class="btn btn-default">More Info</a>
+
+                </div>
 
             </div>
-            <p>
-                <a href="#" class="btn btn-primary">Buy Now!</a> <a href="/{{value.identifier}}/" class="btn btn-default">More Info</a>
-            </p>
+
         </div>
     </div>
 
