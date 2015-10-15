@@ -18,8 +18,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('identifier', 'buyer', 'books',)
-        read_only_fields = ('identifier', 'buyer', 'books',)
+        fields = ('identifier', 'books',)
+        read_only_fields = ('identifier', 'books',)
 
 
 class MakeOrderSerializer(serializers.BaseSerializer):

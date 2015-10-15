@@ -1,12 +1,13 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.db import IntegrityError
 from django.db import transaction
 from rest_framework import viewsets, status, mixins
 from rest_framework.response import Response
 from .models import Order, OrderBook
-from .serializers import OrderSerializer, MakeOrderSerializer
+from .serializers import OrderSerializer, MakeOrderSerializer, OrderBookSerializer
 from books.models import Book
 from rest_framework import permissions
+from .simplex import OrderSimplex
 
 
 class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -21,10 +22,15 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
         B{List} the orders of the user
         B{URL:} ../api/v1/orders/
         """
-        #files = get_list_or_404(Order.objects.all(), buyer=request.user)
-        #serializer = self.serializer_class(files, many=True)
-        #return Response(serializer.data)
-        pass
+        orders = get_list_or_404(Order.objects.all(), buyer=request.user)
+
+        orders_simples = []
+
+        for order in orders:
+            orders_simples += [OrderSimplex(order.identifier, order.buyer, order.orderbook_set.all())]
+
+        serializer = self.serializer_class(orders_simples, many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         """
@@ -66,12 +72,6 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
                         book = get_object_or_404(Book.objects.all(), identifier=book_identifier)
                         OrderBook.objects.create(order=order, book=book)
 
-                    class OrderSimplex:
-                        def __init__(self, identifier, buyer, books):
-                            self.identifier = identifier
-                            self.buyer = buyer
-                            self.books = books
-
                     serializer = self.serializer_class(OrderSimplex(order.identifier, order.buyer,
                                                                     order.orderbook_set.all()))
 
@@ -87,4 +87,19 @@ class OrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Crea
                         status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
-        pass
+        """
+        B{Retrieve} the sticky note represented by the identifier
+        B{URL:} ../api/v1/orders/<identifier>/
+
+        :type  identifier: str
+        :param identifier: The identifier
+        """
+        order = get_object_or_404(Order.objects.all(), identifier=kwargs.get('pk', ''))
+
+        if order.buyer != request.user:
+                return Response({'status': 'Bad request',
+                                 'message': 'Nothing here!'},
+                                status=status.HTTP_403_FORBIDDEN)
+
+        serializer = OrderBookSerializer(order.orderbook_set.all(), many=True)
+        return Response(serializer.data)

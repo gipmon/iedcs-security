@@ -1,9 +1,9 @@
 from django.test import TestCase
-from .models import Book
 from rest_framework.test import APIClient
 from django.core.files.storage import default_storage
 from iedcs.settings import BASE_DIR
 from authentication.models import Account
+from .models import Book, Order
 
 
 class OrdersTestCase(TestCase):
@@ -26,5 +26,19 @@ class OrdersTestCase(TestCase):
         url = "/api/v1/orders/"
         data = {'books_identifier': [self.b1.identifier, self.b2.identifier]}
         response = client.post(path=url, data=data)
-        res = response.data
-        print res
+
+        order = Order.objects.first()
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Order.objects.count(), 1)
+        self.assertEqual(len(order.orderbook_set.all()), 2)
+
+        url = "/api/v1/orders/"
+        response = client.get(path=url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data[0]["books"]), 2)
+
+        url = "/api/v1/orders/" + response.data[0]["identifier"] + "/"
+        response = client.get(path=url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
