@@ -41,7 +41,6 @@ INSTALLED_APPS = (
     'authentication',
     'books',
     'files',
-    'orders',
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinLengthValidator
 import uuid
+from authentication.models import Account
 
 
 class Book(models.Model):
@@ -15,3 +16,10 @@ class Book(models.Model):
     class Meta:
         unique_together = ('name', 'production_date', 'author',)
 
+
+class OrderBook(models.Model):
+    buyer = models.ForeignKey(Account, blank=False)
+    book = models.ForeignKey(Book, blank=False)
+
+    class Meta:
+        unique_together = ('book', 'buyer',)
