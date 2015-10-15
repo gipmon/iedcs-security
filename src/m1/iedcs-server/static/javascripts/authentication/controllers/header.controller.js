@@ -5,14 +5,18 @@
         .module('webstore.authentication.controllers')
         .controller('HeaderController', HeaderController);
 
-    HeaderController.$inject = ['$location', 'Authentication', '$scope'];
+    HeaderController.$inject = ['Authentication', '$scope', '$rootScope'];
 
-    function HeaderController($location, Authentication, $scope){
+    function HeaderController(Authentication, $scope, $rootScope){
         var header = this;
 
         header.login = login;
         header.register = register;
+        header.logout = logout;
+        if(Authentication.isAuthenticated()) {
+            header.account = Authentication.getAuthenticatedAccount();
 
+        }
 
         activate();
 
@@ -20,8 +24,13 @@
             $scope.loader = {
                 loading: false
             };
+            header.loginerror=false;
+            header.registerError = false;
+
             if(Authentication.isAuthenticated()){
                 header.account = Authentication.getAuthenticatedAccount();
+                document.getElementById("demo").innerHTML ="Welcome " + header.account.first_name + " " + header.account.last_name +"!";
+
                 header.logged = true;
                 header.hide = false;
 
@@ -55,14 +64,13 @@
 
             Authentication.setAuthenticatedAccount(data.data);
 
-            header.logged = true;
-            header.hide = false;
+            activate();
             header.account = Authentication.getAuthenticatedAccount();
             console.log(header.account);
         }
 
         function loginError(data){
-
+            header.loginerror = true;
         }
 
         function register(){
@@ -76,7 +84,23 @@
 
 
         function registerError(data){
-            console.error(data.data);
+            var errors = "";
+            for (var value in data.data.message) {
+                errors += "&bull; " + (value.charAt(0).toUpperCase() + value.slice(1)).replace("_", " ") + ":<br/>"
+                for (var error in data.data.message[value]){
+                    errors += " &nbsp; "+ data.data.message[value][error] + '<br/>';
+                }
+            }
+            if(typeof data.data.detail !== 'undefined'){
+                errors += " &nbsp; "+ data.data.detail + '<br/>';
+            }
+            document.getElementById("registerError").innerHTML = errors;
+            header.registerError = true;
+        }
+
+        function logout(){
+            Authentication.logout();
+            activate();
         }
 
     }
