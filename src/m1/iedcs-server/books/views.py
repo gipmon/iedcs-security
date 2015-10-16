@@ -45,7 +45,7 @@ class OrderViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Gene
         B{List} the orders of the user
         B{URL:} ../api/v1/user_books/
         """
-        order_books = get_list_or_404(OrderBook.objects.all(), buyer=request.user)
+        order_books = OrderBook.objects.filter(buyer=request.user)
 
         books = [order_book.book for order_book in order_books]
 
