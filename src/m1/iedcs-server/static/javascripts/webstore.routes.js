@@ -12,7 +12,11 @@
             controller: 'WebSiteController',
             controllerAs: 'vm',
             templateUrl: '/static/templates/home.html/'
-        }).when('/:identifier' ,{
+        }).when('/myBooks/' ,{
+            controller: 'MyBooksController',
+            controllerAs: 'vm',
+            templateUrl: '/static/templates/myBooks.html'
+        }).when('/:identifier/' ,{
             controller: 'BookInfoController',
             controllerAs: 'vm',
             templateUrl: '/static/templates/bookInfo.html'

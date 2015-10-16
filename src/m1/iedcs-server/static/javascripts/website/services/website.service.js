@@ -11,7 +11,8 @@
         var WebSite = {
             getAllBooks: getAllBooks,
             getBook: getBook,
-            orderBook: orderBook
+            orderBook: orderBook,
+            getMyBooks: getMyBooks
 
         };
 
@@ -29,6 +30,10 @@
             return $http.post("/api/v1/user_books/", {
                 book_identifier: identifier
             });
+        }
+
+        function getMyBooks(){
+            return $http.get("/api/v1/user_books/");
         }
 
     }

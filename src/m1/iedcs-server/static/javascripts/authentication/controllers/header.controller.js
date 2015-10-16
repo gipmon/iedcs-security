@@ -24,13 +24,17 @@
             header.registerError = false;
 
             if(Authentication.isAuthenticated()){
-                console.log("entrei");
+
                 header.account = Authentication.getAuthenticatedAccount();
                 document.getElementById("demo").innerHTML ="Welcome " + header.account.first_name + " " + header.account.last_name +"!";
                 header.logged = true;
                 header.hide = false;
                 vm.logged = true;
                 vm.hide = false;
+                console.log("entrei");
+                if($location.url() == "/")
+                    $location.url('/home');
+
 
             }else{
                 header.logged = false;

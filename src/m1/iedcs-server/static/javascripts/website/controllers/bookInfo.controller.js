@@ -5,9 +5,9 @@
         .module('webstore.website.controllers')
         .controller('BookInfoController', BookInfoController);
 
-    BookInfoController.$inject = ['WebSite', '$scope', 'Authentication', '$routeParams'];
+    BookInfoController.$inject = ['WebSite', '$scope', 'Authentication', '$routeParams', '$location'];
 
-    function BookInfoController(WebSite, $scope, Authentication, $routeParams){
+    function BookInfoController(WebSite, $scope, Authentication, $routeParams, $location){
         var vm = this;
 
         vm.orderBook = orderBook;
@@ -51,7 +51,7 @@
             WebSite.orderBook(vm.id).then(orderSuccess, orderError);
 
             function orderSuccess(){
-
+                $location.url("/myBooks/");
             }
 
             function orderError(data){

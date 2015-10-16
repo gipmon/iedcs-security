@@ -5,9 +5,9 @@
         .module('webstore.website.controllers')
         .controller('WebSiteController', WebSiteController);
 
-    WebSiteController.$inject = ['WebSite', '$scope', 'Authentication'];
+    WebSiteController.$inject = ['WebSite', '$scope', 'Authentication', '$location'];
 
-    function WebSiteController(WebSite, $scope, Authentication){
+    function WebSiteController(WebSite, $scope, Authentication, $location){
         var vm = this;
 
         vm.orderBook = orderBook;
@@ -58,7 +58,7 @@
             WebSite.orderBook(identifier).then(orderSuccess, orderError);
 
             function orderSuccess(){
-
+                $location.url("/myBooks/");
             }
 
             function orderError(data){

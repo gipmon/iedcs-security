@@ -29,7 +29,6 @@
                     <span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
                 </button>
                 <a ng-if="header.logged" class="navbar-brand" href="/home/"><i class="fa fa-book fa-3"></i> Ebook Webstore </a>
                 <a ng-if="header.hide" class="navbar-brand" href="/"><i class="fa fa-book fa-3"></i> Ebook Webstore </a>
@@ -42,11 +41,9 @@
                         <a ng-if="header.logged" href="/home">Home</a>
                     </li>
                     <li>
-                        <a href="#">My Ebooks</a>
+                        <a href="/myBooks/">My Ebooks</a>
                     </li>
-                    <li>
-                        <a href="#">My Orders</a>
-                    </li>
+
                 </ul>
                 <ul class="nav navbar-nav navbar-right" ng-show="header.hide" ng-cloak>
                     <li class="dropdown">
