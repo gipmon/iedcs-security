@@ -1,6 +1,5 @@
 import json
 
-from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets, views, status, permissions
 from rest_framework.response import Response
@@ -122,7 +121,6 @@ class LoginView(views.APIView):
     - #### URL: **/api/v1/auth/login/**
     - #### Permissions: **Allow any**
     """
-    @csrf_exempt
     def post(self, request):
         """
         B{Login} an user

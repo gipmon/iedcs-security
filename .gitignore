@@ -6,8 +6,9 @@
 *.pyc
 
 # Directories #
-/build/
-/bin/
+src/m1/iedcs-player/Player/dist/*
+build/
+bin/
 target/
 
 # OS Files #
