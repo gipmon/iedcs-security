@@ -8,12 +8,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="595.0" prefWidth="592.0" stylesheets="@css/anchorpane.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="player.FXMLDocumentController">
+<AnchorPane id="AnchorPane" prefHeight="595.0" prefWidth="592.0" stylesheets="@css/anchorpane.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="player.FrontPageController">
    <children>
-      <TextField layoutX="178.0" layoutY="209.0" prefHeight="27.0" prefWidth="255.0" />
+      <TextField fx:id="login_email" layoutX="178.0" layoutY="209.0" prefHeight="27.0" prefWidth="255.0" />
       <Label layoutX="125.0" layoutY="214.0" text="E-mail" />
       <Label layoutX="104.0" layoutY="254.0" text="Password:" />
-      <TextField layoutX="178.0" layoutY="249.0" prefHeight="27.0" prefWidth="255.0" />
+      <TextField fx:id="login_password" layoutX="178.0" layoutY="249.0" prefHeight="27.0" prefWidth="255.0" />
       <Separator layoutX="26.0" layoutY="340.0" prefHeight="0.0" prefWidth="541.0" />
       <Label layoutX="60.0" layoutY="153.0" text="Login:">
           <font>
@@ -39,12 +39,12 @@
             <Image url="@img/1445058743_User.png" />
          </image>
       </ImageView>
-      <Button layoutX="255.0" layoutY="284.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="76.0" text="Login" />
+      <Button fx:id="login_button" onAction="#handleLogin" layoutX="255.0" layoutY="284.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="76.0" text="Login" />
       <Label layoutX="129.0" layoutY="391.0" text="You don't have an account?">
          <font>
             <Font name="Verdana" size="24.0" />
          </font>
       </Label>
-      <Button layoutX="200.0" layoutY="428.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="193.0" text="Make your account here!" />
+      <Button fx:id="register_button" onAction="#handleRegister"  layoutX="200.0" layoutY="434.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="193.0" text="Make your account here!" />
    </children>
 </AnchorPane>
