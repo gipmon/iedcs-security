@@ -26,7 +26,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 
@@ -94,8 +96,17 @@ public class MyBooksPageController implements Initializable {
             tableBooks.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override 
                 public void handle(MouseEvent event) {
-                    if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                        System.out.println(tableBooks.getSelectionModel().getSelectedItem());                   
+                    if (event.isPrimaryButtonDown()) {
+                        Node node = ((Node) event.getTarget()).getParent();
+                        TableRow row;
+                        if (node instanceof TableRow) {
+                            return; // do nothing
+                        } else {
+                            // clicking on text part
+                            // fazer aqui a transicao...
+                            row = (TableRow) node.getParent();
+                        }
+                        System.out.println(row.getItem());
                     }
                 }
             });
