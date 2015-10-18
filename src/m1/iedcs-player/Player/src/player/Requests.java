@@ -22,14 +22,23 @@ public class Requests {
     private static final String USER_AGENT = "Mozilla/5.0";
     private static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
     private static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
+    private static JSONObject USER;
     private static HttpClient client = HttpClientBuilder.create().build();
       
-    public static void login(String email, String password) throws MalformedURLException, ProtocolException, IOException{
+    public static Result login(String email, String password) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("email", email);
         parameters.put("password", password);
-        post(LOGIN_ENDPOINT, parameters);
-        get(ME_ENDPOINT);
+        Result rs = post(LOGIN_ENDPOINT, parameters);
+        
+        if(rs.getStatusCode()==200){
+            USER = rs.getResult();
+        }
+        return rs;
+    }
+    
+    public static JSONObject getUser(){
+        return USER;
     }
     
     public static void get(String url) throws MalformedURLException, ProtocolException, IOException{
@@ -74,7 +83,7 @@ public class Requests {
         fs.close();
     }
     
-    public static void post(String url, HashMap<String, String> parameters) throws MalformedURLException, ProtocolException, IOException{
+    public static Result post(String url, HashMap<String, String> parameters) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HttpPost post = new HttpPost(url);
 
         // add header
@@ -100,8 +109,7 @@ public class Requests {
         HttpResponse response = client.execute(post);
         System.out.println("\nSending 'POST' request to URL : " + url);
         System.out.println("Post parameters : " + post.getEntity());
-        System.out.println("Response Code : " + 
-                            response.getStatusLine().getStatusCode());
+        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
         
         // print cookies
 
@@ -117,9 +125,8 @@ public class Requests {
         System.out.println("\nGet Response Header By Key ...\n");
         String server = response.getFirstHeader("Server").getValue();
 
-        // output file
-        BufferedReader rd = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()));
+        // output file response, only for DEBUG!!!! REMOVE!!
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
         StringBuffer result = new StringBuffer();
         String line = "";
@@ -130,5 +137,9 @@ public class Requests {
         PrintWriter fs = new PrintWriter("output.html");
         fs.print(result.toString());
         fs.close();
+        
+        JSONObject response_json = new JSONObject(result.toString());
+        
+        return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
 }

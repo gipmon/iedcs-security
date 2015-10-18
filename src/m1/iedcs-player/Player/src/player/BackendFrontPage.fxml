@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="595.0" prefWidth="592.0" stylesheets="@css/anchorpane.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="player.BackendFrontPageController">
+   <children>
+      <ToolBar prefHeight="36.0" prefWidth="592.0">
+        <items>
+          <Button mnemonicParsing="false" text="User" />
+            <Button mnemonicParsing="false" text="My books" />
+            <Button onAction="#handleWebStoreBtn" mnemonicParsing="false" text="WebStore" />
+        </items>
+      </ToolBar>
+      <ImageView fitHeight="114.0" fitWidth="114.0" layoutX="239.0" layoutY="82.0">
+         <image>
+            <Image url="@img/1445141134_businessman.png" />
+         </image>
+      </ImageView>
+      <Label fx:id="name" layoutX="88.0" layoutY="226.0">
+            <font>
+                <Font name="Verdana" size="20.0" />
+            </font>
+      </Label>
+      <Label fx:id="email" layoutX="88.0" layoutY="258.0">
+            <font>
+                <Font name="Verdana" size="20.0" />
+            </font>
+      </Label>
+      <Label fx:id="username" layoutX="88.0" layoutY="289.0">
+            <font>
+                <Font name="Verdana" size="20.0" />
+            </font>
+      </Label>
+      <Label layoutX="113.0" layoutY="442.0" prefHeight="46.0" prefWidth="317.0" text="A book is a gift you can ">
+        <font>
+            <Font name="Verdana Italic" size="24.0" />
+        </font>
+      </Label>
+      <Label layoutX="186.0" layoutY="474.0" prefHeight="46.0" prefWidth="334.0" text="open again and again.">
+          <font>
+            <Font name="Verdana Italic" size="24.0" />
+        </font>
+      </Label>
+      <Label layoutX="361.0" layoutY="512.0" text="Garrison Keillor" />
+   </children>
+</AnchorPane>

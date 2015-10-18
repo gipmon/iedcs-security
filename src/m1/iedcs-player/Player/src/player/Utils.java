@@ -5,6 +5,7 @@ import java.awt.Desktop;
 import java.net.URI;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import org.json.JSONObject;
 
 public class Utils {
     public static void printExceptionStack(Exception e){
@@ -25,4 +26,5 @@ public class Utils {
             desktop.browse(new URI(uri));
         }
     }
+    
 }

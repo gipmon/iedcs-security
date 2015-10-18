@@ -9,14 +9,19 @@ import javafx.stage.Stage;
 
 public class Player extends Application {
     
+    static Stage thestage;
+    
     @Override
-    public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("FrontPage.fxml"));
+    public void start(Stage pstage) throws Exception {
+        thestage = pstage;
         
-        Scene scene = new Scene(root);
-        stage.getIcons().add(new Image("file:../img/1445058536_G12_Ebook.png"));
-        stage.setScene(scene);
-        stage.show();
+        // set first scene, the frontpage scene
+        Parent root = FXMLLoader.load(getClass().getResource("FrontPage.fxml"));
+        Scene scene_frontpage = new Scene(root);
+        
+        thestage.getIcons().add(new Image("file:../img/1445058536_G12_Ebook.png"));
+        thestage.setScene(scene_frontpage);
+        thestage.show();
     }
 
     /**
