@@ -48,9 +48,13 @@ public class FrontPageController implements Initializable {
             return;
         }
         
-        ArrayList<String> parameters = new ArrayList<String>();
         try{
-            Requests.login(login, password);
+            Result rs = Requests.login(login, password);
+            if(rs.getStatusCode()!=200){
+                System.out.println("E-mail or Password is wrong!");
+                login_button.setDisable(false);
+                return;
+            }
         }catch(Exception e){
             Utils.printExceptionStack(e);
         }

@@ -19,9 +19,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 public class Requests {
     
-    private static final String USER_AGENT = "Mozilla/5.0";
     private static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
     private static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
+    
     private static JSONObject USER;
     private static HttpClient client = HttpClientBuilder.create().build();
       
@@ -51,8 +51,7 @@ public class Requests {
         
         HttpResponse response = client.execute(get);
         System.out.println("\nSending 'GET' request to URL : " + url);
-        System.out.println("Response Code : " + 
-                            response.getStatusLine().getStatusCode());
+        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
         
         // print cookies
 
@@ -60,19 +59,16 @@ public class Requests {
 
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
-                System.out.println("Key : " + header.getName() 
-                           + " ,Value : " + header.getValue());
-
+            System.out.println("Key : " + header.getName() + " ,Value : " + header.getValue());
         }
 
         System.out.println("\nGet Response Header By Key ...\n");
         String server = response.getFirstHeader("Server").getValue();
 
         // output file
-        BufferedReader rd = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()));
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String line = "";
         while ((line = rd.readLine()) != null) {
                 result.append(line);
@@ -128,7 +124,7 @@ public class Requests {
         // output file response, only for DEBUG!!!! REMOVE!!
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String line = "";
         while ((line = rd.readLine()) != null) {
                 result.append(line);
