@@ -18,10 +18,9 @@
       </ToolBar>
       <TableView fx:id="tableBooks" layoutY="38.0" prefHeight="558.0" prefWidth="592.0">
         <columns>
-            <TableColumn fx:id="columnName" prefWidth="241.0" text="Name"/>
-            <TableColumn fx:id="columnAuthor" prefWidth="135.0" text="Author" />
-            <TableColumn fx:id="columnDate" prefWidth="128.0" text="Date" />
-            <TableColumn fx:id="columnView" prefWidth="87.0" text="View" />
+            <TableColumn fx:id="columnName" prefWidth="304.0" text="Name" />
+            <TableColumn fx:id="columnAuthor" prefWidth="192.0" text="Author" />
+            <TableColumn fx:id="columnDate" prefWidth="95.0" text="Date" />
         </columns>
       </TableView>
    </children>

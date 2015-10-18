@@ -25,15 +25,16 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 
 public class MyBooksPageController implements Initializable {
     @FXML TableView<BookEntry> tableBooks;
     @FXML TableColumn columnName;
     @FXML TableColumn columnAuthor;
     @FXML TableColumn columnDate;
-    @FXML TableColumn columnView;
     private final ObservableList<BookEntry> data = FXCollections.observableArrayList();  
 
     public class BookEntry {
@@ -41,14 +42,12 @@ public class MyBooksPageController implements Initializable {
         public SimpleStringProperty name = new SimpleStringProperty();
         public SimpleStringProperty production_date = new SimpleStringProperty();
         public SimpleStringProperty author = new SimpleStringProperty();
-        public SimpleObjectProperty<ViewBook> view;
         
         public BookEntry(String identifier, String name, String production_date, String author){
             this.identifier = new SimpleStringProperty(identifier);
             this.name = new SimpleStringProperty(name);
             this.production_date = new SimpleStringProperty(production_date);
             this.author = new SimpleStringProperty(author);
-            this.view = new SimpleObjectProperty(new ViewBook(identifier));
         }
         
         public String getIdentifier() {
@@ -69,22 +68,12 @@ public class MyBooksPageController implements Initializable {
         
     }
     
-    public class ViewBook extends Button{
-        private String identifier;
-        
-        public ViewBook(String identifier){
-            super("View");
-            this.identifier = identifier;
-        }
-    }
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
             columnName.setCellValueFactory(new PropertyValueFactory("name"));
             columnAuthor.setCellValueFactory(new PropertyValueFactory("author"));
             columnDate.setCellValueFactory(new PropertyValueFactory("production_date"));
-            columnView.setCellValueFactory(new PropertyValueFactory("view"));
             
             tableBooks.setItems(data);
             
@@ -101,6 +90,15 @@ public class MyBooksPageController implements Initializable {
                     data.add(new BookEntry(identifier, name, production_date, author));
                 }
             }
+            
+            tableBooks.setOnMousePressed(new EventHandler<MouseEvent>() {
+                @Override 
+                public void handle(MouseEvent event) {
+                    if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                        System.out.println(tableBooks.getSelectionModel().getSelectedItem());                   
+                    }
+                }
+            });
         } catch (ProtocolException ex) {
             Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
