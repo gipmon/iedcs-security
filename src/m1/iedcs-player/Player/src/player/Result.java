@@ -4,9 +4,9 @@ import org.json.JSONObject;
 
 public class Result{
     private final int status_code;
-    private final JSONObject result;
+    private final Object result;
 
-    public Result(int status_code, JSONObject result) {
+    public Result(int status_code, Object result) {
         this.status_code = status_code;
         this.result = result;
     }
@@ -15,7 +15,7 @@ public class Result{
         return this.status_code;
     }
 
-    public JSONObject getResult(){
+    public Object getResult(){
         return this.result;
     }
 }

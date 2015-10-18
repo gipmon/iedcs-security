@@ -19,8 +19,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 public class Requests {
     
-    private static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
-    private static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
+    static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
+    static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
+    static final String USER_BOOKS = IEDCSPlayer.getBaseUrl() + "api/v1/user_books/";
     
     private static JSONObject USER;
     private static HttpClient client = HttpClientBuilder.create().build();
@@ -32,7 +33,7 @@ public class Requests {
         Result rs = post(LOGIN_ENDPOINT, parameters);
         
         if(rs.getStatusCode()==200){
-            USER = rs.getResult();
+            USER = (JSONObject)rs.getResult();
         }
         return rs;
     }
@@ -41,7 +42,7 @@ public class Requests {
         return USER;
     }
     
-    public static void get(String url) throws MalformedURLException, ProtocolException, IOException{
+    public static Result get(String url) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HttpGet get = new HttpGet(url);
 
         // add header
@@ -77,6 +78,15 @@ public class Requests {
         PrintWriter fs = new PrintWriter("output.html");
         fs.print(result.toString());
         fs.close();
+        
+        Object response_json;
+        try{
+            response_json = new JSONObject(result.toString());
+        }catch(JSONException e){
+            response_json = new JSONArray(result.toString());
+        }
+        
+        return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
     
     public static Result post(String url, HashMap<String, String> parameters) throws MalformedURLException, ProtocolException, IOException, JSONException{
