@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="595.0" prefWidth="592.0" stylesheets="@css/anchorpane.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="player.MyBooksPageController">
+   <children>
+      <ToolBar prefHeight="36.0" prefWidth="592.0">
+        <items>
+          <Button mnemonicParsing="false" onAction="#handleUserBtn" text="User" />
+            <Button mnemonicParsing="false" onAction="#handleWebStoreBtn" text="WebStore" />
+        </items>
+      </ToolBar>
+      <TableView layoutY="38.0" prefHeight="558.0" prefWidth="592.0">
+        <columns>
+          <TableColumn prefWidth="241.0" text="Name" />
+          <TableColumn prefWidth="135.0" text="Author" />
+            <TableColumn prefWidth="128.0" text="Date" />
+            <TableColumn prefWidth="87.0" text="View" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>

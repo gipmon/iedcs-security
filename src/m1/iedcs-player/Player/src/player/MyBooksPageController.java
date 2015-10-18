@@ -15,21 +15,11 @@ import javafx.scene.control.Label;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class BackendFrontPageController implements Initializable {
-    @FXML private Label name = new Label();
-    @FXML private Label email = new Label();
-    @FXML private Label username = new Label();
+public class MyBooksPageController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
-            JSONObject user = Requests.getUser();
-            name.setText("Name: " + user.getString("first_name") + " " + user.getString("last_name"));
-            email.setText("E-mail: " + user.getString("email"));
-            username.setText("Username: " + user.getString("username"));
-        } catch (JSONException ex) {
-            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    
     }    
     
     @FXML
@@ -42,9 +32,9 @@ public class BackendFrontPageController implements Initializable {
     }
     
     @FXML
-    private void handleMyBooks(ActionEvent event) {
+    private void handleUserBtn(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("MyBooksPage.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("BackendFrontPage.fxml"));
             Scene scene = new Scene(root);
             Player.thestage.setScene(scene);
         } catch (IOException ex) {

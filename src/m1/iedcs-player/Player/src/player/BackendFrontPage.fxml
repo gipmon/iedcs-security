@@ -12,8 +12,7 @@
    <children>
       <ToolBar prefHeight="36.0" prefWidth="592.0">
         <items>
-          <Button mnemonicParsing="false" text="User" />
-            <Button mnemonicParsing="false" text="My books" />
+            <Button onAction="#handleMyBooks" mnemonicParsing="false" text="My books" />
             <Button onAction="#handleWebStoreBtn" mnemonicParsing="false" text="WebStore" />
         </items>
       </ToolBar>
