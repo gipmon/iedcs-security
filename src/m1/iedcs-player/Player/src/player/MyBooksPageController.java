@@ -103,7 +103,13 @@ public class MyBooksPageController implements Initializable {
                             return; // do nothing
                         } else {
                             // clicking on text part
-                            // fazer aqui a transicao...
+                            try {
+                                Parent root = FXMLLoader.load(getClass().getResource("ViewBook.fxml"));
+                                Scene scene = new Scene(root);
+                                Player.thestage.setScene(scene);
+                            } catch (IOException ex) {
+                                Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             row = (TableRow) node.getParent();
                         }
                         System.out.println(row.getItem());

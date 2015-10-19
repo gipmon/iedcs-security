@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="595.0" prefWidth="592.0" stylesheets="@css/anchorpane.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="player.ViewBookController">
+   <children>
+      <ToolBar prefHeight="36.0" prefWidth="592.0">
+        <items>
+          <Button mnemonicParsing="false" onAction="#handleUserBtn" text="User" />
+            <Button mnemonicParsing="false" onAction="#handleMyBooksBtn" text="My Books" />
+        </items>
+      </ToolBar>
+      <ScrollPane fx:id="viewer" layoutY="38.0" prefHeight="558.0" prefWidth="592.0">
+        <content>
+            <TextArea fx:id="textZone" prefHeight="595.0" prefWidth="592.0" />
+        </content>
+      </ScrollPane>
+   </children>
+</AnchorPane>
