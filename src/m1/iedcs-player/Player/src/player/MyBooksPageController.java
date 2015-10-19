@@ -96,7 +96,7 @@ public class MyBooksPageController implements Initializable {
             tableBooks.setOnMousePressed(new EventHandler<MouseEvent>() {
                 @Override 
                 public void handle(MouseEvent event) {
-                    if (event.isPrimaryButtonDown()) {
+                    if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                         Node node = ((Node) event.getTarget()).getParent();
                         TableRow row;
                         if (node instanceof TableRow) {
