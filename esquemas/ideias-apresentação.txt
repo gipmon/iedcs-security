@@ -1,0 +1,6 @@
+DK = PBKDF2(PRF, key, random1, iteration, dkLen)
+UUID
+maxmind geoip java
+o player só pode correr na localização onde foi instalado
+dm crypt or loopFS
+HMAC
