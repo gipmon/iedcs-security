@@ -1,10 +1,11 @@
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from rest_framework.response import Response
 from .models import Book, OrderBook
 from .serializers import BookSerializer, MakeOrderSerializer
+from .renders import PlainTextRenderer
 from rest_framework import permissions
-from rest_framework import viewsets, status, mixins
+from rest_framework import viewsets, status, mixins, views
 from django.db import transaction
 
 
@@ -87,3 +88,30 @@ class OrderViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Gene
         return Response({'status': 'Bad Request',
                          'message': serializer.errors},
                         status=status.HTTP_400_BAD_REQUEST)
+
+
+class BookView(views.APIView):
+    renderer_classes = (PlainTextRenderer,)
+
+    def get_permissions(self):
+        return permissions.IsAuthenticated(),
+
+    @staticmethod
+    def get(request, identifier):
+        """
+        B{Retrieve} the book
+        B{URL:} ../api/v1/get_book/<identifier>/
+
+        :type  identifier: str
+        :param identifier: The identifier
+        """
+        book = get_object_or_404(Book.objects.all(), identifier=identifier)
+        book_order = get_object_or_404(OrderBook.objects.all(), book=book, buyer=request.user)
+        book_content = book_order.book.original_file.read().decode('utf-8')
+        response = Response(book_content)
+        response["identifier"] = book_order.book.identifier
+        response["name"] = book_order.book.name
+        response["production_date"] = book_order.book.production_date
+        response["author"] = book_order.book.author
+        response["r2"] = "algo bue importante"
+        return response

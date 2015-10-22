@@ -16,3 +16,10 @@ class MakeOrderSerializer(serializers.ModelSerializer):
         model = OrderBook
         fields = ('book_identifier',)
         read_only_fields = ('book_identifier',)
+
+
+class GetBookSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Book
+        fields = ('identifier', 'name', 'production_date', 'author', 'original_file')
