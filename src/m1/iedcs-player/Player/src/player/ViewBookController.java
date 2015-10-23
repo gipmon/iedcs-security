@@ -40,7 +40,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 
 public class ViewBookController implements Initializable {
-    @FXML ScrollPane viewer;
     @FXML private TextArea textZone;
     private String identifier;
 
@@ -90,7 +89,7 @@ public class ViewBookController implements Initializable {
         try {
             Result rs = Requests.getBookContent(Requests.VIEW_BOOK, identifier);
             if(rs.getStatusCode()==200){
-                textZone.setText("");    
+                textZone.setText(rs.getResult().toString());    
             }
         } catch (ProtocolException ex) {
             Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);

@@ -14,10 +14,6 @@
             <Button mnemonicParsing="false" onAction="#handleMyBooksBtn" text="My Books" />
         </items>
       </ToolBar>
-      <ScrollPane fx:id="viewer" layoutY="38.0" prefHeight="558.0" prefWidth="592.0">
-        <content>
-            <TextArea fx:id="textZone" prefHeight="595.0" prefWidth="592.0" />
-        </content>
-      </ScrollPane>
+          <TextArea fx:id="textZone" AnchorPane.topAnchor="39.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </children>
 </AnchorPane>

@@ -151,7 +151,7 @@ public class Requests {
     }
     
     public static Result getBookContent(String url, String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{
-        HttpGet get = new HttpGet(url+identifier);
+        HttpGet get = new HttpGet(url+identifier+"/");
 
         // add header
         get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
@@ -159,7 +159,7 @@ public class Requests {
         get.setHeader("Content-Type", "application/json;charset=UTF-8");
         
         HttpResponse response = client.execute(get);
-        System.out.println("\nSending 'GET' request to URL : " + url+identifier);
+        System.out.println("\nSending 'GET' request to URL : " + url+identifier+"/");
         System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
         
         // print cookies
@@ -180,14 +180,14 @@ public class Requests {
         String line = "";
         while ((line = rd.readLine()) != null) {
                 result.append(line);
+                result.append("\n");
         }
 
         PrintWriter fs = new PrintWriter("output.html");
         fs.print(result.toString());
         fs.close();
         
-        String text = "";
-        return (new Result(response.getStatusLine().getStatusCode(), text));
+        return (new Result(response.getStatusLine().getStatusCode(), result.toString()));
         
     }
 }
