@@ -22,6 +22,7 @@ public class Requests {
     static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
     static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
     static final String USER_BOOKS = IEDCSPlayer.getBaseUrl() + "api/v1/user_books/";
+    static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/get_book/";
     
     private static JSONObject USER;
     private static HttpClient client = HttpClientBuilder.create().build();
@@ -30,7 +31,7 @@ public class Requests {
         HashMap<String, String> parameters = new HashMap<String, String>();
         parameters.put("email", email);
         parameters.put("password", password);
-        Result rs = post(LOGIN_ENDPOINT, parameters);
+        Result rs = postJSON(LOGIN_ENDPOINT, parameters);
         
         if(rs.getStatusCode()==200){
             USER = (JSONObject)rs.getResult();
@@ -42,7 +43,7 @@ public class Requests {
         return USER;
     }
     
-    public static Result get(String url) throws MalformedURLException, ProtocolException, IOException, JSONException{
+    public static Result getJson(String url) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HttpGet get = new HttpGet(url);
 
         // add header
@@ -89,7 +90,7 @@ public class Requests {
         return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
     
-    public static Result post(String url, HashMap<String, String> parameters) throws MalformedURLException, ProtocolException, IOException, JSONException{
+    public static Result postJSON(String url, HashMap<String, String> parameters) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HttpPost post = new HttpPost(url);
 
         // add header
@@ -148,4 +149,46 @@ public class Requests {
         
         return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
+    
+    /*public static Result getBookContent(String url, String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{
+        HttpGet get = new HttpGet(url+identifier);
+
+        // add header
+        get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+        get.setHeader("Accept-Language", "application/json");
+        get.setHeader("Content-Type", "application/json;charset=UTF-8");
+        
+        HttpResponse response = client.execute(get);
+        System.out.println("\nSending 'GET' request to URL : " + url+identifier);
+        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
+        
+        // print cookies
+
+        System.out.println("Printing Response Header...\n");
+
+        Header[] headers = response.getAllHeaders();
+        for (Header header : headers) {
+            System.out.println("Key : " + header.getName() + " ,Value : " + header.getValue());
+        }
+
+        System.out.println("\nGet Response Header By Key ...\n");
+        String server = response.getFirstHeader("Server").getValue();
+
+        // output file
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuilder result = new StringBuilder();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+                result.append(line);
+        }
+
+        PrintWriter fs = new PrintWriter("output.html");
+        fs.print(result.toString());
+        fs.close();
+        /*
+        response_json = "Ola";
+        return (new Result(response.getStatusLine().getStatusCode(), response_json));
+        
+    }*/
 }

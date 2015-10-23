@@ -31,6 +31,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+
 
 public class MyBooksPageController implements Initializable {
     @FXML TableView<BookEntry> tableBooks;
@@ -79,7 +81,7 @@ public class MyBooksPageController implements Initializable {
             
             tableBooks.setItems(data);
             
-            Result rs = Requests.get(Requests.USER_BOOKS);
+            Result rs = Requests.getJson(Requests.USER_BOOKS);
             if(rs.getStatusCode()==200){
                 JSONArray ja = (JSONArray)rs.getResult();
                 for (int i = 0 ; i < ja.length(); i++) {
@@ -104,15 +106,24 @@ public class MyBooksPageController implements Initializable {
                         } else {
                             // clicking on text part
                             try {
-                                Parent root = FXMLLoader.load(getClass().getResource("ViewBook.fxml"));
-                                Scene scene = new Scene(root);
+                                System.out.println(data);
+                                row = (TableRow) node.getParent();
+                                FXMLLoader loader = new FXMLLoader(getClass().getResource("ViewBook.fxml"));
+                                AnchorPane anchor = loader.load();
+                                ViewBookController controller = loader.getController();
+                                controller.setIdentifier(data.get(row.getIndex()).getIdentifier());
+                            
+                                //Parent root = FXMLLoader.load(getClass().getResource("ViewBook.fxml"));
+                                Scene scene = new Scene(anchor, 595.0, 592.0);
                                 Player.thestage.setScene(scene);
                             } catch (IOException ex) {
                                 Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            row = (TableRow) node.getParent();
+                            
+
+                           
                         }
-                        System.out.println(row.getItem());
+                       
                     }
                 }
             });
