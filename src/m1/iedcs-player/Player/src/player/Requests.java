@@ -181,13 +181,15 @@ public class Requests {
         while ((line = rd.readLine()) != null) {
                 result.append(line);
                 result.append("\n");
-        }
+        } 
 
         PrintWriter fs = new PrintWriter("output.html");
         fs.print(result.toString());
         fs.close();
         
-        return (new Result(response.getStatusLine().getStatusCode(), result.toString()));
+        BookContent book = new BookContent(headers, result.toString());
+        
+        return (new Result(response.getStatusLine().getStatusCode(), book));
         
     }
 }

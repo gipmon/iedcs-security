@@ -41,6 +41,7 @@ import javafx.scene.input.MouseEvent;
 
 public class ViewBookController implements Initializable {
     @FXML private TextArea textZone;
+    @FXML private Label title;
     private String identifier;
 
     public class Ebook{
@@ -59,7 +60,6 @@ public class ViewBookController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         textZone.setEditable(false);
-       
         
     }    
     
@@ -89,7 +89,13 @@ public class ViewBookController implements Initializable {
         try {
             Result rs = Requests.getBookContent(Requests.VIEW_BOOK, identifier);
             if(rs.getStatusCode()==200){
-                textZone.setText(rs.getResult().toString());    
+                BookContent obj = (BookContent) rs.getResult();
+                textZone.setText(obj.getContent());  
+                for(int i = 0; i<obj.getHeaders().length; i++){
+                    if(obj.getHeaders()[i].toString().contains("name")){
+                        title.setText(obj.getHeaders()[i].toString().substring(5));
+                    }
+                }
             }
         } catch (ProtocolException ex) {
             Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);

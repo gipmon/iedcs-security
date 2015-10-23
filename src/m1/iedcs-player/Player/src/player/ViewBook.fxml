@@ -12,8 +12,9 @@
         <items>
           <Button mnemonicParsing="false" onAction="#handleUserBtn" text="User" />
             <Button mnemonicParsing="false" onAction="#handleMyBooksBtn" text="My Books" />
+            <Label prefHeight="17.0" prefWidth="436.0" fx:id="title" text="Label" />
         </items>
       </ToolBar>
-          <TextArea fx:id="textZone" AnchorPane.topAnchor="39.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+          <TextArea fx:id="textZone" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="39.0" />
    </children>
 </AnchorPane>
