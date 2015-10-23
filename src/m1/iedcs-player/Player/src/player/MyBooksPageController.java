@@ -114,14 +114,12 @@ public class MyBooksPageController implements Initializable {
                                 controller.setIdentifier(data.get(row.getIndex()).getIdentifier());
                             
                                 //Parent root = FXMLLoader.load(getClass().getResource("ViewBook.fxml"));
-                                Scene scene = new Scene(anchor, 595.0, 592.0);
+                                Scene scene = new Scene(anchor);
                                 Player.thestage.setScene(scene);
                             } catch (IOException ex) {
                                 Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            
-
-                           
+                                
                         }
                        
                     }

@@ -60,20 +60,8 @@ public class ViewBookController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         textZone.setEditable(false);
-        /*
-        Result rs = Requests.getBookContent(Requests.USER_BOOKS, identifier);
-            if(rs.getStatusCode()==200){
-                JSONArray ja = (JSONArray)rs.getResult();
-                for (int i = 0 ; i < ja.length(); i++) {
-                    JSONObject obj = ja.getJSONObject(i);
-                    String identifier = obj.getString("identifier");
-                    String name = obj.getString("name");
-                    String production_date = obj.getString("production_date");
-                    String author = obj.getString("author");                    
-                    System.out.println(identifier + " " + name + " " + production_date + " " + author);
-                    data.add(new MyBooksPageController.BookEntry(identifier, name, production_date, author));
-                }
-            }*/
+       
+        
     }    
     
     @FXML
@@ -99,7 +87,19 @@ public class ViewBookController implements Initializable {
     }
     
     public void setIdentifier(String identifier){
-        textZone.setText(identifier);
+        try {
+            Result rs = Requests.getBookContent(Requests.VIEW_BOOK, identifier);
+            if(rs.getStatusCode()==200){
+                textZone.setText("");    
+            }
+        } catch (ProtocolException ex) {
+            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
     }
     
 }

@@ -150,7 +150,7 @@ public class Requests {
         return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
     
-    /*public static Result getBookContent(String url, String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{
+    public static Result getBookContent(String url, String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HttpGet get = new HttpGet(url+identifier);
 
         // add header
@@ -173,7 +173,6 @@ public class Requests {
 
         System.out.println("\nGet Response Header By Key ...\n");
         String server = response.getFirstHeader("Server").getValue();
-
         // output file
         BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
@@ -186,9 +185,9 @@ public class Requests {
         PrintWriter fs = new PrintWriter("output.html");
         fs.print(result.toString());
         fs.close();
-        /*
-        response_json = "Ola";
-        return (new Result(response.getStatusLine().getStatusCode(), response_json));
         
-    }*/
+        String text = "";
+        return (new Result(response.getStatusLine().getStatusCode(), text));
+        
+    }
 }
