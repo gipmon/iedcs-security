@@ -1,6 +1,9 @@
 package player;
 
+import player.api.Utils;
+import player.api.Requests;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -34,10 +37,12 @@ public class BackendFrontPageController implements Initializable {
     
     @FXML
     private void handleWebStoreBtn(ActionEvent event) {
-        try{
+        try {
             Utils.openBrowser(IEDCSPlayer.getBaseUrl());
-        }catch(Exception e){
-            Utils.printExceptionStack(e);
+        } catch (IOException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

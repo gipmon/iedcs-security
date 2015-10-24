@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.hyperic.sigar.cmd;
+package sigar;
 
 import java.io.File;
 import java.util.Iterator;

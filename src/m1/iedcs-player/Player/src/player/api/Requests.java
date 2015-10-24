@@ -1,4 +1,4 @@
-package player;
+package player.api;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,13 +16,14 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import player.IEDCSPlayer;
 
 public class Requests {
     
-    static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
-    static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
-    static final String USER_BOOKS = IEDCSPlayer.getBaseUrl() + "api/v1/user_books/";
-    static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/get_book/";
+    public static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
+    public static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
+    public static final String USER_BOOKS = IEDCSPlayer.getBaseUrl() + "api/v1/user_books/";
+    public static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/get_book/";
     
     private static JSONObject USER;
     private static HttpClient client = HttpClientBuilder.create().build();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.hyperic.sigar.cmd;
+package sigar;
 
 import java.util.Arrays;
 import java.util.Collection;

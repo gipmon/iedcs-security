@@ -1,7 +1,11 @@
 package player;
 
+import player.api.Utils;
+import player.api.Requests;
+import player.api.Result;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -10,10 +14,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.Button;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,10 +27,12 @@ public class FrontPageController implements Initializable {
     
     @FXML
     private void handleRegister(ActionEvent event) {
-        try{
+        try {
             Utils.openBrowser(IEDCSPlayer.getBaseUrl());
-        }catch(Exception e){
-            Utils.printExceptionStack(e);
+        } catch (IOException ex) {
+            Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -56,7 +60,7 @@ public class FrontPageController implements Initializable {
                 return;
             }
         }catch(Exception e){
-            Utils.printExceptionStack(e);
+            Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, e);
         }
         
         login_button.setDisable(false);
