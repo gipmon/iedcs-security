@@ -3,19 +3,19 @@ package player;
 import org.apache.http.Header;
 
 public class BookContent {
-    static Header headers[];
-    static String content;
+    private static Header headers[];
+    private static String content;
     
-    public BookContent(Header headers[], String content){
-        this.headers = headers;
-        this.content = content;
+    public BookContent(Header h[], String c){
+        headers = h;
+        content = c;
     }
     
     public Header[] getHeaders(){
-        return this.headers;
+        return headers;
     }
     
     public String getContent(){
-        return this.content;
+        return content;
     }
 }
