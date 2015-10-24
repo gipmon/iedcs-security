@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.hyperic.sigar.NetInterfaceConfig;
 import org.hyperic.sigar.SigarException;
+import player.security.ComputerDetails;
 
 public class Player extends Application {
     
@@ -43,7 +44,6 @@ public class Player extends Application {
             */
             // verificar assinatura
             
-            
             // if private key don't exists
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(2048);
@@ -55,10 +55,15 @@ public class Player extends Application {
             PlayerKeyStore.storeKey("privateKeyDevice", privateKeyDevice);
             
             // unique identifier
+            System.out.println(ComputerDetails.getCpu_mhz());
+            System.out.println(ComputerDetails.getCpu_model());
+            System.out.println(ComputerDetails.getCpu_total_cpus());
+            System.out.println(ComputerDetails.getCpu_vendor());
+            System.out.println(ComputerDetails.getMac_address());
+            System.out.println(ComputerDetails.getPublicIP());
             
-            
+            System.out.println(ComputerDetails.getUniqueIdentifier());
             // public key player
-            
             
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);

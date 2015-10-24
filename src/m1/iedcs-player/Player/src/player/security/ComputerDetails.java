@@ -5,13 +5,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.hyperic.sigar.NetInterfaceConfig;
 import org.hyperic.sigar.SigarException;
 import sigar.*;
+import java.util.Base64;
 
 public class ComputerDetails extends SigarCommandBase{
     private static String mac_address;
@@ -19,7 +23,25 @@ public class ComputerDetails extends SigarCommandBase{
     private static String cpu_model;
     private static int cpu_mhz;
     private static int cpu_total_cpus;
-    private static String sn_motherboard;
+    private static ComputerDetails singleton = null;
+    
+    static{
+        File a = new File("lib");
+        try {
+            System.setProperty( "java.library.path", a.getCanonicalPath() );
+            singleton = new ComputerDetails();
+        } catch (IOException ex) {
+            System.out.println(System.getProperty("java.library.path"));
+            System.out.println(a.isDirectory());
+            try {
+                System.out.println(a.getCanonicalPath());
+            } catch (IOException e) {
+                Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, e);
+            }
+            Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     
     public ComputerDetails(){
         super();
@@ -34,8 +56,6 @@ public class ComputerDetails extends SigarCommandBase{
             cpu_model = info.getModel();
             cpu_mhz = info.getMhz();
             cpu_total_cpus = info.getTotalCores();
-            
-            sn_motherboard = getMotherboardSN();
             
         } catch (SigarException ex) {
             Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, ex);
@@ -57,42 +77,46 @@ public class ComputerDetails extends SigarCommandBase{
         return "";
     }
     
-    public static String getMotherboardSN() {
-        // http://www.rgagnon.com/javadetails/java-0580.html
-        String result = "";
-        try {
-            File file = File.createTempFile("realhowto",".vbs");
-            file.deleteOnExit();
-            FileWriter fw = new java.io.FileWriter(file);
-
-            String vbs =
-               "Set objWMIService = GetObject(\"winmgmts:\\\\.\\root\\cimv2\")\n"
-              + "Set colItems = objWMIService.ExecQuery _ \n"
-              + "   (\"Select * from Win32_BaseBoard\") \n"
-              + "For Each objItem in colItems \n"
-              + "    Wscript.Echo objItem.SerialNumber \n"
-              + "    exit for  ' do the first cpu only! \n"
-              + "Next \n";
-
-            fw.write(vbs);
-            fw.close();
-            Process p = Runtime.getRuntime().exec("cscript //NoLogo " + file.getPath());
-            BufferedReader input = new BufferedReader (new InputStreamReader(p.getInputStream()));
-            String line;
-            while ((line = input.readLine()) != null) {
-               result += line;
-            }
-            input.close();
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        return result.trim();
-    }
-    
     @Override
     public void output(String[] args) throws SigarException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    public static String getMac_address() {
+        return mac_address;
+    }
+
+    public static String getCpu_vendor() {
+        return cpu_vendor;
+    }
+
+    public static String getCpu_model() {
+        return cpu_model;
+    }
+
+    public static int getCpu_mhz() {
+        return cpu_mhz;
+    }
+
+    public static int getCpu_total_cpus() {
+        return cpu_total_cpus;
+    }
     
+    public static String getUniqueIdentifier(){
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            String unique_identifier = mac_address + cpu_vendor + cpu_mhz + cpu_model + cpu_total_cpus;
+            
+            md.update(unique_identifier.getBytes("UTF-8"));
+            byte[] digest = md.digest();
+            
+            String encoded = Base64.getEncoder().encodeToString(digest);
+            
+            return encoded;
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
+        return "";
+    }
 }
