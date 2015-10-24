@@ -78,3 +78,6 @@ local.properties
 .buildpath
 
 db.sqlite3
+
+# KeyStore
+*.KeyStore
