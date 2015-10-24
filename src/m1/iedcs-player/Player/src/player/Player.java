@@ -12,8 +12,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.hyperic.sigar.NetInterfaceConfig;
-import org.hyperic.sigar.SigarException;
 import player.security.ComputerDetails;
 
 public class Player extends Application {
