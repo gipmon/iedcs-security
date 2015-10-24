@@ -1,6 +1,9 @@
 # Vagrant #
 .vagrant
 
+# /output.html
+output.html
+
 # idea
 .idea
 *.pyc

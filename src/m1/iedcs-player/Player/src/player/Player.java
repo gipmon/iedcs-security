@@ -41,6 +41,8 @@ public class Player extends Application {
             - unique identifier
             - public key player
             */
+            // verificar assinatura
+            
             
             // if private key don't exists
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
@@ -56,6 +58,7 @@ public class Player extends Application {
             
             
             // public key player
+            
             
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
