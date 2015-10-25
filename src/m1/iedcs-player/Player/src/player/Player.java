@@ -48,7 +48,6 @@ public class Player extends Application {
             // verificar assinatura
             String s = null;
             
-
             File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             System.out.println(codeBase.getPath());
             Process p = Runtime.getRuntime().exec("jarsigner -verify -keystore JarSignature.KeyStore " + codeBase.getPath());
@@ -56,7 +55,16 @@ public class Player extends Application {
             BufferedReader stderror  = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             System.out.println("Here is the standard output of the command:\n");
             while((s = stdinput.readLine()) != null){
-                System.out.println(s);
+                String[] aux = s.split(".");
+                /*for(int i = 0; i<aux.length; i++){
+                    if(aux[i] == "jar is unsigned"){
+                        System.out.println("nao esta assinado");
+                    }else if(aux[i] == "jar is signed"){
+                        System.out.println("esta assinado");
+                    }else{
+                        System.out.println("salta");
+                    }
+                }*/
             }
             
             System.out.println("Here is the standard error of the command:\n");
