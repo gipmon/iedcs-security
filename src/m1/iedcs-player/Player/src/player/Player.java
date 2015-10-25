@@ -94,7 +94,6 @@ public class Player extends Application {
             System.out.println(ComputerDetails.getUniqueIdentifier());
             // public key player
             PublicKey key_Test_apagar = PlayerPublicKey.getKey();
-            System.out.print("");
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }
