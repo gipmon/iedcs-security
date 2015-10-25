@@ -45,7 +45,10 @@ public class Player extends Application {
             - unique identifier
             - public key player
             */
+            
+            
             // verificar assinatura
+            /*
             String s = null;
             
             File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -64,13 +67,14 @@ public class Player extends Application {
                     }else{
                         System.out.println("salta");
                     }
-                }*/
+                }*
             }
             
             System.out.println("Here is the standard error of the command:\n");
             while((s = stderror.readLine()) != null){
                 System.out.println(s);
             }
+            */
 
             // if private key don't exists
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
