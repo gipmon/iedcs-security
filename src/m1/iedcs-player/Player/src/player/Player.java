@@ -54,23 +54,15 @@ public class Player extends Application {
             BufferedReader stdinput  = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader stderror  = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             System.out.println("Here is the standard output of the command:\n");
-            while((s = stdinput.readLine()) != null){
-                String[] aux = s.split(".");
-                /*for(int i = 0; i<aux.length; i++){
-                    if(aux[i] == "jar is unsigned"){
-                        System.out.println("nao esta assinado");
-                    }else if(aux[i] == "jar is signed"){
-                        System.out.println("esta assinado");
-                    }else{
-                        System.out.println("salta");
-                    }
-                }*/
+            s = stdinput.readLine();
+            System.out.println(s);
+              
+            if(s.toLowerCase().contains("jar is unsigned".toLowerCase())){
+                System.exit(0);
+            }else if(s.toLowerCase().contains("jar verified".toLowerCase())){
+                System.out.println("esta assinado");
             }
-            
-            System.out.println("Here is the standard error of the command:\n");
-            while((s = stderror.readLine()) != null){
-                System.out.println(s);
-            }
+             
 
             // if private key don't exists
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
