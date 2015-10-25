@@ -45,7 +45,10 @@ public class Player extends Application {
             - unique identifier
             - public key player
             */
+            
+            
             // verificar assinatura
+            /*
             String s = null;
             
             File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -63,6 +66,10 @@ public class Player extends Application {
                 System.out.println("esta assinado");
             }
              
+
+
+            */
+
 
             // if private key don't exists
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
