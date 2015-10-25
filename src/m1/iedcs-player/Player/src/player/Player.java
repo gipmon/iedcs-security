@@ -1,5 +1,10 @@
 package player;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import player.security.PlayerKeyStore;
 import java.security.Key;
 import java.security.KeyPair;
@@ -31,7 +36,7 @@ public class Player extends Application {
         thestage.show();
     }
 
-    private static void initSecurityResources(){
+    private static void initSecurityResources() throws URISyntaxException, IOException{
         try {
             /* aqui deve carregar o keyStore, verificar se tem o ficheiro e carregar as chaves
             que ele conhece:
@@ -41,7 +46,24 @@ public class Player extends Application {
             - public key player
             */
             // verificar assinatura
+            String s = null;
             
+
+            File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            System.out.println(codeBase.getPath());
+            Process p = Runtime.getRuntime().exec("jarsigner -verify -keystore JarSignature.KeyStore " + codeBase.getPath());
+            BufferedReader stdinput  = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader stderror  = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            System.out.println("Here is the standard output of the command:\n");
+            while((s = stdinput.readLine()) != null){
+                System.out.println(s);
+            }
+            
+            System.out.println("Here is the standard error of the command:\n");
+            while((s = stderror.readLine()) != null){
+                System.out.println(s);
+            }
+
             // if private key don't exists
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(2048);
