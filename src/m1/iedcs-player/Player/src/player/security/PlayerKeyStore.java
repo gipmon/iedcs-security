@@ -61,7 +61,7 @@ public class PlayerKeyStore {
             // store away the keystore
             FileOutputStream fos = null;
             try {
-                fos = new java.io.FileOutputStream("Player.KeyStore");
+                fos = new java.io.FileOutputStream(filename);
                 ks.store(fos, password);
             } catch (IOException | CertificateException ex) {
                 Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
