@@ -26,6 +26,12 @@ class AccountManager(BaseUserManager):
 
         return account
 
+class UserCollectedData(models.Model):
+    cpu_model = models.CharField(max_length=128, default="")
+    op_system = models.CharField(max_length=128, default="")
+    ip = models.CharField(max_length=128, default="")
+    country = models.CharField(max_length=128, default="")
+    timezone = models.CharField(max_length=128, default="")
 
 class Account(AbstractBaseUser):
     email = models.EmailField(unique=True, blank=False, validators=[EmailValidator])
@@ -36,6 +42,8 @@ class Account(AbstractBaseUser):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    user_data = models.ForeignKey(UserCollectedData, blank=True)
 
     objects = AccountManager()
 
@@ -50,3 +58,7 @@ class Account(AbstractBaseUser):
 
     def get_short_name(self):
         return self.first_name
+
+
+
+

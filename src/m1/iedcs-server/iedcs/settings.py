@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'authentication',
     'books',
     'files',
+    'restrictions'
 )
 
 MIDDLEWARE_CLASSES = (
