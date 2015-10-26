@@ -67,11 +67,8 @@ public class Player extends Application {
             }else if(s.toLowerCase().contains("jar verified".toLowerCase())){
                 System.out.println("esta assinado");
             }
-             
-
 
             */
-
 
             // if private key don't exists
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");

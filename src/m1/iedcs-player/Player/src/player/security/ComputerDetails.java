@@ -25,21 +25,14 @@ public class ComputerDetails extends SigarCommandBase{
     private static ComputerDetails singleton = null;
     
     static{
-        File a = new File("lib");
+        File a = new File("sigar");
         try {
-            System.setProperty( "java.library.path", a.getCanonicalPath() );
-            singleton = new ComputerDetails();
+            System.setProperty( "java.library.path", a.getCanonicalPath());
         } catch (IOException ex) {
-            System.out.println(System.getProperty("java.library.path"));
-            System.out.println(a.isDirectory());
-            try {
-                System.out.println(a.getCanonicalPath());
-            } catch (IOException e) {
-                Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, e);
-            }
             Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        System.out.println(System.getProperty("java.library.path"));
+        singleton = new ComputerDetails();
     }
     
     public ComputerDetails(){
