@@ -22,6 +22,7 @@ public class ComputerDetails extends SigarCommandBase{
     private static String cpu_model;
     private static int cpu_mhz;
     private static int cpu_total_cpus;
+    private static String host_name;
     private static ComputerDetails singleton = null;
     
     static{
@@ -49,6 +50,8 @@ public class ComputerDetails extends SigarCommandBase{
             cpu_mhz = info.getMhz();
             cpu_total_cpus = info.getTotalCores();
             
+            org.hyperic.sigar.NetInfo net_info = this.sigar.getNetInfo();
+            host_name = net_info.getHostName();
         } catch (SigarException ex) {
             Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -92,6 +95,10 @@ public class ComputerDetails extends SigarCommandBase{
 
     public static int getCpu_total_cpus() {
         return cpu_total_cpus;
+    }
+    
+    public static String getHostName() {
+        return host_name;
     }
     
     public static String getUniqueIdentifier(){

@@ -88,6 +88,8 @@ public class Player extends Application {
             System.out.println(ComputerDetails.getMac_address());
             System.out.println(ComputerDetails.getPublicIP());
             
+            System.out.println(ComputerDetails.getHostName());
+            
             System.out.println(ComputerDetails.getUniqueIdentifier());
             // public key player
             PublicKey key_Test_apagar = PlayerPublicKey.getKey();
