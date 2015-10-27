@@ -17,7 +17,3 @@ class UserFiles(mixins.ListModelMixin, viewsets.GenericViewSet):
         files = get_list_or_404(File.objects.all(), buyer=request.user)
         serializer = self.serializer_class(files, many=True)
         return Response(serializer.data)
-
-
-class GetFile:
-    pass

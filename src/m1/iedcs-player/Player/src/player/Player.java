@@ -42,9 +42,9 @@ public class Player extends Application {
         try {
             /* aqui deve carregar o keyStore, verificar se tem o ficheiro e carregar as chaves
             que ele conhece:
-            - private key device
-            - public key device
-            - unique identifier
+            - private key device [x]
+            - public key device [x]
+            - unique identifier [x]
             - public key player
             */
             
