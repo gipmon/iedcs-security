@@ -4,7 +4,7 @@ from django.core.files.storage import default_storage
 from iedcs.settings import BASE_DIR
 from rest_framework.test import APIClient
 from collections import OrderedDict
-from authentication.models import Account
+from authentication.models import Account, UserCollectedData
 
 
 class BooksTestCase(TestCase):
@@ -18,7 +18,10 @@ class BooksTestCase(TestCase):
                                       production_date="2010-08-15",
                                       original_file=default_storage.path(BASE_DIR + '/media/books/pg33437.txt'))
 
-        self.a1 = Account.objects.create(email='test@test.com', username='test', first_name='unit', last_name='test')
+        self.ucd1 = UserCollectedData.objects.create(cpu_model="MacBook Pro", op_system="MacOS", ip="193.2.4.1",
+                                                     country="PT")
+
+        self.a1 = Account.objects.create(email='test@test.com', username='test', first_name='unit', last_name='test', user_data=self.ucd1)
 
     def test_books(self):
         client = APIClient()

@@ -1,11 +1,13 @@
 from django.test import TestCase
-from authentication.models import Account
+from authentication.models import Account, UserCollectedData
 from rest_framework.test import APIClient
 
 
 class AuthenticationTestCase(TestCase):
     def setUp(self):
-        Account.objects.create(email='test@test.com', username='test', first_name='unit', last_name='test')
+        self.ucd1 = UserCollectedData.objects.create(cpu_model="MacBook Pro", op_system="MacOS", ip="193.2.4.1",
+                                                     country="PT")
+        Account.objects.create(email='test@test.com', username='test', first_name='unit', last_name='test', user_data=self.ucd1)
 
     def test_account_details(self):
         account = Account.objects.get(email='test@test.com')

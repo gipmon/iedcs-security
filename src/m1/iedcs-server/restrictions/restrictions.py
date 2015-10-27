@@ -1,11 +1,19 @@
 
-def restriction_production_date(book, user_data):
-    if user_data["country"] == "pt":
+def restriction_country(book, user_data):
+    if user_data.country == "PT":
         return False
-        pass
-        print "estou aqui"
+    elif user_data.country == "NL":
+        return False
+    else:
+        return True
 
-methods = {'restriction_production_date': restriction_production_date}
+def restriction_cpu_model(book, user_data):
+    if user_data.cpu_model == "MacBookAir":
+        return False
+    else:
+        return True
+
+methods = {'restriction_country': restriction_country, 'restriction_cpu_model': restriction_cpu_model}
 
 def test_restriction(function_name, book, user_data):
     try:
