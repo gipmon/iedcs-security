@@ -7,6 +7,8 @@ from .renders import PlainTextRenderer
 from rest_framework import permissions
 from rest_framework import viewsets, status, mixins, views
 from django.db import transaction
+from restrictions.restrictions import test_restriction
+from restrictions.models import BookRestrictions
 
 
 class BooksViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -107,6 +109,12 @@ class BookView(views.APIView):
         """
         book = get_object_or_404(Book.objects.all(), identifier=identifier)
         book_order = get_object_or_404(OrderBook.objects.all(), book=book, buyer=request.user)
+
+        can = True
+
+        for book_restriction in BookRestrictions.objects.filter(book=book):
+            can &= test_restriction(book_restriction.restriction.restrictionFunction, book, request.user.user_data)
+
         book_content = book_order.book.original_file.read().decode('utf-8')
         response = Response(book_content)
         response["identifier"] = book_order.book.identifier
@@ -115,3 +123,5 @@ class BookView(views.APIView):
         response["author"] = book_order.book.author
         response["r2"] = "algo bue importante"
         return response
+
+
