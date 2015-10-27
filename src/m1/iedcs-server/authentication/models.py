@@ -15,11 +15,14 @@ class AccountManager(BaseUserManager):
         if not kwargs.get('last_name'):
             raise ValueError('User must have a valid Last Name')
 
+        user_data = UserCollectedData.objects.create()
+
         account = self.model(
             email=self.normalize_email(email),
             username=kwargs.get('username'),
             first_name=kwargs.get('first_name'),
-            last_name=kwargs.get('last_name'))
+            last_name=kwargs.get('last_name'),
+            user_data=user_data)
 
         account.set_password(password)
         account.save()
@@ -45,7 +48,9 @@ class Account(AbstractBaseUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
     user_data = models.ForeignKey('UserCollectedData', db_index=True, blank=True)
+
 
     objects = AccountManager()
 

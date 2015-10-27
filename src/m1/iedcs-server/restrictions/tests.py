@@ -28,6 +28,3 @@ class RestrictionsTestCase(TestCase):
         #testar restriction
         self.assertEqual(test_restriction(r1.restrictionFunction, rb1.book, self.ucd1), False)
         self.assertEqual(test_restriction(r2.restrictionFunction, rb2.book, self.ucd1), True)
-
-
-

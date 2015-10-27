@@ -8,7 +8,7 @@ def restriction_country(book, user_data):
         return True
 
 def restriction_cpu_model(book, user_data):
-    if user_data.cpu_model == "MacBookAir":
+    if user_data.cpu_model == "MacBook Air":
         return False
     else:
         return True
