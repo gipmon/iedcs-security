@@ -10,4 +10,3 @@ class FileSerializer(serializers.ModelSerializer):
         model = File
         fields = ('identifier', 'book',)
         read_only_fields = ('identifier', 'book',)
-

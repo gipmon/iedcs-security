@@ -5,13 +5,16 @@ from authentication.views import AccountViewSet, LoginView, LogoutView, AccountC
 from books.views import BooksViewSet, OrderViewSet, BookView
 from files.views import UserFiles
 from rest_framework import routers
-
+from players.views import DeviceViewSet, DeviceRetrieveView
 
 router_base = routers.SimpleRouter()
 router_base.register(r'accounts', AccountViewSet)
 router_base.register(r'change_password', AccountChangePassword)
 router_base.register(r'books', BooksViewSet)
 router_base.register(r'user_books', OrderViewSet)
+router_base.register(r'devices', DeviceViewSet)
+router_base.register(r'retrieveDevice', DeviceRetrieveView)
+
 
 router_files = routers.SimpleRouter()
 router_files.register(r'user', UserFiles)

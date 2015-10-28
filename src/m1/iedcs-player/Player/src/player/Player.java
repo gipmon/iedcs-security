@@ -80,17 +80,6 @@ public class Player extends Application {
             PlayerKeyStore.storeKey("publicKeyDevice", publicKeyDevice);
             PlayerKeyStore.storeKey("privateKeyDevice", privateKeyDevice);
             
-            // unique identifier
-            System.out.println(ComputerDetails.getCpu_mhz());
-            System.out.println(ComputerDetails.getCpu_model());
-            System.out.println(ComputerDetails.getCpu_total_cpus());
-            System.out.println(ComputerDetails.getCpu_vendor());
-            System.out.println(ComputerDetails.getMac_address());
-            System.out.println(ComputerDetails.getPublicIP());
-            
-            System.out.println(ComputerDetails.getHostName());
-            
-            System.out.println(ComputerDetails.getUniqueIdentifier());
             // public key player
             PublicKey key_Test_apagar = PlayerPublicKey.getKey();
         } catch (NoSuchAlgorithmException ex) {

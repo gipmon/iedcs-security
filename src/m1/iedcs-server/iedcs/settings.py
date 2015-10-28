@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'books',
     'files',
     'restrictions',
+    'players',
 )
 
 MIDDLEWARE_CLASSES = (

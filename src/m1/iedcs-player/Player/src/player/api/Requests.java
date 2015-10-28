@@ -8,6 +8,7 @@ import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import org.json.*;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -17,6 +18,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import player.IEDCSPlayer;
+import player.security.ComputerDetails;
 
 public class Requests {
     
@@ -27,6 +29,7 @@ public class Requests {
     
     private static JSONObject USER;
     private static HttpClient client = HttpClientBuilder.create().build();
+    private static String csrftoken = "";
       
     public static Result login(String email, String password) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HashMap<String, String> parameters = new HashMap<String, String>();
@@ -34,8 +37,38 @@ public class Requests {
         parameters.put("password", password);
         Result rs = postJSON(LOGIN_ENDPOINT, parameters);
         
+        // unique identifier
+        
+        System.out.println(ComputerDetails.getCpu_mhz());
+        System.out.println(ComputerDetails.getCpu_model());
+        System.out.println(ComputerDetails.getCpu_total_cpus());
+        System.out.println(ComputerDetails.getCpu_vendor());
+        System.out.println(ComputerDetails.getMac_address());
+        System.out.println(ComputerDetails.getPublicIP());
+
+        System.out.println(ComputerDetails.getHostName());
+
+        
         if(rs.getStatusCode()==200){
             USER = (JSONObject)rs.getResult();
+            
+            // verificar se o player ja esta registado
+            parameters = new HashMap<String, String>();
+            parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
+            Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/retrieveDevice/", parameters);
+            
+            if(rs_player.getStatusCode()==404){
+                parameters = new HashMap<String, String>();
+                parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
+                parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
+                parameters.put("op_system", ComputerDetails.getCpu_model());
+                parameters.put("ip", ComputerDetails.getPublicIP());
+                // parameters.put("country", );
+                // parameters.put("timezone", );
+                parameters.put("host_name", ComputerDetails.getHostName());
+                // parameters.put("public_key", );
+                rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
+            }
         }
         return rs;
     }
@@ -99,6 +132,10 @@ public class Requests {
         post.setHeader("Accept-Language", "application/json");
         post.setHeader("Content-Type", "application/json;charset=UTF-8");
         
+        if(csrftoken.length()>0){
+            post.setHeader("X-CSRFToken", csrftoken);
+        }
+        
         // to parse parameters to JSON 
         JSONObject json_obj=new JSONObject();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
@@ -125,9 +162,12 @@ public class Requests {
 
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
-                System.out.println("Key : " + header.getName() 
-                           + " ,Value : " + header.getValue());
-
+            String[] value_key = header.getValue().toString().split("=");
+            if(value_key.length == 5 && value_key[0].equals("csrftoken")){
+                csrftoken = value_key[1].split(";")[0];
+            }
+            System.out.println("Key : " + header.getName() 
+                       + " ,Value : " + header.getValue());
         }
 
         System.out.println("\nGet Response Header By Key ...\n");
@@ -146,7 +186,12 @@ public class Requests {
         fs.print(result.toString());
         fs.close();
         
-        JSONObject response_json = new JSONObject(result.toString());
+        Object response_json;
+        try{
+            response_json = new JSONObject(result.toString());
+        }catch(JSONException e){
+            response_json = new JSONArray(result.toString());
+        }
         
         return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
