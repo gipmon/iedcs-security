@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.security.PublicKey;
+import java.util.Base64;
 import org.json.*;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -19,6 +21,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import player.IEDCSPlayer;
 import player.security.ComputerDetails;
+import player.security.PlayerKeyStore;
+import player.security.PlayerPublicKey;
 
 public class Requests {
     
@@ -57,7 +61,7 @@ public class Requests {
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
             Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/retrieveDevice/", parameters);
             
-            if(rs_player.getStatusCode()==404){
+            if(rs_player.getStatusCode()!=200){
                 parameters = new HashMap<String, String>();
                 parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
                 parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
@@ -66,7 +70,9 @@ public class Requests {
                 // parameters.put("country", );
                 // parameters.put("timezone", );
                 parameters.put("host_name", ComputerDetails.getHostName());
-                // parameters.put("public_key", );
+                
+                PublicKey key = PlayerKeyStore.getKey();
+                parameters.put("public_key", Base64.getEncoder().encodeToString(key.getEncoded()));
                 rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
             }
         }

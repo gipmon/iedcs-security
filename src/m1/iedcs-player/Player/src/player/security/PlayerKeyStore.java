@@ -4,12 +4,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.KeyStore.ProtectionParameter;
 import java.security.KeyStore.SecretKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.SecretKey;
@@ -85,14 +90,20 @@ public class PlayerKeyStore {
         }
     }
     
-    public static void getKey(){
-        
+    public static PublicKey getKey(){
+        try {
             // get my private key
-            /*
+            SecretKeyEntry skEntry = (SecretKeyEntry) ks.getEntry("publicKeyDevice", protParam);
+            SecretKey myPrivateKey = skEntry.getSecretKey();
             
-            PrivateKeyEntry pkEntry = (PrivateKeyEntry) ks.getEntry("privateKeyAlias", protParam);
-            PrivateKey myPrivateKey = pkEntry.getPrivateKey();
-            */
-            // return key
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(myPrivateKey.getEncoded());
+            KeyFactory keyFactory = KeyFactory.getInstance(myPrivateKey.getAlgorithm());
+            PublicKey pubKey = keyFactory.generatePublic(keySpec);
+            return pubKey;
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException ex) {
+            Logger.getLogger(PlayerPublicKey.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
     }
 }

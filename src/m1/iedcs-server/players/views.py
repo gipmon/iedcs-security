@@ -6,7 +6,10 @@ from .serializers import CreateDeviceSerializer, DeviceSerializer, DeviceRetriev
 from rest_framework import permissions
 from rest_framework import viewsets, status, mixins
 from django.db import transaction
-import json
+import binascii
+from django.core.files.storage import default_storage
+from iedcs.settings import BASE_DIR
+from django.core.files.base import ContentFile
 
 
 class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
@@ -63,7 +66,11 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         serializer = CreateDeviceSerializer(data=request.data)
 
         if serializer.is_valid():
-            #public_key = serializer.data["public_key"]
+            public_key = serializer.data["public_key"]
+            byte_key = binascii.a2b_base64(public_key)
+
+            path = default_storage.save(BASE_DIR+'/media/devices/'+serializer.data["unique_identifier"]+'/device_pub.key',
+                                        ContentFile(byte_key))
 
             try:
                 with transaction.atomic():
@@ -74,9 +81,11 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                                           ip=serializer.data["ip"],
                                           #country=serializer.data["country"],
                                           #timezone=serializer.data["timezone"],
-                                          host_name=serializer.data["host_name"])#,
-                                          #public_key=public_key)
-                    return Response(json.dumps({"status": "ok"}), status=status.HTTP_201_CREATED)
+                                          host_name=serializer.data["host_name"],
+                                          public_key=path)
+                    return Response({'status': 'Created',
+                                     'message': 'The device has been registered'},
+                                    status=status.HTTP_201_CREATED)
 
             except IntegrityError:
                 return Response({'status': 'Bad request',
