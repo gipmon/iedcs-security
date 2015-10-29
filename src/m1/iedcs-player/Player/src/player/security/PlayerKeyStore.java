@@ -27,7 +27,7 @@ public class PlayerKeyStore {
     
     // https://docs.oracle.com/javase/7/docs/api/java/security/KeyStore.html
     private static KeyStore ks;
-    private static String filename = "Player.KeyStore";
+    private static String filename = "../Player.KeyStore";
     private static ProtectionParameter protParam;
     
     static{
@@ -118,9 +118,7 @@ public class PlayerKeyStore {
             PublicKey pubKey = keyFactory.generatePublic(keySpec);
             return true;
         } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException ex) {
-            Logger.getLogger(PlayerPublicKey.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
-        
-        return false;
     }
 }
