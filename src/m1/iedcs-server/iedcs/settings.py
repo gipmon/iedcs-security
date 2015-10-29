@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'files',
     'restrictions',
     'players',
+    'security',
 )
 
 MIDDLEWARE_CLASSES = (

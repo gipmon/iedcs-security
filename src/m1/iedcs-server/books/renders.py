@@ -7,5 +7,4 @@ class PlainTextRenderer(renderers.BaseRenderer):
     charset = 'utf-8'
 
     def render(self, data, media_type=None, renderer_context=None):
-
         return data.encode(self.charset)

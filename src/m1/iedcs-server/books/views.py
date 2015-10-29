@@ -9,6 +9,7 @@ from rest_framework import viewsets, status, mixins, views
 from django.db import transaction
 from restrictions.restrictions import test_restriction
 from restrictions.models import BookRestrictions
+from functions import encrypt_book_content
 
 
 class BooksViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -115,11 +116,7 @@ class BookView(views.APIView):
         for book_restriction in BookRestrictions.objects.filter(book=book):
             can &= test_restriction(book_restriction.restriction.restrictionFunction, book, request.user.user_data)
 
-        book_content = book_order.book.original_file.read().decode('utf-8')
-
-        book_content = encrypt_book_content(book_content)
-
-        response = Response(book_content)
+        response = Response(encrypt_book_content(book_order.book, request.user))
         response["identifier"] = book_order.book.identifier
         response["name"] = book_order.book.name
         response["production_date"] = book_order.book.production_date

@@ -11,7 +11,6 @@ import hashlib
 from django.core.files.storage import default_storage
 from iedcs.settings import BASE_DIR
 from django.core.files.base import ContentFile
-import requests
 from geoip import geolite2
 
 
@@ -40,7 +39,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         :type  unique_identifier: str
         :param unique_identifier: The identifier
         """
-        device = get_object_or_404(Device.objects.all(), unique_identifier=kwargs.get('pk', ''))
+        device = get_object_or_404(Device.objects.all(), owner=request.user, unique_identifier=kwargs.get('pk', ''))
         serializer = self.serializer_class(device)
         return Response(serializer.data)
 
@@ -124,7 +123,8 @@ class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = DeviceRetrieveSerializer(data=request.data)
 
         if serializer.is_valid():
-            device = get_object_or_404(Device.objects.all(), unique_identifier=serializer.data["unique_identifier"])
+            device = get_object_or_404(Device.objects.all(), owner=request.user,
+                                       unique_identifier=serializer.data["unique_identifier"])
             serializer = self.serializer_class(device)
             return Response(serializer.data)
 
