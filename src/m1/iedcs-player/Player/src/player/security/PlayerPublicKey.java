@@ -63,6 +63,7 @@ public class PlayerPublicKey {
             return pubKey;
         } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException ex) {
             Logger.getLogger(PlayerPublicKey.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
         }
         
         return null;

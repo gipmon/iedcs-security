@@ -45,7 +45,7 @@ public class Player extends Application {
             - private key device [x]
             - public key device [x]
             - unique identifier [x]
-            - public key player
+            - public key player [x]
             */
             
             
@@ -71,14 +71,18 @@ public class Player extends Application {
             */
 
             // if private key don't exists
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(2048);
-            KeyPair kp = kpg.genKeyPair();
-            Key publicKeyDevice = kp.getPublic();
-            Key privateKeyDevice = kp.getPrivate();
-            
-            PlayerKeyStore.storeKey("publicKeyDevice", publicKeyDevice);
-            PlayerKeyStore.storeKey("privateKeyDevice", privateKeyDevice);
+            if(!PlayerKeyStore.exists("privateKeyDevice")){
+                KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+                kpg.initialize(2048);
+                KeyPair kp = kpg.genKeyPair();
+                Key publicKeyDevice = kp.getPublic();
+                Key privateKeyDevice = kp.getPrivate();
+                
+                System.out.println("creating");
+                
+                PlayerKeyStore.storeKey("publicKeyDevice", publicKeyDevice);
+                PlayerKeyStore.storeKey("privateKeyDevice", privateKeyDevice);
+            }
             
             // public key player
             PublicKey key_Test_apagar = PlayerPublicKey.getKey();

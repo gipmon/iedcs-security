@@ -7,6 +7,7 @@ from rest_framework import permissions
 from rest_framework import viewsets, status, mixins
 from django.db import transaction
 import binascii
+import hashlib
 from django.core.files.storage import default_storage
 from iedcs.settings import BASE_DIR
 from django.core.files.base import ContentFile
@@ -69,7 +70,11 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
             public_key = serializer.data["public_key"]
             byte_key = binascii.a2b_base64(public_key)
 
-            path = default_storage.save(BASE_DIR+'/media/devices/'+serializer.data["unique_identifier"]+'/device_pub.key',
+            m = hashlib.md5()
+            m.update(serializer.data["unique_identifier"])
+            folder_name = m.hexdigest()
+
+            path = default_storage.save(BASE_DIR+'/media/devices/' + folder_name + '/device_pub.key',
                                         ContentFile(byte_key))
 
             try:

@@ -106,4 +106,21 @@ public class PlayerKeyStore {
         
         return null;
     }
+    
+    public static boolean exists(String alias){
+        try {
+            // get my private key
+            SecretKeyEntry skEntry = (SecretKeyEntry) ks.getEntry(alias, protParam);
+            SecretKey myPrivateKey = skEntry.getSecretKey();
+            
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(myPrivateKey.getEncoded());
+            KeyFactory keyFactory = KeyFactory.getInstance(myPrivateKey.getAlgorithm());
+            PublicKey pubKey = keyFactory.generatePublic(keySpec);
+            return true;
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException ex) {
+            Logger.getLogger(PlayerPublicKey.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return false;
+    }
 }
