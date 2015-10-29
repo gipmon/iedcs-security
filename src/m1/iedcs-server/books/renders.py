@@ -6,5 +6,6 @@ class PlainTextRenderer(renderers.BaseRenderer):
     format = 'txt'
     charset = 'utf-8'
 
-    def render(self, data, media_type=None, renderer_context=None):
+    def render(self, data, user=None, media_type=None, renderer_context=None):
+
         return data.encode(self.charset)

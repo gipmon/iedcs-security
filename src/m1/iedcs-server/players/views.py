@@ -14,6 +14,7 @@ from django.core.files.base import ContentFile
 import requests
 from geoip import geolite2
 
+
 class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                     mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Device.objects.filter()
