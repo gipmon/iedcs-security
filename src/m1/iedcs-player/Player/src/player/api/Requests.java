@@ -11,8 +11,9 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.util.Base64;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import org.json.*;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -54,14 +55,11 @@ public class Requests {
         System.out.println(ComputerDetails.getMac_address());
         System.out.println(ComputerDetails.getPublicIP());
         
-        TimeZone tz = TimeZone.getDefault();
-        Calendar cal = GregorianCalendar.getInstance(tz);
-        int offsetInMillis = tz.getOffset(cal.getTimeInMillis());
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        String time = dateFormat.format(date);
 
-        String offset = String.format("%02d:%02d", Math.abs(offsetInMillis / 3600000), Math.abs((offsetInMillis / 60000) % 60));
-        offset = (offsetInMillis >= 0 ? "+" : "-") + offset;
-        String timeZone = tz.getDisplayName() + " " + offset;
-
+        
         System.out.println(ComputerDetails.getHostName());
         
         if(rs.getStatusCode()==200){
@@ -79,7 +77,7 @@ public class Requests {
                 parameters.put("op_system", ComputerDetails.getCpu_model());
                 parameters.put("ip", ComputerDetails.getPublicIP());
                 //parameters.put("country", location);
-                //parameters.put("timezone", timeZone);
+                parameters.put("timezone", time);
                 parameters.put("host_name", ComputerDetails.getHostName());
                 
                 PublicKey key = PlayerKeyStore.getKey();
