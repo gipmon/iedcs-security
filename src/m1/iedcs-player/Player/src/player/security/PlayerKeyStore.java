@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import player.Player;
+import java.io.File;
+
 
 public class PlayerKeyStore {
     private final static String key = "WvJd8x4b3fpJPAEtFNWd6ptKUEARSpKZEyZDRVq9xJQZAvpbTpKVUhqYDJt8Q3Pxcgfb9r2eHxKQ7N7n28bt6TgUk9wzZbJVANZPWGUfYqttXwpZYetU3zYjmQXGDqET";
@@ -27,7 +29,8 @@ public class PlayerKeyStore {
     
     // https://docs.oracle.com/javase/7/docs/api/java/security/KeyStore.html
     private static KeyStore ks;
-    private static String filename = "../Player.KeyStore";
+    private static String folder_name = System.getProperty("user.home") +"/iedcs/";
+    private static String filename = folder_name + "Player.KeyStore";
     private static ProtectionParameter protParam;
     
     static{
@@ -62,6 +65,12 @@ public class PlayerKeyStore {
             
             SecretKeyEntry skEntry = new SecretKeyEntry(mySecretKey);
             ks.setEntry(alias, skEntry, protParam);
+            
+            File folder = new File(folder_name);
+                System.out.println(folder_name);
+            if(!folder.exists()){
+                folder.mkdirs();
+            }
             
             // store away the keystore
             FileOutputStream fos = null;
@@ -117,7 +126,7 @@ public class PlayerKeyStore {
             KeyFactory keyFactory = KeyFactory.getInstance(myPrivateKey.getAlgorithm());
             PublicKey pubKey = keyFactory.generatePublic(keySpec);
             return true;
-        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException ex) {
+        } catch (Exception ex) {
             return false;
         }
     }
