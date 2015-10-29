@@ -11,6 +11,8 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.security.PublicKey;
 import java.util.Base64;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import org.json.*;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -23,6 +25,8 @@ import player.IEDCSPlayer;
 import player.security.ComputerDetails;
 import player.security.PlayerKeyStore;
 import player.security.PlayerPublicKey;
+import java.util.TimeZone;
+
 
 public class Requests {
     
@@ -49,14 +53,21 @@ public class Requests {
         System.out.println(ComputerDetails.getCpu_vendor());
         System.out.println(ComputerDetails.getMac_address());
         System.out.println(ComputerDetails.getPublicIP());
+        
+        TimeZone tz = TimeZone.getDefault();
+        Calendar cal = GregorianCalendar.getInstance(tz);
+        int offsetInMillis = tz.getOffset(cal.getTimeInMillis());
+
+        String offset = String.format("%02d:%02d", Math.abs(offsetInMillis / 3600000), Math.abs((offsetInMillis / 60000) % 60));
+        offset = (offsetInMillis >= 0 ? "+" : "-") + offset;
+        String timeZone = tz.getDisplayName() + " " + offset;
 
         System.out.println(ComputerDetails.getHostName());
-
         
         if(rs.getStatusCode()==200){
             USER = (JSONObject)rs.getResult();
             
-            // verificar se o player ja esta registado
+            // verificar se o player ja esta registado  
             parameters = new HashMap<String, String>();
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
             Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/retrieveDevice/", parameters);
@@ -67,8 +78,8 @@ public class Requests {
                 parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
                 parameters.put("op_system", ComputerDetails.getCpu_model());
                 parameters.put("ip", ComputerDetails.getPublicIP());
-                // parameters.put("country", );
-                // parameters.put("timezone", );
+                //parameters.put("country", location);
+                //parameters.put("timezone", timeZone);
                 parameters.put("host_name", ComputerDetails.getHostName());
                 
                 PublicKey key = PlayerKeyStore.getKey();
@@ -200,6 +211,46 @@ public class Requests {
         }
         
         return (new Result(response.getStatusLine().getStatusCode(), response_json));
+    }
+    
+    public static String getLocation(String url) throws MalformedURLException, ProtocolException, IOException, JSONException{
+        HttpGet get = new HttpGet(url);
+
+        // add header
+        get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+        get.setHeader("Accept-Language", "application/json");
+        get.setHeader("Content-Type", "application/json;charset=UTF-8");
+        
+        HttpResponse response = client.execute(get);
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
+        
+        // print cookies
+
+        System.out.println("Printing Response Header...\n");
+
+        Header[] headers = response.getAllHeaders();
+        for (Header header : headers) {
+            System.out.println("Key : " + header.getName() + " ,Value : " + header.getValue());
+        }
+
+        System.out.println("\nGet Response Header By Key ...\n");
+        String server = response.getFirstHeader("Server").getValue();
+
+        // output file
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuilder result = new StringBuilder();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+                result.append(line);
+        }
+
+        PrintWriter fs = new PrintWriter("output.html");
+        fs.print(result.toString());
+        fs.close();
+        
+        return result.toString();
     }
     
     public static Result getBookContent(String url, String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{

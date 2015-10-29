@@ -11,7 +11,8 @@ import hashlib
 from django.core.files.storage import default_storage
 from iedcs.settings import BASE_DIR
 from django.core.files.base import ContentFile
-
+import requests
+from geoip import geolite2
 
 class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                     mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -77,6 +78,8 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
             path = default_storage.save(BASE_DIR+'/media/devices/' + folder_name + '/device_pub.key',
                                         ContentFile(byte_key))
 
+            c = geolite2.lookup(serializer.data["ip"]).country
+
             try:
                 with transaction.atomic():
                     Device.objects.create(unique_identifier=serializer.data["unique_identifier"],
@@ -84,8 +87,8 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                                           cpu_model=serializer.data["cpu_model"],
                                           op_system=serializer.data["op_system"],
                                           ip=serializer.data["ip"],
-                                          #country=serializer.data["country"],
-                                          #timezone=serializer.data["timezone"],
+                                          country=c,
+                                          timezone=serializer.data["timezone"],
                                           host_name=serializer.data["host_name"],
                                           public_key=path)
                     return Response({'status': 'Created',
