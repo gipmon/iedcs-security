@@ -89,7 +89,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                                           op_system=serializer.data["op_system"],
                                           ip=serializer.data["ip"],
                                           country=c,
-                                          timezone=serializer.data["timezone"],
+                                          #timezone=serializer.data["timezone"],
                                           host_name=serializer.data["host_name"],
                                           public_key=path)
                     return Response({'status': 'Created',
