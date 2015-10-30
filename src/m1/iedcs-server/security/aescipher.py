@@ -2,6 +2,7 @@ import base64
 from Crypto import Random
 from Crypto.Cipher import AES
 
+
 class AESCipher(object):
     bs = 32
 
