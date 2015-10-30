@@ -9,7 +9,7 @@ from rest_framework import viewsets, status, mixins, views
 from django.db import transaction
 from restrictions.restrictions import test_restriction
 from restrictions.models import BookRestrictions
-from functions import encrypt_book_content
+from security.functions import encrypt_book_content
 
 
 class BooksViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
