@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from rest_framework.response import Response
-from .models import Device
-from .serializers import CreateDeviceSerializer, DeviceSerializer, DeviceRetrieveSerializer
+from .models import Device, DeviceOwner
+from .serializers import CreateDeviceSerializer, DeviceSerializer, DeviceRetrieveSerializer, DeviceOwnerSerializer
 from rest_framework import permissions
 from rest_framework import viewsets, status, mixins
 from django.db import transaction
@@ -79,11 +79,9 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                                         ContentFile(byte_key))
 
             c = geolite2.lookup(serializer.data["ip"]).country
-            a = serializer.data["timezone"]
             try:
                 with transaction.atomic():
                     Device.objects.create(unique_identifier=serializer.data["unique_identifier"],
-                                          owner=request.user,
                                           cpu_model=serializer.data["cpu_model"],
                                           op_system=serializer.data["op_system"],
                                           ip=serializer.data["ip"],
@@ -91,6 +89,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                                           timezone=serializer.data["timezone"],
                                           host_name=serializer.data["host_name"],
                                           public_key=path)
+
                     return Response({'status': 'Created',
                                      'message': 'The device has been registered'},
                                     status=status.HTTP_201_CREATED)
@@ -106,8 +105,8 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
 
 
 class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = Device.objects.filter()
-    serializer_class = DeviceSerializer
+    queryset = DeviceOwner.objects.filter()
+    serializer_class = DeviceOwnerSerializer
 
     def get_permissions(self):
         return permissions.IsAuthenticated(),
@@ -123,10 +122,12 @@ class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
         serializer = DeviceRetrieveSerializer(data=request.data)
 
         if serializer.is_valid():
-            device = get_object_or_404(Device.objects.all(), owner=request.user,
-                                       unique_identifier=serializer.data["unique_identifier"])
-            serializer = self.serializer_class(device)
-            return Response(serializer.data)
+            unique_identifier = get_object_or_404(Device.objects.all(), device=serializer.data["unique_identifier"])
+            if unique_identifier.count() != 0:
+                deviceOwner = get_object_or_404(DeviceOwner.objects.all(), owner=request.user,
+                                                device=unique_identifier)
+                serializer = self.serializer_class(deviceOwner)
+                return Response(serializer.data)
 
         return Response({'status': 'Bad Request',
                          'message': serializer.errors},

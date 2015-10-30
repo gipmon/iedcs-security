@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Device
+from .models import Device, DeviceOwner
 
 
 class CreateDeviceSerializer(serializers.ModelSerializer):
@@ -23,3 +23,10 @@ class DeviceRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Device
         fields = ('unique_identifier', )
+
+class DeviceOwnerSerializer(serializers.ModelSerializer):
+    device = DeviceSerializer()
+
+    class Meta:
+        model = DeviceOwner
+        fields = ('device', )
