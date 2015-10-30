@@ -79,7 +79,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                                         ContentFile(byte_key))
 
             c = geolite2.lookup(serializer.data["ip"]).country
-
+            a = serializer.data["timezone"]
             try:
                 with transaction.atomic():
                     Device.objects.create(unique_identifier=serializer.data["unique_identifier"],
@@ -88,7 +88,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                                           op_system=serializer.data["op_system"],
                                           ip=serializer.data["ip"],
                                           country=c,
-                                          #timezone=serializer.data["timezone"],
+                                          timezone=serializer.data["timezone"],
                                           host_name=serializer.data["host_name"],
                                           public_key=path)
                     return Response({'status': 'Created',
