@@ -20,6 +20,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import player.IEDCSPlayer;
@@ -69,7 +70,7 @@ public class Requests {
             parameters = new HashMap<String, String>();
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
             Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/retrieveDevice/", parameters);
-            
+            System.out.println(rs_player.toString());
             if(rs_player.getStatusCode()!=200){
                 parameters = new HashMap<String, String>();
                 parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
@@ -83,6 +84,16 @@ public class Requests {
                 PublicKey key = PlayerKeyStore.getKey();
                 parameters.put("public_key", Base64.getEncoder().encodeToString(key.getEncoded()));
                 rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
+            }else{
+                parameters = new HashMap<String, String>();
+                parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
+                parameters.put("op_system", ComputerDetails.getCpu_model());
+                parameters.put("ip", ComputerDetails.getPublicIP());
+                parameters.put("timezone", time);
+                parameters.put("host_name", ComputerDetails.getHostName());
+                String url = URLEncoder.encode(ComputerDetails.getUniqueIdentifier());
+                System.out.println(url);
+                rs_player = putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/" + url + "/", parameters);
             }
         }
         return rs;
@@ -150,7 +161,6 @@ public class Requests {
         if(csrftoken.length()>0){
             post.setHeader("X-CSRFToken", csrftoken);
         }
-        
         // to parse parameters to JSON 
         JSONObject json_obj=new JSONObject();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
@@ -197,6 +207,77 @@ public class Requests {
                 result.append(line);
         }
 
+        PrintWriter fs = new PrintWriter("output.html");
+        fs.print(result.toString());
+        fs.close();
+        
+        Object response_json;
+        try{
+            response_json = new JSONObject(result.toString());
+        }catch(JSONException e){
+            response_json = new JSONArray(result.toString());
+        }
+        
+        return (new Result(response.getStatusLine().getStatusCode(), response_json));
+    }
+    
+    public static Result putJSON(String url, HashMap<String, String> parameters) throws MalformedURLException, ProtocolException, IOException, JSONException{
+        HttpPut put = new HttpPut(url);
+
+        // add header
+        put.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+        put.setHeader("Accept-Language", "application/json");
+        put.setHeader("Content-Type", "application/json;charset=UTF-8");
+        
+        if(csrftoken.length()>0){
+            put.setHeader("X-CSRFToken", csrftoken);
+        }
+        // to parse parameters to JSON 
+        JSONObject json_obj=new JSONObject();
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            try {
+                json_obj.put(key,value);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }                           
+        }
+        StringEntity se = new StringEntity(json_obj.toString(), "UTF-8");
+        se.setContentType("application/json; charset=UTF-8");
+        put.setEntity(se);
+
+        HttpResponse response = client.execute(put);
+        System.out.println("\nSending 'PUT' request to URL : " + url);
+        System.out.println("Post parameters : " + put.getEntity());
+        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
+        
+        // print cookies
+
+        System.out.println("Printing Response Header...\n");
+
+        Header[] headers = response.getAllHeaders();
+        for (Header header : headers) {
+            String[] value_key = header.getValue().toString().split("=");
+            if(value_key.length == 5 && value_key[0].equals("csrftoken")){
+                csrftoken = value_key[1].split(";")[0];
+            }
+            System.out.println("Key : " + header.getName() 
+                       + " ,Value : " + header.getValue());
+        }
+
+        System.out.println("\nGet Response Header By Key ...\n");
+        String server = response.getFirstHeader("Server").getValue();
+
+        // output file response, only for DEBUG!!!! REMOVE!!
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuilder result = new StringBuilder();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+                result.append(line);
+        }
+        System.out.println(result.toString());
         PrintWriter fs = new PrintWriter("output.html");
         fs.print(result.toString());
         fs.close();

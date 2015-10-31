@@ -16,6 +16,12 @@ class DeviceSerializer(serializers.ModelSerializer):
         model = Device
         fields = ('unique_identifier', 'cpu_model', 'op_system', 'ip', 'timezone', 'host_name',)
 
+class UpdateDeviceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Device
+        fields = ('cpu_model', 'op_system', 'ip', 'timezone', 'host_name',)
+
 
 class DeviceRetrieveSerializer(serializers.ModelSerializer):
     unique_identifier = serializers.CharField(max_length=254)
