@@ -14,7 +14,7 @@ from django.core.files.base import ContentFile
 from geoip import geolite2
 
 
-class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
+class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
                     mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Device.objects.filter()
     serializer_class = DeviceSerializer
@@ -111,8 +111,10 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
     def update(self, request, *args, **kwargs):
         """
         B{Update} the device
-        B{URL:} ../api/v1/devices/<unique_identifier>/
+        B{URL:} ../api/v1/devices/<random_string>/
 
+        :type  unique_identifier: str
+        :param unique_identifier: the unique identifier
         :type  host_name: str
         :param host_name: the host name
         :type  cpu_model: str
@@ -126,29 +128,28 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         :type  timezone: str
         :param timezone: the device timezone
         """
-        device = get_object_or_404(Device.objects.all(), unique_identifier=kwargs.get('pk', ''))
         serializer = UpdateDeviceSerializer(data=request.data)
 
         if serializer.is_valid():
-            if DeviceOwner.objects.filter(owner=request.user, device=device).count() is 1:
-                device.cpu_model = serializer.validated_data['cpu_model']
-                device.op_system = serializer.validated_data['op_system']
-                device.ip = serializer.validated_data['ip']
-                device.timezone = serializer.validated_data['timezone']
-                device.host_name = serializer.validated_data['host_name']
-                device.save()
+            device = get_object_or_404(Device.objects.all(), unique_identifier=serializer.validated_data['unique_identifier'])
+            get_object_or_404(DeviceOwner.objects.all(), owner=request.user, device=device)
 
-                return Response({'status': 'Updated',
-                             'message': 'The device has been updated.'},
+            device.cpu_model = serializer.validated_data['cpu_model']
+            device.op_system = serializer.validated_data['op_system']
+            device.ip = serializer.validated_data['ip']
+            device.timezone = serializer.validated_data['timezone']
+            device.host_name = serializer.validated_data['host_name']
+            device.save()
+
+            return Response({'status': 'Updated',
+                            'message': 'The device has been updated.'},
                             status=status.HTTP_200_OK)
 
-            return Response({'status': 'Bad request',
-                             'message': serializer.errors},
-                            status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'status': 'Bad request',
                              'message': serializer.errors},
                             status=status.HTTP_400_BAD_REQUEST)
+
 
 class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Device.objects.filter()

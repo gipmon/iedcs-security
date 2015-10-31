@@ -26,8 +26,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import player.IEDCSPlayer;
 import player.security.ComputerDetails;
 import player.security.PlayerKeyStore;
-import player.security.PlayerPublicKey;
-import java.util.TimeZone;
 
 
 public class Requests {
@@ -83,7 +81,7 @@ public class Requests {
                 
                 PublicKey key = PlayerKeyStore.getKey();
                 parameters.put("public_key", Base64.getEncoder().encodeToString(key.getEncoded()));
-                rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
+                postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
             }else{
                 parameters = new HashMap<String, String>();
                 parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
@@ -91,9 +89,8 @@ public class Requests {
                 parameters.put("ip", ComputerDetails.getPublicIP());
                 parameters.put("timezone", time);
                 parameters.put("host_name", ComputerDetails.getHostName());
-                String url = URLEncoder.encode(ComputerDetails.getUniqueIdentifier());
-                System.out.println(url);
-                rs_player = putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/" + url + "/", parameters);
+                parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
+                putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/update/", parameters);
             }
         }
         return rs;
