@@ -27,8 +27,8 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         B{List} user devices
         B{URL:} ../api/v1/devices/
         """
-        devices = Device.objects.filter(owner=request.user)
-        serializer = self.serializer_class(devices, many=True)
+        devices = DeviceOwner.objects.filter(owner=request.user)
+        serializer = self.serializer_class([device.device for device in devices], many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
@@ -39,7 +39,8 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         :type  unique_identifier: str
         :param unique_identifier: The identifier
         """
-        device = get_object_or_404(Device.objects.all(), owner=request.user, unique_identifier=kwargs.get('pk', ''))
+        device = get_object_or_404(Device.objects.all(), unique_identifier=kwargs.get('pk', ''))
+        get_object_or_404(DeviceOwner.objects.all(), owner=request.user, device=device)
         serializer = self.serializer_class(device)
         return Response(serializer.data)
 
@@ -81,53 +82,39 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
             c = geolite2.lookup(serializer.data["ip"]).country
             try:
                 with transaction.atomic():
-                    Device.objects.create(unique_identifier=serializer.data["unique_identifier"],
-                                          cpu_model=serializer.data["cpu_model"],
-                                          op_system=serializer.data["op_system"],
-                                          ip=serializer.data["ip"],
-                                          country=c,
-                                          timezone=serializer.data["timezone"],
-                                          host_name=serializer.data["host_name"],
-                                          public_key=path)
+                    if Device.objects.filter(unique_identifier=serializer.data["unique_identifier"]).count() is 1:
+                        device = Device.objects.get(unique_identifier=serializer.data["unique_identifier"])
 
-                    return Response({'status': 'Created',
-                                     'message': 'The device has been registered'},
-                                    status=status.HTTP_201_CREATED)
+                        if DeviceOwner.objects.filter(device=device, owner=request.user).count() is 1:
+                            return Response({'status': 'Already created',
+                                             'message': 'The device has been already registered'},
+                                            status=status.HTTP_400_BAD_REQUEST)
+                        else:
+                            DeviceOwner.objects.create(device=device, owner=request.user)
+
+                            return Response({'status': 'Associated',
+                                             'message': 'The device has been associated'},
+                                            status=status.HTTP_201_CREATED)
+                    else:
+                        device = Device.objects.create(unique_identifier=serializer.data["unique_identifier"],
+                                                       cpu_model=serializer.data["cpu_model"],
+                                                       op_system=serializer.data["op_system"],
+                                                       ip=serializer.data["ip"],
+                                                       country=c,
+                                                       timezone=serializer.data["timezone"],
+                                                       host_name=serializer.data["host_name"],
+                                                       public_key=path)
+
+                        DeviceOwner.objects.create(device=device, owner=request.user)
+
+                        return Response({'status': 'Created',
+                                         'message': 'The device has been registered'},
+                                        status=status.HTTP_201_CREATED)
 
             except IntegrityError:
                 return Response({'status': 'Bad request',
                                  'message': 'The device can\'t be added!'},
                                 status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({'status': 'Bad Request',
-                         'message': serializer.errors},
-                        status=status.HTTP_400_BAD_REQUEST)
-
-
-class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = DeviceOwner.objects.filter()
-    serializer_class = DeviceOwnerSerializer
-
-    def get_permissions(self):
-        return permissions.IsAuthenticated(),
-
-    def create(self, request, *args, **kwargs):
-        """
-        B{Retrieve} a device
-        B{URL:} ../api/v1/retrieveDevice/
-
-        :type  unique_identifier: str
-        :param unique_identifier: the device unique identifier
-        """
-        serializer = DeviceRetrieveSerializer(data=request.data)
-
-        if serializer.is_valid():
-            unique_identifier = get_object_or_404(Device.objects.all(), device=serializer.data["unique_identifier"])
-            if unique_identifier.count() != 0:
-                deviceOwner = get_object_or_404(DeviceOwner.objects.all(), owner=request.user,
-                                                device=unique_identifier)
-                serializer = self.serializer_class(deviceOwner)
-                return Response(serializer.data)
 
         return Response({'status': 'Bad Request',
                          'message': serializer.errors},

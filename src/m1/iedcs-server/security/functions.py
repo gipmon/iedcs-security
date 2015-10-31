@@ -55,6 +55,13 @@ def encrypt_book_content(book, user):
 
     file_key = rd3
 
+    # cipher with player key private RSA
+
+
+    # cipher with device key public RSA
+
+    # cipher with File Key AES/CBC
+
     print file_key
 
     return book_content

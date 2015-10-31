@@ -17,12 +17,14 @@ class Device(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
 class DeviceOwner(models.Model):
     owner = models.ForeignKey(Account)
     device = models.ForeignKey(Device)
 
     class Meta:
         unique_together = ('owner', 'device',)
+
 
 class Player(models.Model):
     version = models.CharField(max_length=128, default="", unique=True)
