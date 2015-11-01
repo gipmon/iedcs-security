@@ -73,7 +73,7 @@ public class ViewBookController implements Initializable {
     
     public void setIdentifier(String identifier){
         try {
-            Result rs = Requests.getBookContent(Requests.VIEW_BOOK, identifier);
+            Result rs = Requests.getBookContent(identifier);
             if(rs.getStatusCode()==200){
                 BookContent obj = (BookContent) rs.getResult();
                 textZone.setText(obj.getContent());  

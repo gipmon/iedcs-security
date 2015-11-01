@@ -21,6 +21,14 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import player.Player;
 import java.io.File;
+import java.io.StringWriter;
+import java.security.interfaces.RSAPublicKey;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.RSAPublicKeyStructure;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 
 
 public class PlayerKeyStore {
@@ -115,6 +123,28 @@ public class PlayerKeyStore {
         
         return null;
     }
+    
+    public static String getPemPubKey(){
+        try {
+            RSAPublicKey pub_key = (RSAPublicKey) getKey();
+            RSAPublicKeyStructure struct = new RSAPublicKeyStructure(pub_key.getModulus(), pub_key.getPublicExponent());
+            ASN1Primitive publicKeyPKCS1ASN1 = struct.toASN1Primitive();
+            byte[] publicKeyPKCS1 = publicKeyPKCS1ASN1.getEncoded();
+            
+            PemObject pemObject = new PemObject("RSA PUBLIC KEY", publicKeyPKCS1);
+            StringWriter stringWriter = new StringWriter();
+            PemWriter pemWriter = new PemWriter(stringWriter);
+            pemWriter.writeObject(pemObject);
+            pemWriter.close();
+            String pemString = stringWriter.toString();
+            
+            return pemString;
+        } catch (IOException ex) {
+            Logger.getLogger(PlayerKeyStore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return "";
+    }
+    
     
     public static boolean exists(String alias){
         try {

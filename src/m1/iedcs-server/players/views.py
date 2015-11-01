@@ -31,7 +31,6 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
         serializer = self.serializer_class([device.device for device in devices], many=True)
         return Response(serializer.data)
 
-
     def create(self, request, *args, **kwargs):
         """
         B{Create} a device
@@ -58,14 +57,13 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
 
         if serializer.is_valid():
             public_key = serializer.data["public_key"]
-            byte_key = binascii.a2b_base64(public_key)
 
             m = hashlib.md5()
             m.update(serializer.data["unique_identifier"])
             folder_name = m.hexdigest()
 
             path = default_storage.save(BASE_DIR+'/media/devices/' + folder_name + '/device_pub.key',
-                                        ContentFile(byte_key))
+                                        ContentFile(public_key))
 
             c = geolite2.lookup(serializer.data["ip"]).country
             try:

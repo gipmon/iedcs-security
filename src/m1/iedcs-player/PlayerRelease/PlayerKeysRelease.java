@@ -6,6 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.io.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -18,6 +19,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 
 public class PlayerKeysRelease{
   private final static String key = "77RhYLLHHuMx3FmYP7pXUjUWstWVqC26RQbMgeEAZaXfTLgBULYz735Yd95DGxF7RVe3nj4ymsvK3tyMnP7atYL2L4cwy8mmYdhP7sEkzmGq94r94DGG4kWJaSzky9c8";
@@ -59,15 +67,28 @@ public class PlayerKeysRelease{
 
         storeKey("playerPublicKey", public_key);
 
-        File fpublic = new File("private.key");
-        File fprivate = new File("public.key");
+        File fprivate = new File("private.key");
+        File fpublic = new File("public.key");
 
         // write to private key
-        FileOutputStream fos = new FileOutputStream(fprivate);
-        fos.write(private_key.getEncoded());
-        fos.close();
+        PrivateKeyInfo pkInfo = PrivateKeyInfo.getInstance(private_key.getEncoded());
+        ASN1Encodable privateKeyPKCS1ASN1Encodable = pkInfo.parsePrivateKey();
+        ASN1Primitive privateKeyPKCS1ASN1 = privateKeyPKCS1ASN1Encodable.toASN1Primitive();
+        byte[] privateKeyPKCS1 = privateKeyPKCS1ASN1.getEncoded();
+
+        PemObject pemObject = new PemObject("RSA PRIVATE KEY", privateKeyPKCS1);
+        StringWriter stringWriter = new StringWriter();
+        PemWriter pemWriter = new PemWriter(stringWriter);
+        pemWriter.writeObject(pemObject);
+        pemWriter.close();
+        String pemString = stringWriter.toString();
+
+        PrintWriter ptwriter = new PrintWriter(fprivate);
+        ptwriter.print(pemString);
+        ptwriter.close();
+
         // write to public key
-        fos = new FileOutputStream(fpublic);
+        FileOutputStream fos = new FileOutputStream(fpublic);
         fos.write(public_key.getEncoded());
         fos.close();
   }

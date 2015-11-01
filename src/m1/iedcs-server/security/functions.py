@@ -1,13 +1,18 @@
+import tempfile
 from .models import ContentCiphered
 import hashlib
 from .aescipher import AESCipher, Random
 from pbkdf2 import PBKDF2
+from django.core.files.storage import default_storage
+from iedcs.settings import BASE_DIR
+import rsa
+from rsa.bigfile import *
 
 # max iterations for the file derivation process
 max_iterations = 10
 
 
-def encrypt_book_content(book, user):
+def encrypt_book_content(book, user, device):
     book_content = book.original_file.read().decode('utf-8')
 
     # get or set the random 2
@@ -45,7 +50,7 @@ def encrypt_book_content(book, user):
         k2 = PBKDF2(hashlib.sha224(user.username + "deti" + random1).hexdigest(), random1).read(32)
 
         # rd2 = AES/CBC(rd1, k2)
-        rd2 = AESCipher.decrypt(rd1, k2)
+        rd2 = AESCipher.encrypt(rd1, k2)
 
         # k3 = PBKDF2(hashlib.sha224(n + "ua" + book.identifier), random2)
         k3 = PBKDF2(hashlib.sha224(str(n) + "ua" + book.identifier).hexdigest(), random2).read(32)
@@ -56,8 +61,15 @@ def encrypt_book_content(book, user):
     file_key = rd3
 
     # cipher with player key private RSA
+    private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/private.key').read()
+    public_key_device = device.public_key.read()
+    crypt_tmp_1 = tempfile.TemporaryFile()
 
+    with book.original_file.file as input_file:
+        pubkey = rsa.PublicKey.load_pkcs1(public_key_device)
+        encrypt_bigfile(input_file, crypt_tmp_1, pubkey)
 
+    print "ok"
     # cipher with device key public RSA
 
     # cipher with File Key AES/CBC

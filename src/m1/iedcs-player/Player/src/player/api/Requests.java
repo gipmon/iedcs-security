@@ -14,6 +14,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.*;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -41,6 +43,7 @@ public class Requests {
       
     public static Result login(String email, String password) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HashMap<String, String> parameters = new HashMap<String, String>();
+        
         parameters.put("email", email);
         parameters.put("password", password);
         Result rs = postJSON(LOGIN_ENDPOINT, parameters);
@@ -53,12 +56,6 @@ public class Requests {
         System.out.println(ComputerDetails.getCpu_vendor());
         System.out.println(ComputerDetails.getMac_address());
         System.out.println(ComputerDetails.getPublicIP());
-        
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        Date date = new Date();
-        String time = dateFormat.format(date);
-
-        
         System.out.println(ComputerDetails.getHostName());
         
         if(rs.getStatusCode()==200){
@@ -75,25 +72,38 @@ public class Requests {
                 parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
                 parameters.put("op_system", ComputerDetails.getCpu_model());
                 parameters.put("ip", ComputerDetails.getPublicIP());
-                //parameters.put("country", location);
-                parameters.put("timezone", time);
+                DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                Date date = new Date();
+                parameters.put("timezone", dateFormat.format(date));
                 parameters.put("host_name", ComputerDetails.getHostName());
-                
-                PublicKey key = PlayerKeyStore.getKey();
-                parameters.put("public_key", Base64.getEncoder().encodeToString(key.getEncoded()));
+                parameters.put("public_key", PlayerKeyStore.getPemPubKey());
                 postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
             }else{
-                parameters = new HashMap<String, String>();
-                parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
-                parameters.put("op_system", ComputerDetails.getCpu_model());
-                parameters.put("ip", ComputerDetails.getPublicIP());
-                parameters.put("timezone", time);
-                parameters.put("host_name", ComputerDetails.getHostName());
-                parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
-                putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/update/", parameters);
+                updateDeviceData();
             }
         }
         return rs;
+    }
+    
+    private static void updateDeviceData(){
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        try {
+            parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
+            parameters.put("op_system", ComputerDetails.getCpu_model());
+            parameters.put("ip", ComputerDetails.getPublicIP());
+            DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            Date date = new Date();
+            parameters.put("timezone", dateFormat.format(date));
+            parameters.put("host_name", ComputerDetails.getHostName());
+            parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
+            putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/update/", parameters);
+        } catch (ProtocolException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public static JSONObject getUser(){
@@ -289,8 +299,10 @@ public class Requests {
         return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
     
-    public static String getLocation(String url) throws MalformedURLException, ProtocolException, IOException, JSONException{
-        HttpGet get = new HttpGet(url);
+    public static Result getBookContent(String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{
+        updateDeviceData();
+        
+        HttpGet get = new HttpGet(Requests.VIEW_BOOK+identifier+"/");
 
         // add header
         get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
@@ -298,47 +310,7 @@ public class Requests {
         get.setHeader("Content-Type", "application/json;charset=UTF-8");
         
         HttpResponse response = client.execute(get);
-        System.out.println("\nSending 'GET' request to URL : " + url);
-        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
-        
-        // print cookies
-
-        System.out.println("Printing Response Header...\n");
-
-        Header[] headers = response.getAllHeaders();
-        for (Header header : headers) {
-            System.out.println("Key : " + header.getName() + " ,Value : " + header.getValue());
-        }
-
-        System.out.println("\nGet Response Header By Key ...\n");
-        String server = response.getFirstHeader("Server").getValue();
-
-        // output file
-        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-        StringBuilder result = new StringBuilder();
-        String line = "";
-        while ((line = rd.readLine()) != null) {
-                result.append(line);
-        }
-
-        PrintWriter fs = new PrintWriter("output.html");
-        fs.print(result.toString());
-        fs.close();
-        
-        return result.toString();
-    }
-    
-    public static Result getBookContent(String url, String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{
-        HttpGet get = new HttpGet(url+identifier+"/");
-
-        // add header
-        get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
-        get.setHeader("Accept-Language", "application/json");
-        get.setHeader("Content-Type", "application/json;charset=UTF-8");
-        
-        HttpResponse response = client.execute(get);
-        System.out.println("\nSending 'GET' request to URL : " + url+identifier+"/");
+        System.out.println("\nSending 'GET' request to URL : " + Requests.VIEW_BOOK+identifier+"/");
         System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
         
         // print cookies

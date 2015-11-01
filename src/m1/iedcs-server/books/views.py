@@ -9,7 +9,8 @@ from rest_framework import viewsets, status, mixins, views
 from django.db import transaction
 from restrictions.restrictions import test_restriction
 from restrictions.models import BookRestrictions
-from security.functions import encrypt_book_content
+from security.functions import encrypt_book_content, exists_database_content_by_user_and_book
+from players.models import Device
 
 
 class BooksViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -111,17 +112,21 @@ class BookView(views.APIView):
         book = get_object_or_404(Book.objects.all(), identifier=identifier)
         book_order = get_object_or_404(OrderBook.objects.all(), book=book, buyer=request.user)
 
+        # search for device
+        devices_owner = request.user.deviceowner_set.all()
+        device = Device.objects.filter(pk__in=[device.device.pk for device in devices_owner]).order_by('-updated_at').first()
+
         can = True
 
         for book_restriction in BookRestrictions.objects.filter(book=book):
             can &= test_restriction(book_restriction.restriction.restrictionFunction, book, request.user.user_data)
 
-        response = Response(encrypt_book_content(book_order.book, request.user))
+        response = Response(encrypt_book_content(book_order.book, request.user, device))
         response["identifier"] = book_order.book.identifier
         response["name"] = book_order.book.name
         response["production_date"] = book_order.book.production_date
         response["author"] = book_order.book.author
-        response["r2"] = "algo bue importante"
+        response["r2"] = exists_database_content_by_user_and_book("random2", request.user, book)
         return response
 
 
