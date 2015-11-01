@@ -16,7 +16,7 @@ class AESCipher(object):
     def decrypt(content_ciphered, key):
         enc = base64.b64decode(content_ciphered)
         cipher = AES.new(key, AES.MODE_CBC, enc[:AES.block_size])
-        return AESCipher.unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
+        return AESCipher.unpad(cipher.decrypt(enc[AES.block_size:]))
 
     @staticmethod
     def pad(s):

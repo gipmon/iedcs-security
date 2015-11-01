@@ -49,7 +49,7 @@ def encrypt_book_content(book, user, device):
         k2 = PBKDF2(hashlib.sha224(user.username + "deti" + random1).hexdigest(), random1).read(32)
 
         # rd2 = AES/CBC(rd1, k2)
-        rd2 = AESCipher.encrypt(rd1, k2)
+        rd2 = AESCipher.decrypt(rd1, k2)
 
         # k3 = PBKDF2(hashlib.sha224(n + "ua" + book.identifier), random2)
         k3 = PBKDF2(hashlib.sha224(str(n) + "ua" + book.identifier).hexdigest(), random2).read(32)
@@ -64,9 +64,9 @@ def encrypt_book_content(book, user, device):
     public_key_device = device.public_key.read()
 
     pubkey = rsa.PublicKey.load_pkcs1(public_key_device)
-    privKey = rsa.PrivateKey.load_pkcs1(private_key_player)
+    priv_key = rsa.PrivateKey.load_pkcs1(private_key_player)
 
-    book_signed = base64.b64encode(rsa.sign(book.original_file, privKey, 'SHA-256'))
+    book_signed = base64.b64encode(rsa.sign(book.original_file, priv_key, 'SHA-256'))
     random2_signed = base64.b64encode(rsa.encrypt(str(random2), pubkey))
 
     class BookSecurityResult:
