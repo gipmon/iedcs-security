@@ -1,4 +1,3 @@
-import tempfile
 from .models import ContentCiphered
 import hashlib
 from .aescipher import AESCipher, Random
@@ -6,14 +5,14 @@ from pbkdf2 import PBKDF2
 from django.core.files.storage import default_storage
 from iedcs.settings import BASE_DIR
 import rsa
-from rsa.bigfile import *
+import base64
 
 # max iterations for the file derivation process
 max_iterations = 10
 
 
 def encrypt_book_content(book, user, device):
-    book_content = book.original_file.read().decode('utf-8')
+    book_content = book.original_file.read()
 
     # get or set the random 2
     exists = exists_database_content_by_user_and_book("random2", user, book)
@@ -63,20 +62,23 @@ def encrypt_book_content(book, user, device):
     # cipher with player key private RSA
     private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/private.key').read()
     public_key_device = device.public_key.read()
-    crypt_tmp_1 = tempfile.TemporaryFile()
 
-    with book.original_file.file as input_file:
-        pubkey = rsa.PublicKey.load_pkcs1(public_key_device)
-        encrypt_bigfile(input_file, crypt_tmp_1, pubkey)
+    pubkey = rsa.PublicKey.load_pkcs1(public_key_device)
+    privKey = rsa.PrivateKey.load_pkcs1(private_key_player)
 
-    print "ok"
-    # cipher with device key public RSA
+    book_signed = base64.b64encode(rsa.sign(book.original_file, privKey, 'SHA-256'))
+    random2_signed = base64.b64encode(rsa.encrypt(str(random2), pubkey))
 
-    # cipher with File Key AES/CBC
+    class BookSecurityResult:
+        def __init__(self, rdn2, bs, bc):
+            self.random2_signed = rdn2
+            self.book_signed = bs
+            self.book_ciphered = bc
 
-    print file_key
+    key = PBKDF2(file_key, random2).read(32)
+    book_content_ciphered = AESCipher.encrypt(content=book_content, key=key)
 
-    return book_content
+    return BookSecurityResult(rdn2=random2_signed, bs=book_signed, bc=book_content_ciphered)
 
 
 def exists_database_content_by_user_and_book(alias, user, book):
@@ -89,7 +91,7 @@ def get_database_content_by_user_and_book(alias, user, book):
     c = hashlib.sha224(user.username+user.email+user.last_name).hexdigest()
 
     if ContentCiphered.objects.filter(identifier=identifier).count() == 1:
-        content_ciphered = ContentCiphered.objects.first()
+        content_ciphered = ContentCiphered.objects.get(identifier=identifier)
         key = PBKDF2(c, identifier).read(32)
         content = AESCipher.decrypt(content_ciphered=content_ciphered.content, key=key)
         return content
@@ -102,7 +104,7 @@ def get_database_content_by_user(alias, user):
     c = hashlib.sha224(user.username+user.email+user.last_name).hexdigest()
 
     if ContentCiphered.objects.filter(identifier=identifier).count() == 1:
-        content_ciphered = ContentCiphered.objects.first()
+        content_ciphered = ContentCiphered.objects.get(identifier=identifier)
         key = PBKDF2(c, identifier).read(32)
         content = AESCipher.decrypt(content_ciphered=content_ciphered.content, key=key)
         return content

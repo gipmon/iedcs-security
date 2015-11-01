@@ -121,12 +121,15 @@ class BookView(views.APIView):
         for book_restriction in BookRestrictions.objects.filter(book=book):
             can &= test_restriction(book_restriction.restriction.restrictionFunction, book, request.user.user_data)
 
-        response = Response(encrypt_book_content(book_order.book, request.user, device))
+        result = encrypt_book_content(book_order.book, request.user, device)
+
+        response = Response(result.book_ciphered)
         response["identifier"] = book_order.book.identifier
         response["name"] = book_order.book.name
         response["production_date"] = book_order.book.production_date
         response["author"] = book_order.book.author
-        response["r2"] = exists_database_content_by_user_and_book("random2", request.user, book)
+        response["r2"] = result.random2_signed
+        response["bs"] = result.book_signed
         return response
 
 
