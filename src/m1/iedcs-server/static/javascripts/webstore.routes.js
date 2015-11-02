@@ -11,7 +11,7 @@
         $routeProvider.when('/home/',{
             controller: 'WebSiteController',
             controllerAs: 'vm',
-            templateUrl: '/static/templates/home.html/'
+            templateUrl: '/static/templates/home.html'
         }).when('/myBooks/' ,{
             controller: 'MyBooksController',
             controllerAs: 'vm',
