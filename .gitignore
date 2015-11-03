@@ -1,5 +1,6 @@
 # environment
 env
+src/m1/iedcs-server/venv/*
 
 # Vagrant #
 .vagrant
@@ -10,6 +11,7 @@ output.html
 # idea
 .idea
 *.pyc
+
 
 # Directories #
 src/m1/iedcs-player/Player/dist/*

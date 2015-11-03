@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from ...models import Book
 from django.core.files.storage import default_storage
-from iedcs.settings import BASE_DIR
+from iedcs.settings.base import BASE_DIR
 
 
 class Command(BaseCommand):

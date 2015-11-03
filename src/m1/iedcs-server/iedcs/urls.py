@@ -6,6 +6,7 @@ from books.views import BooksViewSet, OrderViewSet, BookView
 from files.views import UserFiles
 from rest_framework import routers
 from players.views import DeviceViewSet, DeviceRetrieveView
+from security.views import ExchangeRd1Rd2ViewSet
 
 router_base = routers.SimpleRouter()
 router_base.register(r'accounts', AccountViewSet)
@@ -14,6 +15,7 @@ router_base.register(r'books', BooksViewSet)
 router_base.register(r'user_books', OrderViewSet)
 router_base.register(r'devices', DeviceViewSet)
 router_base.register(r'retrieveDevice', DeviceRetrieveView)
+router_base.register(r'security_exchange_r1r2', ExchangeRd1Rd2ViewSet)
 
 
 router_files = routers.SimpleRouter()

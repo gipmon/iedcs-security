@@ -30,3 +30,9 @@ class Player(models.Model):
     version = models.CharField(max_length=128, default="", unique=True)
     public_key = models.FileField()
     private_key = models.FileField()
+
+
+class PlayerVersion(models.Model):
+    version = models.CharField(max_length=128)
+    public_key = models.FileField()
+    private_key = models.FileField()

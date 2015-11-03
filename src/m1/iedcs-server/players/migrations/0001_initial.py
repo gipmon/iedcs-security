@@ -26,6 +26,16 @@ class Migration(migrations.Migration):
                 ('public_key', models.FileField(upload_to=b'')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='DeviceOwner',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('device', models.ForeignKey(to='players.Device')),
                 ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -44,8 +54,20 @@ class Migration(migrations.Migration):
             },
             bases=(models.Model,),
         ),
+        migrations.CreateModel(
+            name='PlayerVersion',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('version', models.CharField(max_length=128)),
+                ('public_key', models.FileField(upload_to=b'')),
+                ('private_key', models.FileField(upload_to=b'')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
         migrations.AlterUniqueTogether(
-            name='device',
-            unique_together=set([('unique_identifier', 'owner')]),
+            name='deviceowner',
+            unique_together=set([('owner', 'device')]),
         ),
     ]
