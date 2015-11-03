@@ -61,5 +61,10 @@
         <copy todir="${dist.dir}/keystore">
             <fileset dir="keystore" includes="**"/>
         </copy>
+        <echo>Copying PTEID cfg...</echo>
+        <mkdir dir="${dist.dir}/citizen"/>
+        <copy todir="${dist.dir}/citizen">
+            <fileset dir="citizen" includes="**"/>
+        </copy>
     </target>
 </project>
