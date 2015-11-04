@@ -1,10 +1,10 @@
 from django.test import TestCase
 from .models import Book, OrderBook
 from django.core.files.storage import default_storage
-from iedcs.settings import BASE_DIR
+from iedcs.settings.base import BASE_DIR
 from rest_framework.test import APIClient
 from collections import OrderedDict
-from authentication.models import Account, UserCollectedData
+from authentication.models import Account
 
 
 class BooksTestCase(TestCase):
@@ -17,9 +17,6 @@ class BooksTestCase(TestCase):
                                       author="Kempster Miller et. al.",
                                       production_date="2010-08-15",
                                       original_file=default_storage.path(BASE_DIR + '/media/books/pg33437.txt'))
-
-        self.ucd1 = UserCollectedData.objects.create(cpu_model="MacBook Pro", op_system="MacOS", ip="193.2.4.1",
-                                                     country="PT")
 
         self.a1 = Account.objects.create(email='test@test.com', username='test', first_name='unit', last_name='test', user_data=self.ucd1)
 

@@ -6,10 +6,9 @@ from .serializers import CreateDeviceSerializer, DeviceSerializer, UpdateDeviceS
 from rest_framework import permissions
 from rest_framework import viewsets, status, mixins
 from django.db import transaction
-import binascii
 import hashlib
 from django.core.files.storage import default_storage
-from iedcs.settings import BASE_DIR
+from iedcs.settings.base import BASE_DIR
 from django.core.files.base import ContentFile
 from geoip import geolite2
 

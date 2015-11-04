@@ -3,7 +3,7 @@ import hashlib
 from .aescipher import AESCipher, Random
 from pbkdf2 import PBKDF2
 from django.core.files.storage import default_storage
-from iedcs.settings import BASE_DIR
+from iedcs.settings.base import BASE_DIR
 import rsa
 import base64
 

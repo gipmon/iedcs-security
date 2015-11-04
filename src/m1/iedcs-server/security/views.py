@@ -15,10 +15,11 @@ from security.functions import get_database_content_by_user_and_book, rd2_proces
 
 
 class ExchangeRd1Rd2ViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = Device.objects.filter()
+    serializer_class = ExchangeRd1Rd2Serializer
 
     def get_permissions(self):
         return permissions.IsAuthenticated(),
-
 
     def create(self, request, *args, **kwargs):
         """

@@ -18,4 +18,8 @@ sudo cp /vagrant/ssl/www_bkiedcs_tk.crt /etc/ssl/certs/www_bkiedcs_tk.crt
 sudo cp /vagrant/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
 a2ensite default-ssl.conf
 
+# mod_rewrite
+sudo a2enmod rewrite
+
+
 sudo service apache2 restart
