@@ -1,7 +1,13 @@
 package player.security;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -24,11 +30,14 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.bouncycastle.jcajce.provider.digest.SHA224;
 import org.bouncycastle.jcajce.provider.digest.BCMessageDigest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import player.IEDCSPlayer;
+import player.api.BookContent;
 import player.api.Requests;
 import player.api.Requests;
 import player.api.Result;
@@ -38,13 +47,19 @@ public class DecryptBook {
     private byte[] r2;
     private String bs;
     private String book_identifier;
-    private final byte[] book_ciphered;
+    private byte[] book_ciphered_bytes;
     private byte[] iv_array;
     private static final int max_iterations = 10;
+    private long last_byte = 0;
+    public String title;
+    private static final long number_of_blocks_per_page = 100;
     final protected static char[] hexArray = "0123456789abcdef".toCharArray();
     
-    public DecryptBook(Header[] headers, String book_ciphered){
-        for(Header h : headers){
+    public DecryptBook(String identifier){
+        Result rs = Requests.getBook(identifier);
+        BookContent bc = (BookContent) rs.getResult();
+        
+        for(Header h : bc.getHeaders()){
             if(h.getName().equals("r2")){
                 byte[] f = Base64.getDecoder().decode(h.getValue());
                 byte[] tmp1 = new byte[32];
@@ -57,13 +72,15 @@ public class DecryptBook {
                 this.bs = h.getValue();
             }else if(h.getName().equals("identifier")){
                 this.book_identifier = h.getValue();
+            }else if(h.getName().equals("name")){
+                this.title = h.getValue();
             }
         }
-        book_ciphered = book_ciphered.replaceAll("(\\r|\\n)", "");
-        this.book_ciphered = Base64.getDecoder().decode(book_ciphered.getBytes());
+        
+        this.book_ciphered_bytes = bc.getContent().getBytes();
     }
     
-    public String decrypt(){
+    public String getContent(long page){
         try {
             byte[] r2_encripted = this.r2;
             // k1 = PBKDF2(user.username + "jnpc" + book.identifier, book.identifier).read(32)
@@ -99,10 +116,9 @@ public class DecryptBook {
             PBKDF2 pbk = new PBKDF2(new String(rd3), new String(rd2_bytes));
             byte[] filekey = pbk.read(32);
             
-            byte[] contentText = decryptAES(this.book_ciphered, filekey);
+            byte[] contentText = decryptStreamAES(filekey, page*number_of_blocks_per_page);
             
             String content = new String(contentText);
-            System.out.println("ok");
             return content;
         } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
@@ -172,7 +188,7 @@ public class DecryptBook {
         return null;
     }
     
-    public static String bytesToHex(byte[] bytes) {
+    private static String bytesToHex(byte[] bytes) {
         // http://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
         char[] hexChars = new char[bytes.length * 2];
         for ( int j = 0; j < bytes.length; j++ ) {
@@ -220,6 +236,61 @@ public class DecryptBook {
             
             return cipher_aes.doFinal(tmp_block);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+            Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    private byte[] decryptStreamAES(byte[] key, long n){
+        try {
+            InputStream book_ciphered = Base64.getDecoder().wrap(new ByteArrayInputStream(this.book_ciphered_bytes));
+            Cipher cipher_aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            
+            int bs = 16;
+            byte[] iv = new byte[bs];
+            long teste = book_ciphered.read(iv);
+            IvParameterSpec iv_spec = new IvParameterSpec(iv);
+            SecretKeySpec sks = new SecretKeySpec(key, "AES");
+            
+            // Instantiate the cipher
+            cipher_aes.init(Cipher.DECRYPT_MODE, sks, iv_spec);
+            
+            long bytesRead = 0;
+            
+            byte[] clearText_block;
+            String clearText = "";
+            
+            long skyp_bytes = this.last_byte;
+            
+            if(skyp_bytes>=bs){
+                book_ciphered.skip(skyp_bytes-bs);
+            }
+            
+            long number_of_bytes_per_page = cipher_aes.getBlockSize() * number_of_blocks_per_page;
+            
+            while (book_ciphered.available() > 0){
+              byte[] dataBlock = new byte[bs];
+              bytesRead += book_ciphered.read(dataBlock);
+              clearText_block = cipher_aes.update(dataBlock);
+              String clearText_str = new String(clearText_block);
+              
+              clearText += clearText_str;
+              
+              if(bytesRead >= number_of_bytes_per_page && clearText.endsWith("\n")){
+                  this.last_byte = this.last_byte + bytesRead;
+                  break;
+              }
+            }
+            
+            if(book_ciphered.available() == 0){
+                clearText_block = cipher_aes.doFinal();
+                clearText += new String(clearText_block);
+            }
+            
+            return clearText.getBytes();
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
+            Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

@@ -99,7 +99,7 @@ def rd1_process(rd, user, book, random2):
         # rd1 = AES/CBC(rd, k1)
         rd1 = AESCipher.encrypt(rd, k1, rd1_iv)
 
-    print "rd1_process: rd1:" + rd1
+    # print "rd1_process: rd1:" + rd1
 
     return rd1
 
@@ -124,9 +124,9 @@ def rd2_process(rd1, user, book, random1):
 def rd3_process(rd2, n, user, book, random2):
     # k3 = PBKDF2(hashlib.sha224(n + "ua" + book.identifier), random2)
     k3 = PBKDF2(hashlib.sha224(str(n) + "ua" + book.identifier).hexdigest(), random2).read(32)
-    print "rd3_process: rd2: " + rd2
-    print "rd3_process: k3:" + base64.b64encode(k3)
-    print "rd3_process: sha:" + hashlib.sha224(str(n) + "ua" + book.identifier).hexdigest()
+    # print "rd3_process: rd2: " + rd2
+    # print "rd3_process: k3:" + base64.b64encode(k3)
+    # print "rd3_process: sha:" + hashlib.sha224(str(n) + "ua" + book.identifier).hexdigest()
 
     # rd3 = AES/CBC(rd2, k3)
     if not exists_database_content_by_user_and_book("rd3_iv", user, book):
@@ -136,10 +136,10 @@ def rd3_process(rd2, n, user, book, random2):
         store_database_content_by_user_and_book("rd3_iv", rd3_iv, user, book)
     else:
         rd3_iv = base64.b64decode(get_database_content_by_user_and_book("rd3_iv", user, book))
-        print "rd3_process: rd3_iv:" + base64.b64encode(rd3_iv)
+        # print "rd3_process: rd3_iv:" + base64.b64encode(rd3_iv)
         rd3 = AESCipher.encrypt(rd2, k3, rd3_iv)
 
-    print "rd3_process: rd3:" + rd3
+    # print "rd3_process: rd3:" + rd3
     return rd3
 
 

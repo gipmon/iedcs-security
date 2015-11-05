@@ -24,12 +24,16 @@ import javafx.scene.control.Label;
 import org.json.JSONException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.TextArea;
+import player.security.DecryptBook;
 
 public class ViewBookController implements Initializable {
     @FXML private TextArea textZone;
     @FXML private Label title;
+    @FXML private Label page;
     private String identifier;
-
+    private DecryptBook db;
+    private int page_number = 0;
+    
     public class Ebook{
         public SimpleStringProperty ebook = new SimpleStringProperty();
 
@@ -40,7 +44,6 @@ public class ViewBookController implements Initializable {
         public String getEbook(){
             return ebook.get();
         }
-         
     }
    
     @Override
@@ -71,26 +74,22 @@ public class ViewBookController implements Initializable {
         }
     }
     
-    public void setIdentifier(String identifier){
-        try {
-            Result rs = Requests.getBookContent(identifier);
-            if(rs.getStatusCode()==200){
-                BookContent obj = (BookContent) rs.getResult();
-                textZone.setText(obj.getContent());  
-                for(int i = 0; i<obj.getHeaders().length; i++){
-                    if(obj.getHeaders()[i].toString().contains("name")){
-                        title.setText(obj.getHeaders()[i].toString().substring(5));
-                    }
-                }
-            }
-        } catch (ProtocolException ex) {
-            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (JSONException ex) {
-            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    @FXML
+    private void handleForwardBtn(ActionEvent event) {
+        textZone.setText(db.getContent(++page_number));
+        page.setText(Integer.toString(page_number+1));
+    }
     
+    @FXML
+    private void handleBackwardBtn(ActionEvent event) {
+        textZone.setText(db.getContent(--page_number));
+        page.setText(Integer.toString(page_number+1));
+    }
+    
+    public void setIdentifier(String identifier){
+        db = new DecryptBook(identifier);
+        textZone.setText(db.getContent(0));
+        title.setText(db.title);
     }
     
 }

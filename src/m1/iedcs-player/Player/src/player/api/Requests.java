@@ -300,53 +300,48 @@ public class Requests {
         return (new Result(response.getStatusLine().getStatusCode(), response_json));
     }
     
-    public static Result getBookContent(String identifier) throws MalformedURLException, ProtocolException, IOException, JSONException{
-        updateDeviceData();
-        
-        HttpGet get = new HttpGet(Requests.VIEW_BOOK+identifier+"/");
-
-        // add header
-        get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
-        get.setHeader("Accept-Language", "application/json");
-        get.setHeader("Content-Type", "application/json;charset=UTF-8");
-        
-        HttpResponse response = client.execute(get);
-        System.out.println("\nSending 'GET' request to URL : " + Requests.VIEW_BOOK+identifier+"/");
-        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
-        
-        // print cookies
-
-        System.out.println("Printing Response Header...\n");
-
-        Header[] headers = response.getAllHeaders();
-        for (Header header : headers) {
-            System.out.println("Key : " + header.getName() + " ,Value : " + header.getValue());
-        }
-
-        System.out.println("\nGet Response Header By Key ...\n");
-        String server = response.getFirstHeader("Server").getValue();
-        // output file
-        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-
-        StringBuilder result = new StringBuilder();
-        String line = "";
-        while ((line = rd.readLine()) != null) {
+    public static Result getBook(String book_identifier){
+        BufferedReader rd = null;
+        try {
+            updateDeviceData();
+            HttpGet get = new HttpGet(Requests.VIEW_BOOK+book_identifier+"/");
+            // add header
+            get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+            get.setHeader("Accept-Language", "application/json");
+            get.setHeader("Content-Type", "application/json;charset=UTF-8");
+            HttpResponse response = client.execute(get);
+            System.out.println("\nSending 'GET' request to URL : " + Requests.VIEW_BOOK+book_identifier+"/");
+            System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
+            // print cookies
+            
+            System.out.println("Printing Response Header...\n");
+            Header[] headers = response.getAllHeaders();
+            for (Header header : headers) {
+                System.out.println("Key : " + header.getName() + " ,Value : " + header.getValue());
+            }   System.out.println("\nGet Response Header By Key ...\n");
+            String server = response.getFirstHeader("Server").getValue();
+            // output file
+            rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            StringBuilder result = new StringBuilder();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
                 result.append(line);
-                result.append("\n");
-        } 
-
-        PrintWriter fs = new PrintWriter("output.html");
-        fs.print(result.toString());
-        fs.close();
-        
-        // decrypt
-        DecryptBook dbook = new DecryptBook(headers, result.toString());
-        String book_content = dbook.decrypt();
-        // decrypt
-        
-        BookContent book = new BookContent(headers, book_content);
-        
-        return (new Result(response.getStatusLine().getStatusCode(), book));
-        
+            }   PrintWriter fs = new PrintWriter("output.html");
+            fs.print(result.toString());
+            fs.close();
+            BookContent book = new BookContent(headers, result.toString());
+            return (new Result(response.getStatusLine().getStatusCode(), book));
+        } catch (IOException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedOperationException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                rd.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return null;
     }
 }
