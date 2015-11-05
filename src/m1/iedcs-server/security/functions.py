@@ -5,6 +5,7 @@ from pbkdf2 import PBKDF2
 from django.core.files.storage import default_storage
 from iedcs.settings.base import BASE_DIR
 import rsa
+from Crypto.Cipher import AES
 import base64
 
 # max iterations for the file derivation process
@@ -34,18 +35,20 @@ def encrypt_book_content(book, user, device):
     number = reduce(lambda x, y: x + y, [int(c) for c in random2 if c.isdigit()], 0)
     n = divmod(number, max_iterations)
 
-    rd3 = random2
+    iv_array = bytearray()
 
     # calculating the file key
-    for i in range(0, n[1]):
-        # generate rd1
-        rd1 = rd1_process(rd3, user, book, random2)
+    # generate rd1
+    rd1 = rd1_process(random2, user, book, random2)
+    # for get the iv
+    iv_array += base64.b64decode(rd1)[:AES.block_size]
 
-        # generate rd2
-        rd2 = rd2_process(rd1, user, random1)
+    # generate rd2
+    rd2 = rd2_process(rd1, user, random1)
 
-        # generate rd3
-        rd3 = rd3_process(rd2, n, book, random2)
+    # generate rd3
+    rd3 = rd3_process(rd2, n, book, random2)
+    iv_array += base64.b64decode(rd3)[:AES.block_size]
 
     file_key = rd3
     key = PBKDF2(file_key, random2).read(32)
@@ -59,24 +62,23 @@ def encrypt_book_content(book, user, device):
     else:
         book_signed = get_database_content_by_user_and_book("book_signed", user, book)
 
-    print "random2 original: " + random2
-
     # cipher with AES
     if not exists_database_content_by_user_and_book("random2_aes", user, book):
         k1 = PBKDF2(user.username + "jnpc" + book.identifier, book.identifier).read(32)
-        print "k1:" + base64.b64encode(k1)
         random2 = AESCipher.encrypt(random2, k1)
         store_database_content_by_user_and_book("random2_aes", random2, user, book)
     else:
         random2 = get_database_content_by_user_and_book("random2_aes", user, book)
-
-    print "random2 AES: " + random2
 
     class BookSecurityResult:
         def __init__(self, rdn2, bs, bc):
             self.random2 = rdn2
             self.book_signed = bs
             self.book_ciphered = bc
+
+    # append iv array
+    rd2 = str(iv_array) + base64.b64decode(random2)
+    random2 = base64.b64encode(rd2)
 
     book_content_ciphered = AESCipher.encrypt(content=book_content, key=key)
     return BookSecurityResult(rdn2=random2, bs=book_signed, bc=book_content_ciphered)
@@ -88,15 +90,20 @@ def rd1_process(rd, user, book, random2):
 
     # rd1 = AES/CBC(rd, k1)
     rd1 = AESCipher.encrypt(rd, k1)
+    print "rd1_process: rd1:" + base64.b64encode(rd1)
+
     return rd1
 
 
 def rd2_process(rd1, user, random1):
     # k2 = PBKDF2(sha224(user.username + "deti" + random1), random1)
     k2 = PBKDF2(hashlib.sha224(user.username + "deti" + random1).hexdigest(), random1).read(32)
+    print "rd2_process: rd1: " + rd1
+    print "rd2_process: k2:" + base64.b64encode(k2)
 
     # rd2 = AES/CBC(rd1, k2)
     rd2 = AESCipher.decrypt(rd1, k2)
+    print "rd2_process: rd2:" + base64.b64encode(rd2)
     return rd2
 
 
