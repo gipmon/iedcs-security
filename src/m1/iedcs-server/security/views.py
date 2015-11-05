@@ -39,9 +39,8 @@ class ExchangeRd1Rd2ViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
             random1 = get_database_content_by_user_and_book("random1", request.user, book)
 
-            rd1 = base64.b64decode(serializer.data["rd1"])
             print "rd1 ser: " + serializer.data["rd1"]
-            return Response({'rd2': rd2_process(rd1, request.user, random1)})
+            return Response({'rd2': rd2_process(serializer.data["rd1"], request.user, book, random1)})
 
         return Response({'status': 'Bad Request',
                          'message': serializer.errors},

@@ -27,6 +27,7 @@ import org.apache.http.Header;
 import org.bouncycastle.jcajce.provider.digest.SHA224;
 import org.bouncycastle.jcajce.provider.digest.BCMessageDigest;
 import org.json.JSONException;
+import org.json.JSONObject;
 import player.IEDCSPlayer;
 import player.api.Requests;
 import player.api.Requests;
@@ -37,7 +38,7 @@ public class DecryptBook {
     private byte[] r2;
     private String bs;
     private String book_identifier;
-    private final String book_ciphered;
+    private final byte[] book_ciphered;
     private byte[] iv_array;
     private static final int max_iterations = 10;
     final protected static char[] hexArray = "0123456789abcdef".toCharArray();
@@ -58,7 +59,8 @@ public class DecryptBook {
                 this.book_identifier = h.getValue();
             }
         }
-        this.book_ciphered = book_ciphered;
+        book_ciphered = book_ciphered.replaceAll("(\\r|\\n)", "");
+        this.book_ciphered = Base64.getDecoder().decode(book_ciphered.getBytes());
     }
     
     public String decrypt(){
@@ -75,7 +77,7 @@ public class DecryptBook {
             
             for(char c : rd2.toCharArray()){
                 if(Character.isDigit(c)){
-                    number += c;
+                    number += Integer.parseInt(String.valueOf(c));
                 }
             }
             
@@ -85,12 +87,23 @@ public class DecryptBook {
             
             HashMap<String, String> parameters = new HashMap<String, String>();
             parameters.put("book_identifier", this.book_identifier);
-            parameters.put("rd1", new String(Base64.getEncoder().encode(rd1)));
+            parameters.put("rd1", new String(rd1));
             parameters.put("device_identifier", ComputerDetails.getUniqueIdentifier());
             Result r = Requests.postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/security_exchange_r1r2/", parameters);
             
+            JSONObject jso = (JSONObject) r.getResult();
+            String rd2_server = jso.getString("rd2");
+            
+            byte[] rd3 = rd3_process(rd2_server.getBytes(), n, rd2_bytes);
+            
+            PBKDF2 pbk = new PBKDF2(new String(rd3), new String(rd2_bytes));
+            byte[] filekey = pbk.read(32);
+            
+            byte[] contentText = decryptAES(this.book_ciphered, filekey);
+            
+            String content = new String(contentText);
             System.out.println("ok");
-            return this.book_ciphered;
+            return content;
         } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ProtocolException ex) {
@@ -98,20 +111,17 @@ public class DecryptBook {
         } catch (IOException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return this.book_ciphered;
+        return "";
     }
     
     private byte[] rd1_process(byte[] rd, byte[] random2){
         try {
             MessageDigest messageDigest224 = MessageDigest.getInstance( "SHA-224");
+            messageDigest224.reset();
             messageDigest224.update((Requests.getUser().getString("username") + "fcp" + this.book_identifier).getBytes());
             byte[] sha_tmp = bytesToHex(messageDigest224.digest()).getBytes();
             PBKDF2 pbk = new PBKDF2(new String(sha_tmp), new String(random2));
             byte[] k1 = pbk.read(32);
-            
-            String rd2 = new String(random2);
-            String sha = new String(sha_tmp);
-            String teste = new String(Base64.getEncoder().encode(k1));
             
             byte[] iv1 = new byte[16];
             System.arraycopy(this.iv_array, 0, iv1, 0, 16);
@@ -121,8 +131,42 @@ public class DecryptBook {
             System.arraycopy(iv1, 0, final_rd1, 0, iv1.length);
             System.arraycopy(rd1, 0, final_rd1, iv1.length, rd1.length);
             
-            return final_rd1;
+            return Base64.getEncoder().encode(final_rd1);
         } catch (NoSuchAlgorithmException | JSONException | InvalidKeySpecException ex) {
+            Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
+    private byte[] rd3_process(byte[] rd2, int n, byte[] random2){
+        try {
+            MessageDigest messageDigest224 = MessageDigest.getInstance( "SHA-224");
+            messageDigest224.reset();
+            messageDigest224.update((Integer.toString(n) + "ua" + this.book_identifier).getBytes());
+            String dsgs = Integer.toString(n) + "ua" + this.book_identifier;
+            byte[] sha_tmp = bytesToHex(messageDigest224.digest()).getBytes();
+            PBKDF2 pbk = new PBKDF2(new String(sha_tmp), new String(random2));
+            byte[] k3 = pbk.read(32);
+            
+            String rd2_str = new String(rd2);
+            String random2_rd3 = new String(random2);
+            String sha = new String(sha_tmp);
+            String teste_k3 = new String(Base64.getEncoder().encode(k3));
+            
+            byte[] iv3 = new byte[16];
+            System.arraycopy(this.iv_array, 16, iv3, 0, 16);
+            
+            String teste_iv3 = new String(Base64.getEncoder().encode(iv3));
+            
+            byte[] rd3 = encryptAES(rd2, k3, iv3);
+            String d = new String(rd3);
+            
+            byte[] final_rd3 = new byte[iv3.length + rd3.length];
+            System.arraycopy(iv3, 0, final_rd3, 0, iv3.length);
+            System.arraycopy(rd3, 0, final_rd3, iv3.length, rd3.length);
+            
+            return Base64.getEncoder().encode(final_rd3);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

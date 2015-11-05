@@ -4,11 +4,13 @@ from Crypto.Cipher import AES
 
 
 class AESCipher(object):
-    bs = 32
+    bs = 16
 
     @staticmethod
-    def encrypt(content, key):
-        iv = Random.new().read(AES.block_size)
+    def encrypt(content, key, iv=None):
+        if iv is None:
+            iv = Random.new().read(AES.block_size)
+
         cipher = AES.new(key, AES.MODE_CBC, iv)
         return base64.b64encode(iv + cipher.encrypt(AESCipher.pad(content)))
 
