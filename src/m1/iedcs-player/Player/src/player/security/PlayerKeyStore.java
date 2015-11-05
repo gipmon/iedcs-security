@@ -22,7 +22,9 @@ import javax.crypto.spec.SecretKeySpec;
 import player.Player;
 import java.io.File;
 import java.io.StringWriter;
+import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -107,14 +109,14 @@ public class PlayerKeyStore {
         }
     }
     
-    public static PublicKey getKey(){
+    public static PublicKey getPublicKey(){
         try {
-            // get my private key
+            // get my public key
             SecretKeyEntry skEntry = (SecretKeyEntry) ks.getEntry("publicKeyDevice", protParam);
-            SecretKey myPrivateKey = skEntry.getSecretKey();
+            SecretKey myPublicKey = skEntry.getSecretKey();
             
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(myPrivateKey.getEncoded());
-            KeyFactory keyFactory = KeyFactory.getInstance(myPrivateKey.getAlgorithm());
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(myPublicKey.getEncoded());
+            KeyFactory keyFactory = KeyFactory.getInstance(myPublicKey.getAlgorithm());
             PublicKey pubKey = keyFactory.generatePublic(keySpec);
             return pubKey;
         } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException | InvalidKeySpecException ex) {
@@ -124,9 +126,23 @@ public class PlayerKeyStore {
         return null;
     }
     
+    public static PrivateKey getPrivateKey(){
+        try {
+            SecretKeySpec sks = (SecretKeySpec)ks.getKey("privateKeyDevice", password);
+            PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(sks.getEncoded()));
+            return privateKey;
+        } catch (NoSuchAlgorithmException | UnrecoverableEntryException | KeyStoreException ex) {
+            Logger.getLogger(PlayerPublicKey.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeySpecException ex) {
+            Logger.getLogger(PlayerKeyStore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+    
     public static String getPemPubKey(){
         try {
-            RSAPublicKey pub_key = (RSAPublicKey) getKey();
+            RSAPublicKey pub_key = (RSAPublicKey) getPublicKey();
             RSAPublicKeyStructure struct = new RSAPublicKeyStructure(pub_key.getModulus(), pub_key.getPublicExponent());
             ASN1Primitive publicKeyPKCS1ASN1 = struct.toASN1Primitive();
             byte[] publicKeyPKCS1 = publicKeyPKCS1ASN1.getEncoded();

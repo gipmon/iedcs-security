@@ -9,6 +9,8 @@ class AESCipher(object):
     @staticmethod
     def encrypt(content, key):
         iv = Random.new().read(AES.block_size)
+        print "iv: " + base64.b64encode(iv)
+        print "block size: " + str(AES.block_size)
         cipher = AES.new(key, AES.MODE_CBC, iv)
         return base64.b64encode(iv + cipher.encrypt(AESCipher.pad(content)))
 

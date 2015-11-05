@@ -27,6 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import player.IEDCSPlayer;
 import player.security.ComputerDetails;
+import player.security.DecryptBook;
 import player.security.PlayerKeyStore;
 
 
@@ -338,7 +339,12 @@ public class Requests {
         fs.print(result.toString());
         fs.close();
         
-        BookContent book = new BookContent(headers, result.toString());
+        // decrypt
+        DecryptBook dbook = new DecryptBook(headers, result.toString());
+        String book_content = dbook.decrypt();
+        // decrypt
+        
+        BookContent book = new BookContent(headers, book_content);
         
         return (new Result(response.getStatusLine().getStatusCode(), book));
         

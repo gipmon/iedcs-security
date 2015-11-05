@@ -59,23 +59,27 @@ def encrypt_book_content(book, user, device):
     else:
         book_signed = get_database_content_by_user_and_book("book_signed", user, book)
 
-    # cipher with player key private RSA
-    if not exists_database_content_by_user_and_book("random2_signed", user, book):
-        public_key_device = device.public_key.read()
-        pubkey = rsa.PublicKey.load_pkcs1(public_key_device)
-        random2_signed = base64.b64encode(rsa.encrypt(str(random2), pubkey))
-        store_database_content_by_user_and_book("random2_signed", random2_signed, user, book)
+    print "random2 original: " + random2
+
+    # cipher with AES
+    if not exists_database_content_by_user_and_book("random2_aes", user, book):
+        k1 = PBKDF2(user.username + "jnpc" + book.identifier, book.identifier).read(32)
+        print "k1:" + base64.b64encode(k1)
+        random2 = AESCipher.encrypt(random2, k1)
+        store_database_content_by_user_and_book("random2_aes", random2, user, book)
     else:
-        random2_signed = get_database_content_by_user_and_book("random2_signed", user, book)
+        random2 = get_database_content_by_user_and_book("random2_aes", user, book)
+
+    print "random2 AES: " + random2
 
     class BookSecurityResult:
         def __init__(self, rdn2, bs, bc):
-            self.random2_signed = rdn2
+            self.random2 = rdn2
             self.book_signed = bs
             self.book_ciphered = bc
 
     book_content_ciphered = AESCipher.encrypt(content=book_content, key=key)
-    return BookSecurityResult(rdn2=random2_signed, bs=book_signed, bc=book_content_ciphered)
+    return BookSecurityResult(rdn2=random2, bs=book_signed, bc=book_content_ciphered)
 
 
 def rd1_process(rd, user, book, random2):
