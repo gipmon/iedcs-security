@@ -41,7 +41,11 @@ public class Requests {
     private static JSONObject USER;
     private static HttpClient client = HttpClientBuilder.create().build();
     private static String csrftoken = "";
-      
+    
+    static{
+        
+    }
+    
     public static Result login(String email, String password) throws MalformedURLException, ProtocolException, IOException, JSONException{
         HashMap<String, String> parameters = new HashMap<String, String>();
         

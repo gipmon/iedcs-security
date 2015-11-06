@@ -43,8 +43,8 @@ public class FrontPageController implements Initializable {
         }
         login_button.setDisable(true);
         
-        String login = "mail@rafaelferreira.pt";//login_email.getText();
-        String password = "12345678";//login_password.getText();
+        String login = login_email.getText();
+        String password = login_password.getText();
         
         if(login.length()==0 || password.length()==0){
             System.out.println("E-mail or Password is empty!");
