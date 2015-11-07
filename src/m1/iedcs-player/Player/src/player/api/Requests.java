@@ -1,6 +1,8 @@
 package player.api;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -8,14 +10,32 @@ import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import org.json.*;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -23,8 +43,18 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeSocketFactory;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.ssl.TrustStrategy;
 import player.IEDCSPlayer;
 import player.security.ComputerDetails;
 import player.security.DecryptBook;
@@ -39,11 +69,65 @@ public class Requests {
     public static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/get_book/";
     
     private static JSONObject USER;
-    private static HttpClient client = HttpClientBuilder.create().build();
+    private static HttpClient client = buildHttpsClient();
     private static String csrftoken = "";
     
-    static{
-        
+    private static HttpClient buildHttpsClient(){
+        if(!IEDCSPlayer.isHttps()){
+            return HttpClientBuilder.create().build();
+        }
+        try {
+            FileInputStream fis = null;
+            fis = new FileInputStream("keystore/cacerts.keystore");
+            KeyStore keystore  = KeyStore.getInstance("JKS");
+            char[] pwd = "changeit".toCharArray();
+            keystore.load(fis, pwd);
+            
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                    TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(keystore);
+            TrustManager[] tm = tmf.getTrustManagers();
+            
+            KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
+                    KeyManagerFactory.getDefaultAlgorithm());
+            kmfactory.init(keystore, pwd);
+            KeyManager[] km = kmfactory.getKeyManagers();
+            
+            SSLContext sslcontext = SSLContext.getInstance("SSL");
+            sslcontext.init(km, tm, null);
+
+            // set up a TrustManager that trusts everything
+            sslcontext.init(km, tm, new SecureRandom());
+            
+            HttpClientBuilder builder = HttpClientBuilder.create();
+            SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslcontext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            builder.setSSLSocketFactory(sslConnectionFactory);
+
+            Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register("https", sslConnectionFactory)
+                    .build();
+
+            HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
+
+            builder.setConnectionManager(ccm);
+
+            return builder.build();
+        }catch (KeyStoreException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnrecoverableKeyException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (KeyManagementException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return HttpClientBuilder.create().build();
     }
     
     public static Result login(String email, String password) throws MalformedURLException, ProtocolException, IOException, JSONException{
