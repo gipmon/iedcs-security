@@ -34,7 +34,7 @@ class Command(BaseCommand):
         try:
             for book in books:
                 Book.objects.create(name=book['name'], production_date=book['production_date'], author=book['author'],
-                                    original_file=default_storage.path(BASE_DIR+'/media/books/'+book['original_file']))
+                                    original_file=book['original_file'])
         except Exception, e:
             print "The books are already inserted!"
             # print e.message

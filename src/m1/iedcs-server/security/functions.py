@@ -13,7 +13,7 @@ max_iterations = 10
 
 
 def encrypt_book_content(book, user, device):
-    book_content = book.original_file.read()
+    book_content = default_storage.open(book.get_file_path()).read()
 
     # get or set the random 2
     if not exists_database_content_by_user_and_book("random2", user, book):
@@ -56,7 +56,7 @@ def encrypt_book_content(book, user, device):
     # get or set the book signed
     private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/private.key').read()
     priv_key = rsa.PrivateKey.load_pkcs1(private_key_player)
-    book_signed = base64.b64encode(rsa.sign(book.original_file, priv_key, 'SHA-256'))
+    book_signed = base64.b64encode(rsa.sign(default_storage.open(book.get_file_path()), priv_key, 'SHA-256'))
 
     # cipher with AES
     k1 = PBKDF2(user.username + "jnpc" + book.identifier, book.identifier).read(32)

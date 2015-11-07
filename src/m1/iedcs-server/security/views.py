@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import viewsets, status, mixins
@@ -16,6 +17,7 @@ class ExchangeRd1Rd2ViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def get_permissions(self):
         return permissions.IsAuthenticated(),
 
+    @csrf_exempt
     def create(self, request, *args, **kwargs):
         """
         B{Create} decipher process

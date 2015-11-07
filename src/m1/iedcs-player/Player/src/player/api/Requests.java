@@ -254,6 +254,10 @@ public class Requests {
         post.setHeader("Accept-Language", "application/json");
         post.setHeader("Content-Type", "application/json;charset=UTF-8");
         
+        if(IEDCSPlayer.isHttps()){
+            post.setHeader("Referer", "https://www.bkiedcs.tk/");
+        }
+        
         if(csrftoken.length()>0){
             post.setHeader("X-CSRFToken", csrftoken);
         }
