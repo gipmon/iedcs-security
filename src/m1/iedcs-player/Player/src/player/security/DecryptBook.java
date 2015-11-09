@@ -51,6 +51,8 @@ public class DecryptBook {
     private byte[] iv_array;
     private static final int max_iterations = 10;
     private long last_byte = 0;
+    private long[] last_skyp_bytes = {0};
+    private long last_page = 1;
     public String title;
     private static final long number_of_blocks_per_page = 100;
     final protected static char[] hexArray = "0123456789abcdef".toCharArray();
@@ -116,7 +118,7 @@ public class DecryptBook {
             PBKDF2 pbk = new PBKDF2(new String(rd3), new String(rd2_bytes));
             byte[] filekey = pbk.read(32);
             
-            byte[] contentText = decryptStreamAES(filekey, page*number_of_blocks_per_page);
+            byte[] contentText = decryptStreamAES(filekey, page*number_of_blocks_per_page, page);
             
             String content = new String(contentText);
             return content;
@@ -241,7 +243,7 @@ public class DecryptBook {
         return null;
     }
     
-    private byte[] decryptStreamAES(byte[] key, long n){
+    private byte[] decryptStreamAES(byte[] key, long n, long page){
         try {
             InputStream book_ciphered = Base64.getDecoder().wrap(new ByteArrayInputStream(this.book_ciphered_bytes));
             Cipher cipher_aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -259,11 +261,12 @@ public class DecryptBook {
             
             byte[] clearText_block;
             String clearText = "";
+            long skyp_bytes;
             
-            long skyp_bytes = this.last_byte;
+            skyp_bytes = this.last_skyp_bytes[(int) page-1];
             
             if(skyp_bytes>=bs){
-                book_ciphered.skip(skyp_bytes-bs);
+                book_ciphered.skip(skyp_bytes-32);
             }
             
             long number_of_bytes_per_page = cipher_aes.getBlockSize() * number_of_blocks_per_page;
@@ -274,10 +277,22 @@ public class DecryptBook {
               clearText_block = cipher_aes.update(dataBlock);
               String clearText_str = new String(clearText_block);
               
-              clearText += clearText_str;
+              if((bytesRead >= 32 && skyp_bytes == 0) || (bytesRead >= 48 && skyp_bytes > 0)){
+                  clearText += clearText_str;
+              }
               
-              if(bytesRead >= number_of_bytes_per_page && clearText.endsWith("\n")){
+              if(bytesRead >= number_of_bytes_per_page && clearText.endsWith("\n")){ 
                   this.last_byte = this.last_byte + bytesRead;
+                  if(this.last_skyp_bytes.length == page){
+                      long[] toAppend = {this.last_byte};
+                      long[] tmp = new long[this.last_skyp_bytes.length + toAppend.length];
+                      System.arraycopy(this.last_skyp_bytes, 0, tmp, 0, this.last_skyp_bytes.length);
+                      System.arraycopy(toAppend, 0, tmp, this.last_skyp_bytes.length, toAppend.length);
+
+                      this.last_skyp_bytes = tmp;
+                      
+                  }
+                                          
                   break;
               }
             }

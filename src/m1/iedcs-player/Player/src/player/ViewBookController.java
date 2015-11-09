@@ -32,7 +32,7 @@ public class ViewBookController implements Initializable {
     @FXML private Label page;
     private String identifier;
     private DecryptBook db;
-    private int page_number = 0;
+    private int page_number = 1;
     
     public class Ebook{
         public SimpleStringProperty ebook = new SimpleStringProperty();
@@ -77,18 +77,18 @@ public class ViewBookController implements Initializable {
     @FXML
     private void handleForwardBtn(ActionEvent event) {
         textZone.setText(db.getContent(++page_number));
-        page.setText(Integer.toString(page_number+1));
+        page.setText(Integer.toString(page_number));
     }
     
     @FXML
     private void handleBackwardBtn(ActionEvent event) {
         textZone.setText(db.getContent(--page_number));
-        page.setText(Integer.toString(page_number+1));
+        page.setText(Integer.toString(page_number));
     }
     
     public void setIdentifier(String identifier){
         db = new DecryptBook(identifier);
-        textZone.setText(db.getContent(0));
+        textZone.setText(db.getContent(1));
         title.setText(db.title);
     }
     
