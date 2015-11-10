@@ -23,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import org.json.JSONException;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import player.security.DecryptBook;
 
@@ -30,6 +31,8 @@ public class ViewBookController implements Initializable {
     @FXML private TextArea textZone;
     @FXML private Label title;
     @FXML private Label page;
+    @FXML private Button backward;
+    @FXML private Button forward;
     private String identifier;
     private DecryptBook db;
     private int page_number = 1;
@@ -78,12 +81,24 @@ public class ViewBookController implements Initializable {
     private void handleForwardBtn(ActionEvent event) {
         textZone.setText(db.getContent(++page_number));
         page.setText(Integer.toString(page_number));
+        backward.setDisable(false);
+        if(db.isFinal == false){
+            forward.setDisable(false);
+        }else{
+            forward.setDisable(true);
+        }
     }
     
     @FXML
     private void handleBackwardBtn(ActionEvent event) {
         textZone.setText(db.getContent(--page_number));
         page.setText(Integer.toString(page_number));
+        if(page_number == 1){
+            backward.setDisable(true);
+        }else{
+            backward.setDisable(false);
+        }
+        forward.setDisable(false);
     }
     
     public void setIdentifier(String identifier){

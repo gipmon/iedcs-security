@@ -54,6 +54,7 @@ public class DecryptBook {
     private long[] last_skyp_bytes = {0};
     private long last_page = 1;
     public String title;
+    public boolean isFinal = false;
     private static final long number_of_blocks_per_page = 100;
     final protected static char[] hexArray = "0123456789abcdef".toCharArray();
     
@@ -249,6 +250,12 @@ public class DecryptBook {
             Cipher cipher_aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
             
             int bs = 16;
+            long skyp_bytes;
+            
+            skyp_bytes = this.last_skyp_bytes[(int) page-1];
+            if(skyp_bytes>=bs){
+                book_ciphered.skip(skyp_bytes-(page-1)*bs);
+            }
             byte[] iv = new byte[bs];
             long teste = book_ciphered.read(iv);
             IvParameterSpec iv_spec = new IvParameterSpec(iv);
@@ -261,14 +268,7 @@ public class DecryptBook {
             
             byte[] clearText_block;
             String clearText = "";
-            long skyp_bytes;
-            
-            skyp_bytes = this.last_skyp_bytes[(int) page-1];
-            
-            if(skyp_bytes>=bs){
-                book_ciphered.skip(skyp_bytes-32);
-            }
-            
+
             long number_of_bytes_per_page = cipher_aes.getBlockSize() * number_of_blocks_per_page;
             
             while (book_ciphered.available() > 0){
@@ -277,11 +277,11 @@ public class DecryptBook {
               clearText_block = cipher_aes.update(dataBlock);
               String clearText_str = new String(clearText_block);
               
-              if((bytesRead >= 32 && skyp_bytes == 0) || (bytesRead >= 48 && skyp_bytes > 0)){
-                  clearText += clearText_str;
-              }
               
-              if(bytesRead >= number_of_bytes_per_page && clearText.endsWith("\n")){ 
+              clearText += clearText_str;
+              
+              
+              if(bytesRead >= number_of_bytes_per_page && (clearText.endsWith("\n") || clearText.endsWith(".") || clearText.endsWith(","))){ 
                   this.last_byte = this.last_byte + bytesRead;
                   if(this.last_skyp_bytes.length == page){
                       long[] toAppend = {this.last_byte};
@@ -300,6 +300,9 @@ public class DecryptBook {
             if(book_ciphered.available() == 0){
                 clearText_block = cipher_aes.doFinal();
                 clearText += new String(clearText_block);
+                this.isFinal = true;
+            }else{
+                this.isFinal = false;
             }
             
             return clearText.getBytes();
