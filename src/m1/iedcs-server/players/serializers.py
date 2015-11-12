@@ -7,14 +7,14 @@ class CreateDeviceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ('unique_identifier', 'cpu_model', 'op_system', 'ip', 'timezone', 'host_name', 'public_key',)
+        fields = ('unique_identifier', 'cpu_model', 'op_system', 'ip', 'time', 'host_name', 'public_key',)
 
 
 class DeviceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ('unique_identifier', 'cpu_model', 'op_system', 'ip', 'timezone', 'host_name',)
+        fields = ('unique_identifier', 'cpu_model', 'op_system', 'ip', 'time', 'host_name',)
 
 
 class UpdateDeviceSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class UpdateDeviceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Device
-        fields = ('unique_identifier', 'cpu_model', 'op_system', 'ip', 'timezone', 'host_name',)
+        fields = ('unique_identifier', 'cpu_model', 'op_system', 'ip', 'time', 'host_name',)
 
 
 class DeviceRetrieveSerializer(serializers.ModelSerializer):

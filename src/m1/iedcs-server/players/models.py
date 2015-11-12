@@ -9,7 +9,7 @@ class Device(models.Model):
     op_system = models.CharField(max_length=128, default="")
     ip = models.CharField(max_length=128, default="")
     country = models.CharField(max_length=128, default="")
-    timezone = models.CharField(max_length=128, default="")
+    time = models.CharField(max_length=128, default="")
     host_name = models.CharField(max_length=128, default="")
 
     public_key = models.FileField()

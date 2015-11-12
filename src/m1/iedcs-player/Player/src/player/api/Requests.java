@@ -163,7 +163,7 @@ public class Requests {
                 parameters.put("ip", ComputerDetails.getPublicIP());
                 DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
                 Date date = new Date();
-                parameters.put("timezone", dateFormat.format(date));
+                parameters.put("time", dateFormat.format(date));
                 parameters.put("host_name", ComputerDetails.getHostName());
                 parameters.put("public_key", PlayerKeyStore.getPemPubKey());
                 postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
@@ -182,7 +182,7 @@ public class Requests {
             parameters.put("ip", ComputerDetails.getPublicIP());
             DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
             Date date = new Date();
-            parameters.put("timezone", dateFormat.format(date));
+            parameters.put("time", dateFormat.format(date));
             parameters.put("host_name", ComputerDetails.getHostName());
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
             putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/update/", parameters);

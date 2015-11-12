@@ -86,7 +86,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
                                                        op_system=serializer.data["op_system"],
                                                        ip=serializer.data["ip"],
                                                        country=c,
-                                                       timezone=serializer.data["timezone"],
+                                                       time=serializer.data["time"],
                                                        host_name=serializer.data["host_name"],
                                                        public_key=path)
 
@@ -134,7 +134,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
             device.cpu_model = serializer.validated_data['cpu_model']
             device.op_system = serializer.validated_data['op_system']
             device.ip = serializer.validated_data['ip']
-            device.timezone = serializer.validated_data['timezone']
+            device.time = serializer.validated_data['time']
             device.host_name = serializer.validated_data['host_name']
             device.save()
 
