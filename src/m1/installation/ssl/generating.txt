@@ -1,8 +1,8 @@
-root@vagrant-ubuntu-trusty-64:/etc/apache2/ssl# openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr
+root@vagrant-ubuntu-trusty-64:/etc/apache2/ssl# openssl req -new -newkey rsa:2048 -nodes -keyout iedcs.rafaelferreira.pt.key -out iedcs.rafaelferreira.pt.csr
 Generating a 2048 bit RSA private key
-.....+++
-.................................................+++
-writing new private key to 'server.key'
+....................................................................................................................+++
+.......................................................+++
+writing new private key to 'iedcs.rafaelferreira.pt.key'
 -----
 You are about to be asked to enter information that will be incorporated
 into your certificate request.
@@ -14,34 +14,12 @@ If you enter '.', the field will be left blank.
 Country Name (2 letter code) [AU]:PT
 State or Province Name (full name) [Some-State]:Aveiro
 Locality Name (eg, city) []:Aveiro
-Organization Name (eg, company) [Internet Widgits Pty Ltd]:Universidade de Aveiro - Security - P4G1
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Universidade de Aveiro
 Organizational Unit Name (eg, section) []:Security - P4G1
-Common Name (e.g. server FQDN or YOUR name) []:*.bkiedcs.tk
+Common Name (e.g. server FQDN or YOUR name) []:iedcs.rafaelferreira.pt
 Email Address []:mail@rafaelferreira.pt
 
 Please enter the following 'extra' attributes
 to be sent with your certificate request
 A challenge password []:
 An optional company name []:
-root@vagrant-ubuntu-trusty-64:/etc/apache2/ssl# ls
-apache.crt  apache.key  server.csr  server.key
-root@vagrant-ubuntu-trusty-64:/etc/apache2/ssl# cat server.csr
------BEGIN CERTIFICATE REQUEST-----
-MIIDADCCAegCAQAwgboxCzAJBgNVBAYTAlBUMQ8wDQYDVQQIDAZBdmVpcm8xDzAN
-BgNVBAcMBkF2ZWlybzExMC8GA1UECgwoVW5pdmVyc2lkYWRlIGRlIEF2ZWlybyAt
-IFNlY3VyaXR5IC0gUDRHMTEYMBYGA1UECwwPU2VjdXJpdHkgLSBQNEcxMRUwEwYD
-VQQDDAwqLmJraWVkY3MudGsxJTAjBgkqhkiG9w0BCQEWFm1haWxAcmFmYWVsZmVy
-cmVpcmEucHQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDGPYmRwMMH
-bvFM+jH89B9r0ttMXVNwh7HUKwlXD5QSlUn9b4bDoTRJ0xGuF8/IkKIMrw6G/uLj
-iKVsluKJLRzCRqO8x8VaKMnJGz+gHJJ87EPexSTiL7AmfdWu5mxZX/X0LiZHdq5k
-QBiozppl2lh9nYKc5CgyC7e/jks//aoe0BP4K95+m+LQbeTIEYqpDZ6CswsHiSD6
-LwJy86/5+is6yZDP+QAT+kaf6qaHhAFjOtdhqWb/d4g3bN6zqcV8rrgyTLiMpI7o
-HmqH26e1vijwg/MH+UmyogcUvqpgUmb9Lk0D3KZC8ubca9VK87MPqEmqDpGXCAfy
-+ZZyElRbsVWZAgMBAAGgADANBgkqhkiG9w0BAQsFAAOCAQEAfs46P6ZLBN50yisN
-vLqBUXSTRKYLWT9hd/xA1LZ2cqbFHCc52GJrXyD4K8E4gjf2mJBQXligdBs22xC1
-p0E0C11rs887bJXKIua6uPHDbLXw2b0kpJzRodt+uxqsR2HRtHYQRGTA7h/ri8Bj
-01ibXIrxV3SUof6FFgqmrCUKn4dmUurktnj76SP2w3AJeaEhlLcSrDzX/brEYHro
-bv5+m1zlQAqc4CBGfeXHsFqU2eIiw0aOIPFe8/I06X+ZHy+GXvORsmvLFAmmBuCg
-rIxDPEk1PZ+1uGqPu2Qwvm40kPUGAKlH2mV0WdSxgbFDMp86i6W06w3/5Ks0bGC8
-Ue4Zew==
------END CERTIFICATE REQUEST-----

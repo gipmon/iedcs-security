@@ -180,11 +180,3 @@ def store_database_content_by_user_and_book(alias, content, user, book):
     key = PBKDF2(c, identifier).read(32)
     content = AESCipher.encrypt(content=content, key=key)
     ContentCiphered.objects.create(identifier=identifier, content=content)
-
-
-def store_database_content_by_user(alias, content, user):
-    identifier = hashlib.sha224(alias+user.username).hexdigest()
-    c = hashlib.sha224(user.username+user.email+user.last_name).hexdigest()
-    key = PBKDF2(c, identifier).read(32)
-    content = AESCipher.encrypt(content=content, key=key)
-    ContentCiphered.objects.create(identifier=identifier, content=content)

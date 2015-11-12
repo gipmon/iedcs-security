@@ -80,7 +80,7 @@ public class Requests {
             FileInputStream fis = null;
             fis = new FileInputStream("keystore/cacerts.keystore");
             KeyStore keystore  = KeyStore.getInstance("JKS");
-            char[] pwd = "changeit".toCharArray();
+            char[] pwd = "p4g1rr".toCharArray();
             keystore.load(fis, pwd);
             
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(
@@ -255,7 +255,7 @@ public class Requests {
         post.setHeader("Content-Type", "application/json;charset=UTF-8");
         
         if(IEDCSPlayer.isHttps()){
-            post.setHeader("Referer", "https://www.bkiedcs.tk/");
+            post.setHeader("Referer", "https://iedcs.rafaelferreira.pt/");
         }
         
         if(csrftoken.length()>0){
