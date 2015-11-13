@@ -9,6 +9,12 @@ pip install -r requirements.txt
 if [ ! -f db.sqlite3 ]; then
   python manage.py migrate
   python manage.py insert_books
+  python manage.py restriction add restriction 'restriction_country' 'restriction_country' 'You are restricted by country!'
+  python manage.py restriction add restriction 'restriction_hour' 'restriction_hour' 'You are restricted by hour!'
+  BOOK_IDENTIFIER=$(python manage.py restriction list books | grep "Household organization" | awk '{print $1;}')
+  python manage.py restriction add restrict_book $(echo $BOOK_IDENTIFIER) 'restriction_country'
+  BOOK_IDENTIFIER=$(python manage.py restriction list books | grep "IBM 1401 Programming Systems" | awk '{print $1;}')
+  python manage.py restriction add restrict_book $(echo $BOOK_IDENTIFIER) 'restriction_hour'
 fi
 
 echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/servername.conf

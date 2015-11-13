@@ -4,7 +4,8 @@ from books.models import Book
 
 class Restriction(models.Model):
     aliasKey = models.CharField(max_length=128, blank=False, unique=True)
-    restrictionFunction = models.CharField(max_length=128, blank = False)
+    restrictionFunction = models.CharField(max_length=128, blank=False)
+    cause = models.TextField()
 
 
 class BookRestrictions(models.Model):

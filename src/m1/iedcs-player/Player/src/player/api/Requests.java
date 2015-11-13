@@ -58,6 +58,7 @@ import org.apache.http.ssl.TrustStrategy;
 import player.IEDCSPlayer;
 import player.security.ComputerDetails;
 import player.security.DecryptBook;
+import player.security.PBKDF2;
 import player.security.PlayerKeyStore;
 
 
@@ -134,6 +135,7 @@ public class Requests {
         HashMap<String, String> parameters = new HashMap<String, String>();
         
         parameters.put("email", email);
+        PBKDF2 password_pbkdf2 = new PBKDF2(password, password, 500);
         parameters.put("password", password);
         Result rs = postJSON(LOGIN_ENDPOINT, parameters);
         
