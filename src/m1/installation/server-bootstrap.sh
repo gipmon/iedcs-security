@@ -11,6 +11,10 @@ if [ ! -f db.sqlite3 ]; then
   python manage.py insert_books
 fi
 
+echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/servername.conf
+sudo a2enconf servername
+sudo service apache2 restart
+
 cp /vagrant/iedcs.rafaelferreira.pt.conf /etc/apache2/sites-available/iedcs.rafaelferreira.pt.conf
 a2ensite iedcs.rafaelferreira.pt.conf
 sudo a2enmod ssl
