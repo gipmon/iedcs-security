@@ -142,7 +142,7 @@ public class Requests {
         Result rs = postJSON(LOGIN_ENDPOINT, parameters);
         
         // unique identifier
-        
+        /*
         System.out.println(ComputerDetails.getCpu_mhz());
         System.out.println(ComputerDetails.getCpu_model());
         System.out.println(ComputerDetails.getCpu_total_cpus());
@@ -150,7 +150,7 @@ public class Requests {
         System.out.println(ComputerDetails.getMac_address());
         System.out.println(ComputerDetails.getPublicIP());
         System.out.println(ComputerDetails.getHostName());
-        
+        */
         if(rs.getStatusCode()==200){
             USER = (JSONObject)rs.getResult();
             
@@ -158,7 +158,7 @@ public class Requests {
             parameters = new HashMap<String, String>();
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
             Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/retrieveDevice/", parameters);
-            System.out.println(rs_player.toString());
+            // System.out.println(rs_player.toString());
             if(rs_player.getStatusCode()!=200){
                 parameters = new HashMap<String, String>();
                 parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
@@ -212,19 +212,20 @@ public class Requests {
         get.setHeader("Content-Type", "application/json;charset=UTF-8");
         
         HttpResponse response = client.execute(get);
-        System.out.println("\nSending 'GET' request to URL : " + url);
-        System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
+        // System.out.println("\nSending 'GET' request to URL : " + url);
+        // System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
         
         // print cookies
 
-        System.out.println("Printing Response Header...\n");
-
+        // System.out.println("Printing Response Header...\n");
+        /*
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
             System.out.println("Key : " + header.getName() + " ,Value : " + header.getValue());
         }
-
+                
         System.out.println("\nGet Response Header By Key ...\n");
+        */
         String server = response.getFirstHeader("Server").getValue();
 
         // output file
@@ -281,6 +282,7 @@ public class Requests {
         post.setEntity(se);
 
         HttpResponse response = client.execute(post);
+        /*
         System.out.println("\nSending 'POST' request to URL : " + url);
         System.out.println("Post parameters : " + post.getEntity());
         System.out.println("Response Code : " + response.getStatusLine().getStatusCode());
@@ -288,18 +290,19 @@ public class Requests {
         // print cookies
 
         System.out.println("Printing Response Header...\n");
-
+        */
+        
         Header[] headers = response.getAllHeaders();
         for (Header header : headers) {
             String[] value_key = header.getValue().toString().split("=");
             if(value_key.length == 5 && value_key[0].equals("csrftoken")){
                 csrftoken = value_key[1].split(";")[0];
             }
-            System.out.println("Key : " + header.getName() 
-                       + " ,Value : " + header.getValue());
+            //System.out.println("Key : " + header.getName() 
+            //           + " ,Value : " + header.getValue());
         }
 
-        System.out.println("\nGet Response Header By Key ...\n");
+        // System.out.println("\nGet Response Header By Key ...\n");
         String server = response.getFirstHeader("Server").getValue();
 
         // output file response, only for DEBUG!!!! REMOVE!!

@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 public class FrontPageController implements Initializable {
     @FXML private TextField login_email = new TextField();
@@ -47,7 +49,11 @@ public class FrontPageController implements Initializable {
         String password = login_password.getText();
         
         if(login.length()==0 || password.length()==0){
-            System.out.println("E-mail or Password is empty!");
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Wait!");
+            alert.setHeaderText(null);
+            alert.setContentText("E-mail or Password is empty!");
+            alert.showAndWait();
             login_button.setDisable(false);
             return;
         }
@@ -55,7 +61,11 @@ public class FrontPageController implements Initializable {
         try{
             Result rs = Requests.login(login, password);
             if(rs.getStatusCode()!=200){
-                System.out.println("E-mail or Password is wrong!");
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Wait!");
+                alert.setHeaderText(null);
+                alert.setContentText("E-mail or Password is wrong!");
+                alert.showAndWait();
                 login_button.setDisable(false);
                 return;
             }

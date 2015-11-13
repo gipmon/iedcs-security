@@ -97,7 +97,7 @@ public class MyBooksPageController implements Initializable {
                     String name = obj.getString("name");
                     String production_date = obj.getString("production_date");
                     String author = obj.getString("author");                    
-                    System.out.println(identifier + " " + name + " " + production_date + " " + author);
+                    Utils.println(identifier + " " + name + " " + production_date + " " + author);
                     data.add(new BookEntry(identifier, name, production_date, author));
                 }
             }
@@ -113,7 +113,7 @@ public class MyBooksPageController implements Initializable {
                         } else {
                             // clicking on text part
                             try {
-                                System.out.println(data);
+                                Utils.println(data);
                                 row = (TableRow) node.getParent();
                                 FXMLLoader loader = new FXMLLoader(getClass().getResource("ViewBook.fxml"));
                                 AnchorPane anchor = loader.load();

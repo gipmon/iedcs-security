@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 
 public class Utils {
     
+    private static final boolean DEBUG = false;
+    
     public static void openBrowser(String uri) throws IOException, URISyntaxException{
         Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
         if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -13,4 +15,9 @@ public class Utils {
         }
     }
     
+    public static void println(Object out){
+        if(!DEBUG){
+            System.out.println(out);
+        }
+    }
 }
