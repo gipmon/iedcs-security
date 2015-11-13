@@ -4,7 +4,7 @@ from Crypto.Cipher import AES
 
 
 class AESCipher(object):
-    bs = 16
+    bs = 16  # 16 blocos * 8 bits = 128bits
 
     @staticmethod
     def encrypt(content, key, iv=None):
@@ -22,7 +22,6 @@ class AESCipher(object):
 
     @staticmethod
     def pad(s):
-        # http://stackoverflow.com/questions/12562021/aes-decryption-padding-with-pkcs5-python
         return s + (AESCipher.bs - len(s) % AESCipher.bs) * chr(AESCipher.bs - len(s) % AESCipher.bs)
 
     @staticmethod
