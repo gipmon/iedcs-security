@@ -57,7 +57,7 @@
 % o que, porquê e o objetivo
 O trabalho proposto para o projeto da unidade curricular de Segurança é um IEDCS: Identity Enabled Distribution Control System. Para o  efeito foi necessário implementar uma Ebook Webstore, um WebService e um Player de reprodução dos Ebooks em formato de texto.
 
-O objetivo deste sistema é garantir a máxima e possível segurança do serviço, utilizando os conhecimentos adquiridos na unidade curricular de Segurança. Para isso são necessários vários processos como por exemplo, a utilização de certificados HTTPS, a cifragem de todo o material existente, geração de chaves e registo de utilizadores.	
+O objetivo deste sistema é garantir a máxima e possível segurança do serviço, utilizando os conhecimentos adquiridos na unidade curricular de Segurança. Para isso são necessários vários processos como por exemplo, a utilização de certificados HTTPS, a cifragem de todo o material existente, derivação de chaves e registo de utilizadores.	
 
 O relatório reflete todos os passos e decisões tomadas na criação do sistema, assim como uma análise ao que foi mostrado na primeira apresentação e decisões que se tomaram depois desta, tecnologias utilizadas, descrição dos vários processos existentes e conclusão.
 
@@ -76,7 +76,7 @@ A causa de termos abandonado este processo para cifrar o conteúdo do livro foi:
         \item Normalmente para evitar este esforço computacional faz-se uma assinatura sobre o resultado de uma função de síntese desse mesmo conteúdo do livro.
         \item As chaves simétricas são muito mais eficientes a nível computacional.
         \item As funções para derivar as chaves foram abandonadas em detrimento da PBKDF2 que efetua já as iterações idealizadas.
-        \item Não é boa ideia usar as passwords dos utilizadores para cifrar o conteúdo do mesmo pois caso o utilizador mude a palavra pass teremos de derivar as chaves outra vez.
+        \item Não é boa ideia usar as passwords dos utilizadores para cifrar o conteúdo do mesmo pois caso o utilizador mude a password teremos de derivar as chaves outra vez.
 \pagebreak
                 
 \end{itemize}
@@ -90,7 +90,7 @@ A causa de termos abandonado este processo para cifrar o conteúdo do livro foi:
 \subsection{Processo de decifra do conteúdo do livro}
 O processo de decifra foi desenhado para reverter o processo anunciado em cima. Sendo por isso nada mais do que fazer as operações inversas das realizadas no processo de cifra. As razões para que se tenha abandonado este processo de decifra são as mesmas enunciadas no processo de cifra.
 
-O processo de “challenge” consistia no pedido do \textit{random1} e do \textit{random2} ao servidor, mas, contudo isso não é suficiente para que o processo seja seguro, pois basta ao atacante conhecer o processo de cifra e decifra e interceptar os pedidos ao servidor do \textit{random1} e do \textit{random2}. Para o Player também seria fácil decifrar sem necessitar da cooperação do servidor, pois, bastava que coopera-se uma primeira vez.
+O processo de “challenge” consistia no pedido do \textit{random1} e do \textit{random2} ao servidor, mas, contudo isso não é suficiente para que o processo seja seguro, pois basta ao atacante conhecer o processo de cifra e decifra e intercetar os pedidos ao servidor do \textit{random1} e do \textit{random2}. Para o Player também seria fácil decifrar sem necessitar da cooperação do servidor, pois, bastava que coopera-se uma primeira vez.
 
 \begin{figure}[!htb]
 \center
@@ -122,20 +122,20 @@ Neste novo processo, o servidor cifra um valor aleatório, designado por Random2
 \begin{figure}[!htb]
 \center
  \includegraphics[width=150mm,scale=1]{file-key-generation.pdf}
- \caption{\\Processo de geração da File Key}\label{fig:eer}
+ \caption{\\Processo de derivação da File Key}\label{fig:eer}
 \end{figure}
 
-Para derivar a File Key, como poderemos ver na figura 4, o Random2 é cifrado com uma chave K1, que é calculada através do SHA-224 do username, de um salt (“fcp”) e do identificador do livro. Este SHA é a nossa password e o Random2 o nosso slat aplicando-se assim a função PBKDF2 (recomendado na apresentação), com o valor por defeito de 1000 iterações, obtendo-se assim a chave pretendida, K1. O cálculo desta chave K1 é possível de ser efetuado tanto do lado do servidor como do cliente.
+Para derivar a File Key, como poderemos ver na figura 4, o Random2 é cifrado com uma chave K1, que é calculada através do SHA-224 do username, de um salt (“fcp”) e do identificador do livro. Este SHA é a nossa password e o Random2 o nosso salt aplicando-se assim a função PBKDF2 (recomendado na apresentação), com o valor por defeito de 1000 iterações, obtendo-se assim a chave pretendida, K1. O cálculo desta chave K1 é possível de ser efetuado tanto do lado do servidor como do cliente.
 
 Após isto, o resultado obtido da cifra de Random2 com a chave K1, RD1, vai ser cifrado com uma nova chave K2, sendo esta apenas e exclusivamente calculada pelo servidor. Esta é calculada praticamente como a K1, sendo diferente por no SHA-224 utilizar um outro salt (“deti”) e um \textit{random1}, em vez de \textit{random2}, apenas disponível no servidor, em vez de usar o identificador do livro. Aplica-se igualmente a função PBKDF2, com o SHA como password e o \textit{random1} como salt, de forma a obter K2 para se poder cifrar o valor de RD1.
 
-Numa última fase deste processo de geração da File Key, é calculada ainda uma terceira chave, K3, com o mesmo processo das outras chaves K1 e K2, sendo nesta última utilizado no calculo do SHA um valor n, que corresponde a:
+Numa última fase deste processo de derivação da File Key, é calculada ainda uma terceira chave, K3, com o mesmo processo das outras chaves K1 e K2, sendo nesta última utilizado no calculo do SHA um valor n, que corresponde a:
 
 \begin{center}
 	\textbf{n = (soma de todos os digitos de random2) \% 10}
 \end{center}
 
-Juntamente com o valor n, utiliza-se o identificador do livro e um salt (“ua”). Através deste SHA e do random2 que actuam respectivamente como password e salt, aplica-se uma função PBKDF2 para obter K3.
+Juntamente com o valor n, utiliza-se o identificador do livro e um salt (“ua”). Através deste SHA e do random2 que atuam respetivamente como password e salt, aplica-se uma função PBKDF2 para obter K3.
 
 Por último através da cifra de RD2 (valor obtido da cifra de \textit{random1} com a chave K2) com a chave K3 obtida, obtém-se a File Key, que será utilizada para cifrar o conteúdo do livro e desta forma este conteúdo cifrado será enviado para o cliente.
 
@@ -170,24 +170,30 @@ Os Random2, Random1 e Initialization Vectors passam todos por um processo de cif
  \label{fig:eer}
 \end{figure}
 
-Tal como no processo de cifra de um livro, a Random2 Key é calculada, desta feita no lado do cliente para este poder decifrar o valor de random2 que recebe cifrado, obtendo assim o valor original que vai ser utilizado para o cálculo da File Key usando também um processo de challenge.
+Tal como no processo de cifra de um livro, a Random2 Key é calculada, mas desta vez no lado do cliente para este conseguir decifrar o random2 que recebeu cifrado, obtendo assim o valor original que vai ser utilizado para o cálculo da File Key usando também um processo de challenge.
 
 \begin{figure}[!htb]
 \center
  \includegraphics[width=80mm,scale=1]{challengefilekey.pdf}
- \caption{\\Challenge entre Player e Servidor na geração da File Key}
+ \caption{\\Challenge entre Player e Servidor na derivação da File Key}
  \label{fig:eer}
 \end{figure}
 
-O processo de geração da File Key no lado do servidor e do cliente é feito da mesma maneira, apenas mudando, que quando o Player está a gerar a File Key, precisa de colocar um challenge ao servidor (Figura 7), pois ele é o único capaz de calcular o valor de RD2, obtido através da cifra de RD1 (cifra de Random2 com K1) com uma chave K2 calculada com um random1 que só o servidor conhece (Figura 5). 
+O processo de derivação da File Key no lado do servidor e do cliente é feito da mesma maneira, apenas mudando, que quando o Player está a gerar a File Key, precisa de questionar o servidor (Figura 7), pois ele é o único capaz de calcular o valor de RD2, obtido através da cifra de RD1 (cifra de Random2 com K1) com uma chave K2 calculada com um random1 que só o servidor conhece (Figura 5). 
 
-Posto isto, o servidor retorna, o valor que calculou, para o cliente, para que este prossiga o processo de geração da File Key. 
+Este "challenge", que é um processo de pergunta e resposta, em que a pergunta tem de vir bem formulada, consiste na pergunta que o Cliente faz ao servidor, como já mencionado e na resposta, com o valor que calculou, para que o cliente prossiga o processo de derivação da File Key. 
 
-Após este processo de geração da File Key o Player decifra o conteúdo cifrado do livro de forma a obter o conteúdo original do mesmo, podendo agora apresentá-lo ao utilizador.
+A pergunta colocada ao servidor tem de ter um tamanho esperado e tem de ser colocada em Base64. Como a pergunta é em Base64 espera-se que a pergunta tenha um valor de 108 caracteres. 
+
+O resultado da cifra de RD1 com AES/CBC tem 64 bytes, resultante de o random 2 ter 56 bytes (mais o padding ficam 4 blocos de 16 bytes na saída cada). Com o IV soma-se 16 bytes. Temos então, 80 bytes a enviar para o servidor em Base64, sendo isto 640 bits. Como cada caracter é usado para representar 6 bits, mas como 640 não é múltiplo de 6 teremos de adicionar padding, neste caso, terá de ser adicionado 2 bits para ser múltiplo de 6 bits. Sendo assim 642 resulta em 107 caracteres, como apenas adicionou-se 2 bits apenas será necessário adicionar um '=' no final, resultando em 108 caracteres.
+
+A resposta dada pelo servidor não é verificada se é a correta ou não pois isso poderia resultar em pedidos mal intencionados só para saber qual seria a resposta correta, e por consequência qual seria o valor de entrada correto para aquele livro e utilizador, resultando numa fraqueza no processo de cifra/ decifra.
+
+Após este processo de derivação da File Key o Player decifra o conteúdo cifrado do livro de forma a obter o conteúdo original do mesmo, podendo agora apresenta-lo ao utilizador.
 
 \section{Tecnologias usadas}
 
-As tecnologias usadas no desenvolvimento do IEDCS Server, foram: Django + Python e AngularJS + JS. O Django dá a possibilidade de usar protecção contra \href{https://docs.djangoproject.com/en/1.8/ref/csrf/}{CSRF} usando um token e um middleware que obriga que o cliente envie este token sempre que faz um pedido para a aplicação.  
+As tecnologias usadas no desenvolvimento do IEDCS Server, foram: Django + Python e AngularJS + JS. O Django dá a possibilidade de usar proteção contra \href{https://docs.djangoproject.com/en/1.8/ref/csrf/}{CSRF} usando um token e um middleware que obriga que o cliente envie este token sempre que faz um pedido para a aplicação.  
 
 O Angular.JS já tem suporte para enviar o CSRF token, sempre que recebe um \textit{Set-Cookie CSRFToken = XXX} na resposta do servidor, irá gravar esse csrf token num cookie no browser do utilizador e irá enviar sempre que for feito um pedido.
 
@@ -195,7 +201,7 @@ Já o nosso Player foi feito usando Java e JavaFX. No java tivemos de usar uma b
 
 No servidor, também temos a proteção contra SQL Injection e XSS ataques pois fazemos uso dos métodos disponibilizados pelo Django para manipulação de modelos da base de dados. Já o AngularJS não permite que seja injetado código JS nem HTML sem intenção do programador da aplicação.
 
-Como usamos Python e Java já temos protecção contra buffer overflows e mesmo assim tivemos cuidado para não fazer implementações que comprometessem o estado tanto do servidor como do player, como por exemplo, uma saída inesperada devido a um erro.
+Como usamos Python e Java já temos proteção contra buffer overflows e mesmo assim tivemos cuidado para não fazer implementações que comprometessem o estado tanto do servidor como do player, como por exemplo, uma saída inesperada devido a um erro.
 
 \section{Casos de utilização}
 
@@ -232,7 +238,7 @@ Quando um player é utilizado pela primeira vez num determinado device, no momen
 
 	No Player é usado a biblioteca sigar para obter os dados do device. O País é obtido no servidor através do IP recebido pelo mesmo.
 	A cada utilizador também são associados os vários devices por onde já se conectou ao servidor.
-	Caso no momento do login, o device já exista na base de dados, este é actualizado com os novos dados recebidos, tal como a hora, IP, entre outros já especificados.
+	Caso no momento do login, o device já exista na base de dados, este é atualizado com os novos dados recebidos, tal como a hora, IP, entre outros já especificados.
 
 \subsection{Aquisição de um livro}
 
@@ -293,7 +299,7 @@ Como foi criado um domínio que aponta para o endereço \textit{192.168.33.10} q
 
 \section{Problemas identificados na primeira entrega}
 
-Nesta primeira entrega, identificaram-se alguns problemas, nomeadamente no corrompimento do HTTPS, através da troca da keystore onde são guardados os certificados confiáveis, podendo assim injetar todos os certificados que se deseja de forma a que seja possível interceptar as comunicações entre o servidor e o Player. Para isso sabemos que o utilizador pode descompilar o código do Player, analisar o nosso processo de cifra e o código. Com isto ele poderá descobrir que usamos um ficheiro cacerts.keystore para o Java confiar apenas no nosso certificado, pode então modificar essa keystore e o cliente ao fazer download pode ser-lhe dada uma versão corrompida, mas sem estar corrompida no código, apenas no cacerts.keystore. Se estiver presente outro certificado que o atacante domine, ele pode interceptar as comunicações HTTPS e aceder às comunicações que estão a ser trocadas entre a vítima que está a usar o Player e o nosso Servidor e assim, pode, obter o Random2 e derivar o n (este é enviado inicialmente num Header), o book identifier e o rd2 que é enviado pelo servidor no pedido de challenge ao cliente. O salt “ua” é possível de ser obtido descompilando o código. Após isto, ele pode cifrar com AES e obter a file key. Com isto, consegue decifrar o nosso livro cifrado.
+Nesta primeira entrega, identificaram-se alguns problemas, nomeadamente no corrompimento do HTTPS, através da troca da keystore onde são guardados os certificados confiáveis, podendo assim injetar todos os certificados que se deseja de forma a que seja possível intercetar as comunicações entre o servidor e o Player. Para isso sabemos que o utilizador pode descompilar o código do Player, analisar o nosso processo de cifra e o código. Com isto ele poderá descobrir que usamos um ficheiro cacerts.keystore para o Java confiar apenas no nosso certificado, pode então modificar essa keystore e o cliente ao fazer download pode ser-lhe dada uma versão corrompida, mas sem estar corrompida no código, apenas no cacerts.keystore. Se estiver presente outro certificado que o atacante domine, ele pode intercetar as comunicações HTTPS e aceder às comunicações que estão a ser trocadas entre a vítima que está a usar o Player e o nosso Servidor e assim, pode, obter o Random2 e derivar o n (este é enviado inicialmente num Header), o book identifier e o rd2 que é enviado pelo servidor no pedido de challenge ao cliente. O salt “ua” é possível de ser obtido descompilando o código. Após isto, ele pode cifrar com AES e obter a file key. Com isto, consegue decifrar o nosso livro cifrado.
 
 Outra possibilidade seria um atacante/cliente que usasse ferramentas de análise de memória para obter o livro cifrado, e todas as outras variáveis que estão expostas em Runtime.
 
