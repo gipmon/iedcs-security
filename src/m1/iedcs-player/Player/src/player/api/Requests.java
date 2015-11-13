@@ -425,9 +425,7 @@ public class Requests {
             fs.close();
             BookContent book = new BookContent(headers, result.toString());
             return (new Result(response.getStatusLine().getStatusCode(), book));
-        } catch (IOException ex) {
-            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedOperationException ex) {
+        } catch (IOException | UnsupportedOperationException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {

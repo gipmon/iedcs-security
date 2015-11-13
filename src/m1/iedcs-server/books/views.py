@@ -120,7 +120,7 @@ class BookView(views.APIView):
         restriction_cause = ""
 
         for book_restriction in BookRestrictions.objects.filter(book=book):
-            test = test_restriction(book_restriction.restriction.restrictionFunction, book, request.user.user_data)
+            test = test_restriction(book_restriction.restriction.restrictionFunction, book, device)
             if not test:
                 restriction_cause += book_restriction.restriction.cause + " "
             can &= test
