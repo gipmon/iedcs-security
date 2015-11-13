@@ -8,6 +8,7 @@ from books.models import Book, OrderBook
 from players.models import Device, DeviceOwner
 from security.functions import get_database_content_by_user_and_book, rd2_process
 import base64
+import binascii
 
 
 class ExchangeRd1Rd2ViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -41,6 +42,20 @@ class ExchangeRd1Rd2ViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
             random1 = get_database_content_by_user_and_book("random1", request.user, book)
 
+            # verify question
+            if len(serializer.data["rd1"]) != 108:
+                return Response({'status': 'Bad Request',
+                                 'message': 'Verify question.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            try:
+                base64.decodestring(serializer.data["rd1"])
+            except binascii.Error:
+                return Response({'status': 'Bad Request',
+                                 'message': 'Verify question.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            # answer
             return Response({'rd2': rd2_process(serializer.data["rd1"], request.user, book, random1)})
 
         return Response({'status': 'Bad Request',

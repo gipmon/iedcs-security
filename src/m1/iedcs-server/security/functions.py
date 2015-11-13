@@ -105,6 +105,7 @@ def rd1_process(rd, user, book, random2):
 
 
 def rd2_process(rd1, user, book, random1):
+    # print len(rd1)
     # k2 = PBKDF2(sha224(user.username + "deti" + random1), random1)
     k2 = PBKDF2(hashlib.sha224(user.username + "deti" + random1).hexdigest(), random1).read(32)
 
