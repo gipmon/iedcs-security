@@ -1,9 +1,6 @@
 package player;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import player.security.PlayerKeyStore;
 import java.security.Key;
@@ -18,7 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import player.security.ComputerDetails;
+import player.api.Utils;
 import player.security.PlayerPublicKey;
 
 public class Player extends Application {
@@ -53,18 +50,18 @@ public class Player extends Application {
             String s = null;
             
             File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-            System.out.println(codeBase.getPath());
+            Utils.println(codeBase.getPath());
             Process p = Runtime.getRuntime().exec("jarsigner -verify -keystore JarSignature.KeyStore " + codeBase.getPath());
             BufferedReader stdinput  = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader stderror  = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            System.out.println("Here is the standard output of the command:\n");
+            Utils.println("Here is the standard output of the command:\n");
             s = stdinput.readLine();
-            System.out.println(s);
+            Utils.println(s);
               
             if(s.toLowerCase().contains("jar is unsigned".toLowerCase())){
                 System.exit(0);
             }else if(s.toLowerCase().contains("jar verified".toLowerCase())){
-                System.out.println("esta assinado");
+                Utils.println("esta assinado");
             }
             */
 
@@ -76,7 +73,7 @@ public class Player extends Application {
                 Key publicKeyDevice = kp.getPublic();
                 Key privateKeyDevice = kp.getPrivate();
                 
-                System.out.println("creating");
+                Utils.println("creating");
                 
                 PlayerKeyStore.storeKey("publicKeyDevice", publicKeyDevice);
                 PlayerKeyStore.storeKey("privateKeyDevice", privateKeyDevice);

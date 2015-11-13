@@ -20,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
+import player.api.Utils;
 
 public class CitizenCard {
     
@@ -38,7 +38,7 @@ public class CitizenCard {
             Enumeration<String> aliases = ks.aliases();
             
             while (aliases.hasMoreElements()) {
-                System.out.println( aliases.nextElement() );
+                Utils.println( aliases.nextElement() );
             }
             
             // sign
@@ -51,7 +51,7 @@ public class CitizenCard {
             sig.update(txt);
             
             byte signed[] = sig.sign();
-            System.out.println(signed);
+            Utils.println(signed);
             
         } catch (KeyStoreException | NoSuchAlgorithmException | InvalidKeyException | UnrecoverableKeyException ex) {
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
@@ -69,7 +69,7 @@ public class CitizenCard {
             String line = null;
             while ((line = reader.readLine()) != null)
             {
-                System.out.println(line);
+                Utils.println(line);
             }
             
             KeyStore ks_cartao_cidadao = KeyStore.getInstance(KeyStore.getDefaultType());

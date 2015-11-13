@@ -8,7 +8,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -26,6 +25,7 @@ import player.IEDCSPlayer;
 import player.api.BookContent;
 import player.api.Requests;
 import player.api.Result;
+import player.api.Utils;
 
 public class DecryptBook {
     
@@ -198,7 +198,7 @@ public class DecryptBook {
             
             // Instantiate the cipher
             cipher_aes.init(Cipher.ENCRYPT_MODE, sks, iv_spec);
-            System.out.println(cipher_aes.getBlockSize());
+            Utils.println(cipher_aes.getBlockSize());
             
             return cipher_aes.doFinal(clearText);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
@@ -222,7 +222,7 @@ public class DecryptBook {
             
             // Instantiate the cipher
             cipher_aes.init(Cipher.DECRYPT_MODE, sks, iv_spec);
-            System.out.println(cipher_aes.getBlockSize());
+            Utils.println(cipher_aes.getBlockSize());
             
             return cipher_aes.doFinal(tmp_block);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {

@@ -31,6 +31,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.RSAPublicKeyStructure;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
+import player.api.Utils;
 
 
 public class PlayerKeyStore {
@@ -77,7 +78,7 @@ public class PlayerKeyStore {
             ks.setEntry(alias, skEntry, protParam);
             
             File folder = new File(folder_name);
-                System.out.println(folder_name);
+                Utils.println(folder_name);
             if(!folder.exists()){
                 folder.mkdirs();
             }

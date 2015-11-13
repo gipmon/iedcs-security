@@ -5,11 +5,7 @@
  */
 package player;
 
-import player.api.Requests;
-import player.api.Result;
-import player.api.BookContent;
 import java.io.IOException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -21,7 +17,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import org.json.JSONException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;

@@ -15,6 +15,7 @@ import org.hyperic.sigar.NetInterfaceConfig;
 import org.hyperic.sigar.SigarException;
 import sigar.*;
 import java.util.Base64;
+import player.api.Utils;
 
 public class ComputerDetails extends SigarCommandBase{
     private static String mac_address;
@@ -32,7 +33,7 @@ public class ComputerDetails extends SigarCommandBase{
         } catch (IOException ex) {
             Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(System.getProperty("java.library.path"));
+        Utils.println(System.getProperty("java.library.path"));
         singleton = new ComputerDetails();
     }
     
