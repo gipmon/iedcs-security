@@ -23,6 +23,7 @@ src/m1/iedcs-server/venv/*
 *.lot
 *.maf
 *.mtc
+*.mtc0
 *.mtc1
 *.out
 *.synctex.gz
