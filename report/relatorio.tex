@@ -86,7 +86,7 @@ A causa de termos abandonado este processo para cifrar o conteúdo do livro foi:
 \subsection{Processo de decifra do conteúdo do livro}
 O processo de decifra foi desenhado para reverter o processo anunciado em cima. Sendo por isso nada mais do que fazer as operações inversas das realizadas no processo de cifra. As razões para que se tenha abandonado este processo de decifra são as mesmas enunciadas no processo de cifra.
 
-O processo de “challenge” consistia no pedido do random1 e do random2 ao servidor, mas, contudo isso não é suficiente para que o processo seja seguro, pois basta ao atacante conhecer o processo de cifra e decifra e interceptar os pedidos ao servidor do random1 e do random2. Para o Player também seria fácil decifrar sem necessitar da cooperação do servidor, pois, bastava que coopera-se uma primeira vez.
+O processo de “challenge” consistia no pedido do \textit{random1} e do \textit{random2} ao servidor, mas, contudo isso não é suficiente para que o processo seja seguro, pois basta ao atacante conhecer o processo de cifra e decifra e interceptar os pedidos ao servidor do \textit{random1} e do \textit{random2}. Para o Player também seria fácil decifrar sem necessitar da cooperação do servidor, pois, bastava que coopera-se uma primeira vez.
 
 \begin{figure}[!htb]
 \center
@@ -108,7 +108,9 @@ No seguimento da primeira apresentação procedeu-se a muitas alterações no mo
 
 Neste novo processo, o servidor cifra um valor aleatório, designado por Random2, com uma chave Random2 Key, calculada através da seguinte forma:
 
-Random2 Key = PBKDF2(username + “jnpc” + book.identifier, book.identifier, 1000)
+\begin{center}
+	\textbf{Random2 Key = PBKDF2(username + “jnpc” + book.identifier, book.identifier, 1000)}
+\end{center}
 
 	Esta key é partilhada pelo servidor e pelo cliente, pois ambos conhecem a forma de como ela é calculada, não sendo preciso enviar a mesma. Apenas o conteúdo de Random2 cifrado é enviado para o cliente. 
 	O valor Random2 foi criado, para através dele tanto o servidor como o cliente obterem a File Key que será utilizada para cifrar o conteúdo de um livro e que não poderá ser guardada do lado do cliente e poderá ser reutilizada para um mesmo utilizador noutro Player ou noutro Device.
@@ -121,15 +123,17 @@ Random2 Key = PBKDF2(username + “jnpc” + book.identifier, book.identifier, 1
 
 Para derivar a File Key, como poderemos ver na figura 4, o Random2 é cifrado com uma chave K1, que é calculada através do SHA-224 do username, de um salt (“fcp”) e do identificador do livro. Este SHA é a nossa password e o Random2 o nosso slat aplicando-se assim a função PBKDF2 (recomendado na apresentação), com o valor por defeito de 1000 iterações, obtendo-se assim a chave pretendida, K1. O cálculo desta chave K1 é possível de ser efetuado tanto do lado do servidor como do cliente.
 
-Após isto, o resultado obtido da cifra de Random2 com a chave K1, RD1, vai ser cifrado com uma nova chave K2, sendo esta apenas e exclusivamente calculada pelo servidor. Esta é calculada praticamente como a K1, sendo diferente por no SHA-224 utilizar um outro salt (“deti”) e um random1, em vez de random2, apenas disponível no servidor, em vez de usar o identificador do livro. Aplica-se igualmente a função PBKDF2, com o SHA como password e o random1 como salt, de forma a obter K2 para se poder cifrar o valor de RD1.
+Após isto, o resultado obtido da cifra de Random2 com a chave K1, RD1, vai ser cifrado com uma nova chave K2, sendo esta apenas e exclusivamente calculada pelo servidor. Esta é calculada praticamente como a K1, sendo diferente por no SHA-224 utilizar um outro salt (“deti”) e um \textit{random1}, em vez de \textit{random2}, apenas disponível no servidor, em vez de usar o identificador do livro. Aplica-se igualmente a função PBKDF2, com o SHA como password e o \textit{random1} como salt, de forma a obter K2 para se poder cifrar o valor de RD1.
 
 Numa última fase deste processo de geração da File Key, é calculada ainda uma terceira chave, K3, com o mesmo processo das outras chaves K1 e K2, sendo nesta última utilizado no calculo do SHA um valor n, que corresponde a:
 
-n = (soma de todos os digitos de random2) % 10
+\begin{center}
+	\textbf{n = (soma de todos os digitos de random2) \% 10}
+\end{center}
 
 Juntamente com o valor n, utiliza-se o identificador do livro e um salt (“ua”). Através deste SHA e do random2 que actuam respectivamente como password e salt, aplica-se uma função PBKDF2 para obter K3.
 
-Por último através da cifra de RD2 (valor obtido da cifra de random1 com a chave K2) com a chave K3 obtida, obtém-se a File Key, que será utilizada para cifrar o conteúdo do livro e desta forma este conteúdo cifrado será enviado para o cliente.
+Por último através da cifra de RD2 (valor obtido da cifra de \textit{random1} com a chave K2) com a chave K3 obtida, obtém-se a File Key, que será utilizada para cifrar o conteúdo do livro e desta forma este conteúdo cifrado será enviado para o cliente.
 
 \subsection{Cifra simétrica e modo}
 
@@ -147,9 +151,9 @@ Todos os Initialization Vectors são também guardados na base de dados com o me
 Os Random2, Random1 e Initialization Vectors passam todos por um processo de cifra antes de serem guardados na base de dados. Este processo consiste em:
 
 \begin{itemize}
-\item Gerar um identifier, através de um SHA-224 composto por um alias (nome pelo qual queremos identificar o conteúdo, por exemplo “random2”), username e identificador do livro.
+\item Gerar um \textit{identifier}, através de um SHA-224 composto por um alias (nome pelo qual queremos identificar o conteúdo, por exemplo “random2”), username e identificador do livro.
 \item Gerar um valor que será a nossa password na função PBKDF2, através de um SHA-224, composto pelo username, email e último nome.
-\item Depois de gerados os dois valores acima descritos, recorre-se a uma função PBKDF2, onde o salt é o identifier. Esta função terá um número de 1000 iterações por defeito.
+\item Depois de gerados os dois valores acima descritos, recorre-se a uma função PBKDF2, onde o salt é o \textit{identifier}. Esta função terá um número de 1000 iterações por defeito.
 \item Posto isto, o conteúdo que desejamos guardar na base de dados é cifrado com a chave gerada acima, ficando assim salvaguardado com alguma segurança.
 \end{itemize}
 
@@ -179,9 +183,9 @@ Após este processo de geração da File Key o Player decifra o conteúdo cifrad
 
 \section{Tecnologias usadas}
 
-As tecnologias usadas no desenvolvimento do IEDCS Server, foram: Django + Python e AngularJS + JS. O Django dá a possibilidade de usar protecção contra CSRF usando um token e um middleware que obriga que o cliente envie este token sempre que faz um pedido para a aplicação.  
+As tecnologias usadas no desenvolvimento do IEDCS Server, foram: Django + Python e AngularJS + JS. O Django dá a possibilidade de usar protecção contra \href{https://docs.djangoproject.com/en/1.8/ref/csrf/}{CSRF} usando um token e um middleware que obriga que o cliente envie este token sempre que faz um pedido para a aplicação.  
 
-O Angular.JS já tem suporte para enviar o CSRF token, sempre que recebe um Set-Cookie CSRFToken = XXX na resposta do servidor, irá gravar esse csrf token num cookie no browser do utilizador e irá enviar sempre que for feito um pedido.
+O Angular.JS já tem suporte para enviar o CSRF token, sempre que recebe um \textit{Set-Cookie CSRFToken = XXX} na resposta do servidor, irá gravar esse csrf token num cookie no browser do utilizador e irá enviar sempre que for feito um pedido.
 
 Já o nosso Player foi feito usando Java e JavaFX. No java tivemos de usar uma biblioteca para fazer os pedidos HTTP e HTTPS exterior, neste caso usámos a org.apache.http. Esta biblioteca não tem suporte para uso de um CSRF de forma correta, por isso, tivemos de implementar uma classe (Requests.java) que gerisse uma ligação HTTP e guardasse o seu estado de sessão. Nesta classe enviamos um X-CSRFToken no Header do pedido.
 
@@ -196,6 +200,13 @@ Como usamos Python e Java já temos protecção contra buffer overflows e mesmo 
 Um registo de um utilizador é feito na página web disponibilizada pelo IEDCS, não é feito nenhuma síntese quando se envia desde o Javascript para o servidor, sendo este um dos problemas identificados por nós. No entanto, ao gravar na base de dados a password é gravada com PBKDF2 e SHA256 o que torna computacionalmente trabalhoso obter as passwords dos nossos utilizadores caso a base de dados seja exposta. Ao fazer login, tanto no Player como na interface Web também poderia ser aplicado um processo de síntese para caso o HTTPS seja comprometido as passwords não sejam enviadas em claro pela rede.
 
 Não existe nenhuma criação da chamada UserKey, esta no entanto, é gerada para cada livro por cada utilizador quando ele solicita pela primeira vez a leitura do mesmo. Optou-se por fazer um UserKey por Livro para dificultar ainda mais a tarefa a quem tente comprometer o nosso sistema de IEDCS.
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=150mm,scale=1]{pbkdf2_saved.pdf}
+ \caption{\\Password guardada com PBKDF2 e SHA256}
+ \label{fig:eer}
+\end{figure}
 
 \subsection{Registo de um device}
 Quando um player é utilizado pela primeira vez num determinado device, no momento do login de um utilizador, o Device é registado na base de dados com os seguintes parâmetros:
@@ -227,15 +238,15 @@ Isto permite que os conteúdos não possam ser acedidos a qualquer momento e em 
 
 \section{Instalação}
 
-Para uso e instalação do nosso sistema, criou-se uma pasta /installation que tem um ficheiro Vagrantfile que permite criar um servidor ubuntu trusty 64bits que cria uma pasta partilhada neste em /var/www que irá servir para lançar o servidor IEDCS com recurso ao Apache2. O ficheiro server-bootstrap.sh servirá para instalar todas as bibliotecas necessárias, todos os pacotes do python, a configuração do Apache2 para o nosso site que está no ficheiro www.bkiedcs.tk.conf e default-ssl.conf e também para instalar os certificados necessários para o HTTPS nas pastas usadas para esse efeito.
+Para uso e instalação do nosso sistema, criou-se uma pasta /installation que tem um ficheiro \textit{Vagrantfile} que permite criar um servidor ubuntu trusty 64bits que cria uma pasta partilhada neste em /var/www que irá servir para lançar o servidor IEDCS com recurso ao Apache2. O ficheiro \textit{server-bootstrap.sh} servirá para instalar todas as bibliotecas necessárias, todos os pacotes do python, a configuração do Apache2 para o nosso site que está no ficheiro \textit{iedcs.rafaelferreira.pt.conf} e \textit{default-ssl.conf} e também para instalar os certificados necessários para o HTTPS nas pastas usadas para esse efeito.
 	
-O ficheiro iedcs.rafaelferreira.pt.conf serve apenas para redirecionar todos os pedidos HTTP para HTTPS. O ficheiro default-ssl.conf tem todas as configurações necessárias para o uso de HTTPS e para usar o modWSGI do Apache2 para o Django.
+O ficheiro \textit{iedcs.rafaelferreira.pt.conf} serve apenas para redirecionar todos os pedidos HTTP para HTTPS. O ficheiro \textit{default-ssl.conf} tem todas as configurações necessárias para o uso de HTTPS e para usar o modWSGI do Apache2 para o Django.
 
 Criou-se um package de settings para o Django para ter definições de development e outras de servidor. Usando o hostname do servidor sabemos em que modo deve estar, sendo assim nesse servidor iniciado com Vagrant o servidor estará em modo produção, ou seja, não irá lançar output de debug para o utilizador.
 
-O install{\_}cert.sh é usado para criar uma keystore que será usada pelo Java para armazenar os certificados em que ele confia ao usar HTTPS.	
+O \textit{install{\_}cert.sh} é usado para criar uma keystore que será usada pelo Java para armazenar os certificados em que ele confia ao usar HTTPS.	
 	
-Para usar o servidor, além de ter o Vagrant intalado, é apenas necessário fazer:
+Para usar o servidor, além de ter o \href{https://www.vagrantup.com/downloads.html}{Vagrant} intalado, é apenas necessário fazer:
 vagrant up
 
 A password caso seja pedida é sempre vagrant e para aceder à máquina é apenas necessário fazer vagrant ssh.
@@ -249,7 +260,7 @@ Para criar um certificado criou-se uma chave privada RSA com:
 
 \textbf{output:} /installation/ssl/generating.txt
 
-O certificado foi depois emitido usando a Free SSL.
+O certificado foi depois emitido usando a \href{https://www.instantssl.com/free-ssl-certificate.html}{Free SSL}.
 
 Como foi criado um domínio que aponta para o endereço \textit{192.168.33.10} que é o endereço local do servidor IEDCS inicializado pelo Vagrant.
 
