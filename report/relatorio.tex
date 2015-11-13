@@ -73,7 +73,7 @@ A causa de termos abandonado este processo para cifrar o conteúdo do livro foi:
 
 \begin{itemize}  
         \item É computacionalmente exigente cifrar com chaves assimétricas conteúdos grandes.
-        \item Normalmente para evitar este forço computacional faz-se uma assinatura sobre o resultado de uma função de síntese desse mesmo conteúdo do livro.
+        \item Normalmente para evitar este esforço computacional faz-se uma assinatura sobre o resultado de uma função de síntese desse mesmo conteúdo do livro.
         \item As chaves simétricas são muito mais eficientes a nível computacional.
         \item As funções para derivar as chaves foram abandonadas em detrimento da PBKDF2 que efetua já as iterações idealizadas.
         \item Não é boa ideia usar as passwords dos utilizadores para cifrar o conteúdo do mesmo pois caso o utilizador mude a palavra pass teremos de derivar as chaves outra vez.
@@ -201,7 +201,7 @@ Como usamos Python e Java já temos protecção contra buffer overflows e mesmo 
 
 \subsection{Registo de um utilizador}
 
-Um registo de um utilizador é feito na página web disponibilizada pelo IEDCS. Ao gravar na base de dados a password é gravada com um segundo PBKDF2 e SHA256, o que torna computacionalmente trabalhoso obter as passwords dos nossos utilizadores caso a base de dados seja exposta. Ao fazer login, tanto no Player como na interface Web é aplicado PBKDF2 com Hmac e SHA1 para caso o HTTPS seja comprometido, as passwords não sejam enviadas em claro pela rede ou  caso se esteja a usar HTTP.
+Um registo de um utilizador é feito na página web disponibilizada pelo IEDCS. Ao gravar na base de dados a password é gravada com um segundo PBKDF2 e SHA256, o que torna computacionalmente trabalhoso obter as passwords dos nossos utilizadores caso a base de dados seja exposta. Ao fazer login, tanto no Player como na interface Web é aplicado PBKDF2 com HMAC e SHA1 para caso o HTTPS seja comprometido, as passwords não sejam enviadas em claro pela rede ou  caso se esteja a usar HTTP.
 
 \begin{center}
 	\textbf{Password = PBKDF2(Password, Password, 500)}
