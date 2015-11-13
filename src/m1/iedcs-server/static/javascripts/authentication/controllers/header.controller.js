@@ -67,14 +67,13 @@
         }
 
         function login(){
-
-            Authentication.login(header.email1, header.password1)
+            var pass = CryptoJS.PBKDF2(header.password1, header.password1, {keySize: 256/32, iterations: 500}).toString(CryptoJS.enc.Base64);
+            Authentication.login(header.email1, pass)
                 .then(loginSuccess, loginError);
 
         }
 
         function loginafterRegister(email, password){
-
             Authentication.login(email, password)
                 .then(loginSuccess, loginError);
 
@@ -97,14 +96,13 @@
         }
 
         function register(){
-            Authentication.register(header.email, header.username, header.first_name, header.last_name, header.password, header.confirm_password).then(registerSuccess, registerError);
+            var pass = CryptoJS.PBKDF2(header.password, header.password, {keySize: 256/32, iterations: 500}).toString(CryptoJS.enc.Base64);
+            Authentication.register(header.email, header.username, header.first_name, header.last_name, pass, header.confirm_password).then(registerSuccess, registerError);
 
             function registerSuccess(){
-                loginafterRegister(header.email, header.password);
+                loginafterRegister(header.email, pass);
             }
         }
-
-
 
         function registerError(data){
             var errors = "";

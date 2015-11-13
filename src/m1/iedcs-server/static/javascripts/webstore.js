@@ -6,7 +6,8 @@
             'webstore.config',
             'webstore.routes',
             'webstore.authentication',
-            'webstore.website'
+            'webstore.website',
+            'angularjs-crypto'
         ])
         .run(run);
 
@@ -15,6 +16,9 @@
 
     angular
         .module('webstore.routes', ['ngRoute']);
+
+    angular
+        .module('angularjs-crypto', []);
 
     run.$inject = ['$http', '$rootScope'];
 

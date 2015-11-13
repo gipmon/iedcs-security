@@ -12,4 +12,5 @@
 
     angular
         .module('webstore.authentication.services', ['ngCookies']);
+
 })();
