@@ -123,7 +123,7 @@ public class DecryptBook {
             
             String content = new String(contentText);
             return content;
-        } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
+        } catch (JSONException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ProtocolException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,7 +151,7 @@ public class DecryptBook {
             System.arraycopy(rd1, 0, final_rd1, iv1.length, rd1.length);
             
             return Base64.getEncoder().encode(final_rd1);
-        } catch (NoSuchAlgorithmException | JSONException | InvalidKeySpecException ex) {
+        } catch (NoSuchAlgorithmException | JSONException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
@@ -185,7 +185,7 @@ public class DecryptBook {
             System.arraycopy(rd3, 0, final_rd3, iv3.length, rd3.length);
             
             return Base64.getEncoder().encode(final_rd3);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

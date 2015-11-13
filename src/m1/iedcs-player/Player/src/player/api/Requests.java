@@ -136,7 +136,9 @@ public class Requests {
         
         parameters.put("email", email);
         PBKDF2 password_pbkdf2 = new PBKDF2(password, password, 500);
-        parameters.put("password", password);
+        
+        String pass = new String (Base64.getEncoder().encode(password_pbkdf2.read(32)));
+        parameters.put("password", pass);
         Result rs = postJSON(LOGIN_ENDPOINT, parameters);
         
         // unique identifier

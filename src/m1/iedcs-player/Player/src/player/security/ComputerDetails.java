@@ -28,7 +28,6 @@ public class ComputerDetails extends SigarCommandBase{
     static{
         File a = new File("sigar");
         try {
-            System.out.println(a.getCanonicalPath());
             System.setProperty( "java.library.path", a.getCanonicalPath());
         } catch (IOException ex) {
             Logger.getLogger(ComputerDetails.class.getName()).log(Level.SEVERE, null, ex);
