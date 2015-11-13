@@ -25,6 +25,7 @@ import org.json.JSONException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import player.security.BookRestricted;
 import player.security.DecryptBook;
 
 public class ViewBookController implements Initializable {
@@ -101,7 +102,7 @@ public class ViewBookController implements Initializable {
         forward.setDisable(false);
     }
     
-    public void setIdentifier(String identifier){
+    public void setIdentifier(String identifier) throws BookRestricted{
         db = new DecryptBook(identifier);
         textZone.setText(db.getContent(1));
         title.setText(db.title);

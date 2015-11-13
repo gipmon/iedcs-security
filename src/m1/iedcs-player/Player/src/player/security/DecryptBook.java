@@ -1,25 +1,15 @@
 package player.security;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,15 +20,10 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.bouncycastle.jcajce.provider.digest.SHA224;
-import org.bouncycastle.jcajce.provider.digest.BCMessageDigest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import player.IEDCSPlayer;
 import player.api.BookContent;
-import player.api.Requests;
 import player.api.Requests;
 import player.api.Result;
 
@@ -58,7 +43,7 @@ public class DecryptBook {
     private static final long number_of_blocks_per_page = 100;
     final protected static char[] hexArray = "0123456789abcdef".toCharArray();
     
-    public DecryptBook(String identifier){
+    public DecryptBook(String identifier) throws BookRestricted{
         Result rs = Requests.getBook(identifier);
         BookContent bc = (BookContent) rs.getResult();
         
@@ -77,6 +62,8 @@ public class DecryptBook {
                 this.book_identifier = h.getValue();
             }else if(h.getName().equals("name")){
                 this.title = h.getValue();
+            }else if(h.getName().equals("restriction")){
+                throw new BookRestricted(h.getValue());
             }
         }
         
@@ -314,3 +301,4 @@ public class DecryptBook {
         return null;
     }
 }
+

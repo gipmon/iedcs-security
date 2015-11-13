@@ -31,11 +31,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import player.security.BookRestricted;
 
 
 public class MyBooksPageController implements Initializable {
@@ -115,11 +118,19 @@ public class MyBooksPageController implements Initializable {
                                 FXMLLoader loader = new FXMLLoader(getClass().getResource("ViewBook.fxml"));
                                 AnchorPane anchor = loader.load();
                                 ViewBookController controller = loader.getController();
-                                controller.setIdentifier(data.get(row.getIndex()).getIdentifier());
-                            
-                                //Parent root = FXMLLoader.load(getClass().getResource("ViewBook.fxml"));
-                                Scene scene = new Scene(anchor);
-                                Player.thestage.setScene(scene);
+                                try {
+                                    controller.setIdentifier(data.get(row.getIndex()).getIdentifier());
+                                    
+                                    //Parent root = FXMLLoader.load(getClass().getResource("ViewBook.fxml"));
+                                    Scene scene = new Scene(anchor);
+                                    Player.thestage.setScene(scene);
+                                } catch (BookRestricted ex) {
+                                    Alert alert = new Alert(AlertType.INFORMATION);
+                                    alert.setTitle("Book restricted!");
+                                    alert.setHeaderText(null);
+                                    alert.setContentText(ex.cause());
+                                    alert.showAndWait();
+                                }
                             } catch (IOException ex) {
                                 Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
                             }
