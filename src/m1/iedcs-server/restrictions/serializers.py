@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Restriction, BookRestrictions
 
+
 class BookRestrictionsSerializer(serializers.ModelSerializer):
     book_identifier = serializers.CharField(max_length=128)
 

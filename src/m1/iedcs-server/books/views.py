@@ -117,19 +117,28 @@ class BookView(views.APIView):
         device = Device.objects.filter(pk__in=[device.device.pk for device in devices_owner]).order_by('-updated_at').first()
 
         can = True
+        restriction_cause = ""
 
         for book_restriction in BookRestrictions.objects.filter(book=book):
-            can &= test_restriction(book_restriction.restriction.restrictionFunction, book, request.user.user_data)
+            test = test_restriction(book_restriction.restriction.restrictionFunction, book, request.user.user_data)
+            if not test:
+                restriction_cause += book_restriction.restriction.cause + " "
+            can &= test
 
-        result = encrypt_book_content(book_order.book, request.user, device)
+        if can:
+            result = encrypt_book_content(book_order.book, request.user, device)
 
-        response = Response(result.book_ciphered)
-        response["identifier"] = book_order.book.identifier
-        response["name"] = book_order.book.name
-        response["production_date"] = book_order.book.production_date
-        response["author"] = book_order.book.author
-        response["r2"] = result.random2
-        response["bs"] = result.book_signed
-        return response
+            response = Response(result.book_ciphered)
+            response["identifier"] = book_order.book.identifier
+            response["name"] = book_order.book.name
+            response["production_date"] = book_order.book.production_date
+            response["author"] = book_order.book.author
+            response["r2"] = result.random2
+            response["bs"] = result.book_signed
+            return response
+        else:
+            response = Response("")
+            response["restriction"] = "Restriction cause: " + restriction_cause
+            return response
 
 

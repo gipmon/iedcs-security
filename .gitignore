@@ -12,6 +12,8 @@ output.html
 .idea
 *.pyc
 
+# devices
+devices/
 
 # Directories #
 src/m1/iedcs-player/Player/dist/*

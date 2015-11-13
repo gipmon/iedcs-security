@@ -18,6 +18,11 @@ public class PBKDF2 {
         this.salt = salt.getBytes();
     }
     
+    public PBKDF2(String password, String salt, int iterations){
+        this(password, salt);
+        this.iterations = iterations;
+    }
+    
     public byte[] read(int bytes) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, bytes*8);
