@@ -273,7 +273,7 @@ public class DecryptBook {
               
               counter_linhas = number_of_barran.length - 1;
               
-              if(counter_linhas >= 29 || book_ciphered.available() == 0){ 
+              if(counter_linhas >= 31 || book_ciphered.available() == 0){ 
                 String[] linha = clearText_str.split(System.getProperty("line.separator"));
                     
                 if(linha.length>1){

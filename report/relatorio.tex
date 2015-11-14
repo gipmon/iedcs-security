@@ -185,11 +185,25 @@ Este "challenge", que é um processo de pergunta e resposta, em que a pergunta t
 
 A pergunta colocada ao servidor tem de ter um tamanho esperado e tem de ser colocada em Base64. Como a pergunta é em Base64 espera-se que a pergunta tenha um valor de 108 caracteres. 
 
-O resultado da cifra de RD1 com AES/CBC tem 64 bytes, resultante de o random 2 ter 56 bytes (mais o padding ficam 4 blocos de 16 bytes na saída cada). Com o IV soma-se 16 bytes. Temos então, 80 bytes a enviar para o servidor em Base64, sendo isto 640 bits. Como cada caracter é usado para representar 6 bits, mas como 640 não é múltiplo de 6 teremos de adicionar padding, neste caso, terá de ser adicionado 2 bits para ser múltiplo de 6 bits. Sendo assim 642 resulta em 107 caracteres, como apenas adicionou-se 2 bits apenas será necessário adicionar um '=' no final, resultando em 108 caracteres.
+O resultado da cifra de RD1 com AES/CBC tem 64 bytes, resultante de o random 2 ter 56 bytes (mais o padding ficam 4 blocos de 16 bytes cada). Com o IV soma-se 16 bytes. Temos então, 80 bytes a enviar para o servidor em Base64, sendo isto 640 bits. Como cada caracter é usado para representar 6 bits, mas como 640 não é múltiplo de 6 teremos de adicionar padding, neste caso, terá de ser adicionado 2 bits para ser múltiplo de 6 bits. Sendo assim 642 resulta em 107 caracteres, como apenas adicionou-se 2 bits apenas será necessário adicionar um '=' no final, resultando em 108 caracteres.
 
 A resposta dada pelo servidor não é verificada se é a correta ou não pois isso poderia resultar em pedidos mal intencionados só para saber qual seria a resposta correta, e por consequência qual seria o valor de entrada correto para aquele livro e utilizador, resultando numa fraqueza no processo de cifra/ decifra.
 
 Após este processo de derivação da File Key o Player decifra o conteúdo cifrado do livro de forma a obter o conteúdo original do mesmo, podendo agora apresenta-lo ao utilizador.
+
+\newpage
+\subsubsection{Paginação}
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=80mm,scale=1]{Book_page.pdf}
+ \caption{\\Paginação ajustada à janela}
+ \label{fig:eer}
+\end{figure}
+
+A paginação foi feita de acordo com o tamanho da janela do Player de modo ao número de linhas ser igual a 31. Caso o último bloco a ser decifrado possua mais que uma linha, é apenas escrita a primeira linha desse bloco, sendo o resto do texto apresentado no início página seguinte.
+
+Convém contudo realçar que a decifra do conteúdo é feita página a página, usando o acesso aleatório do modo CBC, e  a cada página apresentada ao utilizador são calculadas todas as chaves necessárias e é efetuado o challenge ao servidor.
 
 \section{Tecnologias usadas}
 
