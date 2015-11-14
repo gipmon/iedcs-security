@@ -125,9 +125,9 @@ Neste novo processo, o servidor cifra um valor aleatório, designado por Random2
  \caption{\\Processo de derivação da File Key}\label{fig:eer}
 \end{figure}
 
-Para derivar a File Key, como poderemos ver na figura 4, o Random2 é cifrado com uma chave K1, que é calculada através do SHA-224 do username, de um salt (“fcp”) e do identificador do livro. Este SHA é a nossa password e o Random2 o nosso salt aplicando-se assim a função PBKDF2 (recomendado na apresentação), com o valor por defeito de 1000 iterações, obtendo-se assim a chave pretendida, K1. O cálculo desta chave K1 é possível de ser efetuado tanto do lado do servidor como do cliente.
+Para derivar a File Key, como poderemos ver na figura 4, o Random2 é cifrado com uma chave K1, que é calculada através do SHA-224 do username, de um texto (“fcp”) e do identificador do livro. Este SHA é a nossa password e o Random2 o nosso texto aplicando-se assim a função PBKDF2 (recomendado na apresentação), com o valor por defeito de 1000 iterações, obtendo-se assim a chave pretendida, K1. O cálculo desta chave K1 é possível de ser efetuado tanto do lado do servidor como do cliente.
 
-Após isto, o resultado obtido da cifra de Random2 com a chave K1, RD1, vai ser cifrado com uma nova chave K2, sendo esta apenas e exclusivamente calculada pelo servidor. Esta é calculada praticamente como a K1, sendo diferente por no SHA-224 utilizar um outro salt (“deti”) e um \textit{random1}, em vez de \textit{random2}, apenas disponível no servidor, em vez de usar o identificador do livro. Aplica-se igualmente a função PBKDF2, com o SHA como password e o \textit{random1} como salt, de forma a obter K2 para se poder cifrar o valor de RD1.
+Após isto, o resultado obtido da cifra de Random2 com a chave K1, RD1, vai ser cifrado com uma nova chave K2, sendo esta apenas e exclusivamente calculada pelo servidor. Esta é calculada praticamente como a K1, sendo diferente por no SHA-224 utilizar um outro texto (“deti”) e um \textit{random1}, em vez de \textit{random2}, apenas disponível no servidor, em vez de usar o identificador do livro. Aplica-se igualmente a função PBKDF2, com o SHA como password e o \textit{random1} como texto, de forma a obter K2 para se poder cifrar o valor de RD1.
 
 Numa última fase deste processo de derivação da File Key, é calculada ainda uma terceira chave, K3, com o mesmo processo das outras chaves K1 e K2, sendo nesta última utilizado no calculo do SHA um valor n, que corresponde a:
 
@@ -135,7 +135,7 @@ Numa última fase deste processo de derivação da File Key, é calculada ainda 
 	\textbf{n = (soma de todos os digitos de random2) \% 10}
 \end{center}
 
-Juntamente com o valor n, utiliza-se o identificador do livro e um salt (“ua”). Através deste SHA e do random2 que atuam respetivamente como password e salt, aplica-se uma função PBKDF2 para obter K3.
+Juntamente com o valor n, utiliza-se o identificador do livro e um texto “ua”. Através deste SHA e do random2 que atuam respetivamente como password e salt, aplica-se uma função PBKDF2 para obter K3.
 
 Por último através da cifra de RD2 (valor obtido da cifra de \textit{random1} com a chave K2) com a chave K3 obtida, obtém-se a File Key, que será utilizada para cifrar o conteúdo do livro e desta forma este conteúdo cifrado será enviado para o cliente.
 
@@ -300,7 +300,7 @@ A password caso seja pedida é sempre vagrant e para aceder à máquina é apena
 
 O site pode ser acessível em: \url{https://iedcs.rafaelferreira.pt/}
 
-Para fazer download do Player apenas é preciso registar na webstore e depois clicar em "Player" que será feito o download do Player. A implementação do Player está apenas disponível para Mac OS X, com uma aplicação nativa tendo como base uma aplicação JavaFX. Testado com o java version "1.8.0{\_}60".
+Para fazer download do Player apenas é preciso registar na webstore e depois clicar em "Player" que será feito o download do Player. A implementação do Player está apenas disponível para Mac OS X, com uma aplicaçãnative application  tendo como base uma aplicação JavaFX. Testado com o java version "1.8.0{\_}60".
 
 \section{HTTPS}
 Para criar um certificado criou-se uma chave privada RSA com:
@@ -315,7 +315,7 @@ Como foi criado um domínio que aponta para o endereço \textit{192.168.33.10} q
 
 \section{Problemas identificados na primeira entrega}
 
-Nesta primeira entrega, identificaram-se alguns problemas, nomeadamente no corrompimento do HTTPS, através da troca da keystore onde são guardados os certificados confiáveis, podendo assim injetar todos os certificados que se deseja de forma a que seja possível intercetar as comunicações entre o servidor e o Player. Para isso sabemos que o utilizador pode descompilar o código do Player, analisar o nosso processo de cifra e o código. Com isto ele poderá descobrir que usamos um ficheiro cacerts.keystore para o Java confiar apenas no nosso certificado, pode então modificar essa keystore e o cliente ao fazer download pode ser-lhe dada uma versão corrompida, mas sem estar corrompida no código, apenas no cacerts.keystore. Se estiver presente outro certificado que o atacante domine, ele pode intercetar as comunicações HTTPS e aceder às comunicações que estão a ser trocadas entre a vítima que está a usar o Player e o nosso Servidor e assim, pode, obter o Random2 e derivar o n (este é enviado inicialmente num Header), o book identifier e o rd2 que é enviado pelo servidor no pedido de challenge ao cliente. O salt “ua” é possível de ser obtido descompilando o código. Após isto, ele pode cifrar com AES e obter a file key. Com isto, consegue decifrar o nosso livro cifrado.
+Nesta primeira entrega, identificaram-se alguns problemas, nomeadamente no corrompimento do HTTPS, através da troca da keystore onde são guardados os certificados confiáveis, podendo assim injetar todos os certificados que se deseja de forma a que seja possível intercetar as comunicações entre o servidor e o Player. Para isso sabemos que o utilizador pode descompilar o código do Player, analisar o nosso processo de cifra e o código. Com isto ele poderá descobrir que usamos um ficheiro cacerts.keystore para o Java confiar apenas no nosso certificado, pode então modificar essa keystore e o cliente ao fazer download pode ser-lhe dada uma versão corrompida, mas sem estar corrompida no código, apenas no cacerts.keystore. Se estiver presente outro certificado que o atacante domine, ele pode intercetar as comunicações HTTPS e aceder às comunicações que estão a ser trocadas entre a vítima que está a usar o Player e o nosso Servidor e assim, pode, obter o Random2 e derivar o n (este é enviado inicialmente num Header), o book identifier e o rd2 que é enviado pelo servidor no pedido de challenge ao cliente. O texto “ua” é possível de ser obtido descompilando o código. Após isto, ele pode cifrar com AES e obter a file key. Com isto, consegue decifrar o nosso livro cifrado.
 
 Outra possibilidade seria um atacante/cliente que usasse ferramentas de análise de memória para obter o livro cifrado, e todas as outras variáveis que estão expostas em Runtime.
 
