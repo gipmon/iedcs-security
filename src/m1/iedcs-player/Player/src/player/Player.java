@@ -32,6 +32,7 @@ public class Player extends Application {
         Scene scene_frontpage = new Scene(root);
         
         thestage.setScene(scene_frontpage);
+        thestage.setResizable(false);
         thestage.show();
     }
 
