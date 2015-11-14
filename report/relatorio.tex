@@ -329,3 +329,19 @@ Outra possibilidade seria um atacante/cliente que usasse ferramentas de análise
 \end{itemize}
 
 \end{document}
+
+\newpage
+\section{Conclusão}
+
+Esta conclusão não é uma conclusão final, pois este projeto será realizado em duas partes.
+Sendo assim vamos optar por nesta conclusão dizer principalmente as implementações futuras e problemas encontrados.
+
+O principal problema encontrado, foi fazer a decifra no lado do Java, depois de a cifra estar feita do lado do Python, pois muitas tecnologias disponibilizadas por este não estão disponíveis diretamente no Java, o que nos obriga a utilizar bibliotecas externas o que nem sempre é bom, pois podemos estar a acrescentar problemas ao sistema. 
+
+As implementações futuras que não conseguimos implementar a tempo nesta fase do projeto, mas que contudo poderão fazer parte da próxima são:
+\begin{itemize}
+\item Uma sessão única sempre o device atualiza os seus dados. Este atualiza os seus dados sempre que o utilizador efetua um inicio de sessão, tenta ler um livro e muda de página. Esta solução faria com que a cifra do conteúdo do livro apenas fosse válida durante a sessão, pois assim que fosse efetuado um outro challenge com o servidor a sessão iria mudar e o Player não iria conseguir fazer a decifra.
+\item A solução apresentada acima, obriga a que seja feita a cifra página a página, consoante a sessão do Player, Device e utilizador.
+\item Outra ideia que nos surgiu, foi apresentar ao utilizador as duas páginas iniciais de cada EBook (Sample) de forma gratuita.
+\end{itemize}
+
