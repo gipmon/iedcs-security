@@ -67,4 +67,15 @@
             <fileset dir="citizen" includes="**"/>
         </copy>
     </target>
+    <target name="-post-jfx-native">
+      <mkdir dir="${basedir}/dist/bundles/IEDCS Player.app/Contents/Java/sigar"/>
+      <copy todir="${basedir}/dist/bundles/IEDCS Player.app/Contents/Java/sigar">
+          <fileset dir="sigar_source" includes="**"/>
+      </copy>
+      <echo>Copying player public key keystore file to build directory...</echo>
+      <mkdir dir="${basedir}/dist/bundles/IEDCS Player.app/Contents/Java/keystore"/>
+      <copy todir="${basedir}/dist/bundles/IEDCS Player.app/Contents/Java/keystore">
+          <fileset dir="keystore" includes="**"/>
+      </copy>
+    </target>
 </project>
