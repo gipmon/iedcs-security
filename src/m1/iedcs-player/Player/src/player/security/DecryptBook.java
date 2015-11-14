@@ -40,7 +40,7 @@ public class DecryptBook {
     private long last_page = 1;
     public String title;
     public boolean isFinal = false;
-    private static final long number_of_blocks_per_page = 100;
+    private static final long number_of_blocks_per_page = 50;
     final protected static char[] hexArray = "0123456789abcdef".toCharArray();
     
     public DecryptBook(String identifier) throws BookRestricted{
@@ -48,22 +48,27 @@ public class DecryptBook {
         BookContent bc = (BookContent) rs.getResult();
         
         for(Header h : bc.getHeaders()){
-            if(h.getName().equals("r2")){
-                byte[] f = Base64.getDecoder().decode(h.getValue());
-                byte[] tmp1 = new byte[32];
-                System.arraycopy(f, 0, tmp1, 0, 32);
-                this.iv_array = tmp1;
-                byte[] tmp2 = new byte[f.length-32];
-                System.arraycopy(f, 32, tmp2, 0, f.length-32);
-                this.r2 = tmp2;
-            }else if(h.getName().equals("bs")){
-                this.bs = h.getValue();
-            }else if(h.getName().equals("identifier")){
-                this.book_identifier = h.getValue();
-            }else if(h.getName().equals("name")){
-                this.title = h.getValue();
-            }else if(h.getName().equals("restriction")){
-                throw new BookRestricted(h.getValue());
+            switch (h.getName()) {
+                case "r2":
+                    byte[] f = Base64.getDecoder().decode(h.getValue());
+                    byte[] tmp1 = new byte[32];
+                    System.arraycopy(f, 0, tmp1, 0, 32);
+                    this.iv_array = tmp1;
+                    byte[] tmp2 = new byte[f.length-32];
+                    System.arraycopy(f, 32, tmp2, 0, f.length-32);
+                    this.r2 = tmp2;
+                    break;
+                case "bs":
+                    this.bs = h.getValue();
+                    break;
+                case "identifier":
+                    this.book_identifier = h.getValue();
+                    break;
+                case "name":
+                    this.title = h.getValue();
+                    break;
+                case "restriction":
+                    throw new BookRestricted(h.getValue());
             }
         }
         
@@ -106,7 +111,7 @@ public class DecryptBook {
             PBKDF2 pbk = new PBKDF2(new String(rd3), new String(rd2_bytes));
             byte[] filekey = pbk.read(32);
             
-            byte[] contentText = decryptStreamAES(filekey, page*number_of_blocks_per_page, page);
+            byte[] contentText = decryptStreamAES(filekey, page);
             
             String content = new String(contentText);
             return content;
@@ -231,7 +236,7 @@ public class DecryptBook {
         return null;
     }
     
-    private byte[] decryptStreamAES(byte[] key, long n, long page){
+    private byte[] decryptStreamAES(byte[] key, long page){
         try {
             InputStream book_ciphered = Base64.getDecoder().wrap(new ByteArrayInputStream(this.book_ciphered_bytes));
             Cipher cipher_aes = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -255,32 +260,48 @@ public class DecryptBook {
             
             byte[] clearText_block;
             String clearText = "";
-
-            long number_of_bytes_per_page = cipher_aes.getBlockSize() * number_of_blocks_per_page;
+            
+            int counter_linhas = 0;
             
             while (book_ciphered.available() > 0){
               byte[] dataBlock = new byte[bs];
-              bytesRead += book_ciphered.read(dataBlock);
+              long read_bytes = book_ciphered.read(dataBlock);
               clearText_block = cipher_aes.update(dataBlock);
               String clearText_str = new String(clearText_block);
               
+              String[] number_of_barran = (clearText + clearText_str).split(System.getProperty("line.separator"));
               
-              clearText += clearText_str;
+              counter_linhas = number_of_barran.length - 1;
               
-              
-              if(bytesRead >= number_of_bytes_per_page && (clearText.endsWith("\n") || clearText.endsWith(".") || clearText.endsWith(","))){ 
-                  this.last_byte = this.last_byte + bytesRead;
-                  if(this.last_skyp_bytes.length == page){
-                      long[] toAppend = {this.last_byte};
-                      long[] tmp = new long[this.last_skyp_bytes.length + toAppend.length];
-                      System.arraycopy(this.last_skyp_bytes, 0, tmp, 0, this.last_skyp_bytes.length);
-                      System.arraycopy(toAppend, 0, tmp, this.last_skyp_bytes.length, toAppend.length);
+              if(counter_linhas >= 29 || book_ciphered.available() == 0){ 
+                String[] linha = clearText_str.split(System.getProperty("line.separator"));
+                    
+                if(linha.length>1){
+                    clearText += linha[0];
+                    
+                    this.last_byte = this.last_byte + bytesRead;
+                    if(this.last_skyp_bytes.length == page){
+                        long[] toAppend = {this.last_byte};
+                        long[] tmp = new long[this.last_skyp_bytes.length + toAppend.length];
+                        System.arraycopy(this.last_skyp_bytes, 0, tmp, 0, this.last_skyp_bytes.length);
+                        System.arraycopy(toAppend, 0, tmp, this.last_skyp_bytes.length, toAppend.length);
 
-                      this.last_skyp_bytes = tmp;
-                      
-                  }
-                                          
-                  break;
+                        this.last_skyp_bytes = tmp; 
+                    }         
+                    break;
+                }else{
+                    clearText += clearText_str;
+                    bytesRead += read_bytes;
+                }
+              }else{
+                if(bytesRead==bs){
+                    String[] linha = clearText_str.split(System.getProperty("line.separator"));
+                    clearText += clearText_str.replace(linha[0]+System.getProperty("line.separator"), "");
+                    bytesRead += read_bytes;
+                }else{
+                    clearText += clearText_str;
+                    bytesRead += read_bytes;
+                }
               }
             }
             
@@ -293,9 +314,7 @@ public class DecryptBook {
             }
             
             return clearText.getBytes();
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException ex) {
-            Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException | IOException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
