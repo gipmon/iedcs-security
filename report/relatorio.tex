@@ -67,7 +67,7 @@ O relatório reflete todos os passos e decisões tomadas na criação do sistema
 \subsection{Processo de cifra do conteúdo do livro}
 Na primeira apresentação foram concebidos dois processos que foram abandonados após a sua apresentação. O primeiro processo apresentado foi o “Book content cipher process”. Este pretendia fazer uso de cifras simétricas e assimétricas de forma a ser possível obter uma File Key que seria usada para cifrar o conteúdo do livro. Idealmente o conteúdo do livro seria cifrado com a chave privada do Player, depois cifrado com a chave pública do Device e finalmente seria feito sobre esses resultados uma cifra com o User Key e a File Key. O processo de cifra com o User Key e a File Key seriam repetidos n vezes, sendo o n obtido através do random2. Foi pensado também usar duas funções para derivar as keys, uma f1 que seria usada para derivar a User Key e uma f2 que seria usada para derivar a File Key.
 
-A ideia de usar uma função de derivação da File Key e da User key é boa, e usando um número de iterações finita também. Isto permite que quem esteja a ouvir na rede tenha mais dificuldades em obter uma chave usando aquilo que conseguiu ouvir, teria de conhecer o processo usado pelos intervenientes para conseguir obter as chaves. Diga-se que também não seria difícil perceber o processo usado pelos dois intervenientes pois basta ao atacante usar o serviço e obter um Player e usando ferramentas próprias analisar o código.
+A ideia de usar uma função de derivação da File Key e da User key é boa, e usando um número de iterações finita também. Isto permite que quem esteja a ouvir na rede tenha mais dificuldades em obter uma chave usando aquilo que conseguiu ouvir, pois teria de conhecer o processo usado pelos intervenientes para conseguir obter as chaves. Diga-se que também não seria difícil perceber o processo usado pelos dois intervenientes pois basta ao atacante usar o serviço e obter um Player e usando ferramentas próprias analisar o código.
 
 A causa de ter-se abandonado este processo para cifrar o conteúdo do livro foi:
 
@@ -122,10 +122,11 @@ O valor Random2 foi criado, para que através dele tanto o servidor como o clien
 \begin{figure}[!htb]
 \center
  \includegraphics[width=150mm,scale=1]{file-key-generation.pdf}
- \caption{\\Processo de derivação da File Key}\label{fig:eer}
+ \caption{\\Processo de derivação da File Key}
+ \label{fig:processo_de_derivacao_file_key}
 \end{figure}
 
-Para derivar a File Key, como se pode ver na figura 4, o Random2 é cifrado com uma chave K1, que é calculada através do SHA-224 do username, de um texto (“fcp”) e do identificador do livro. Este SHA é a password e o Random2 o texto, aplicando-se assim a função PBKDF2 (recomendado na apresentação), com o valor por defeito de 1000 iterações, obtendo-se assim a chave pretendida, K1. O cálculo desta chave K1 é possível de ser efetuado tanto do lado do servidor como do cliente.
+Para derivar a File Key, como se pode ver na figura \ref{fig:processo_de_derivacao_file_key}, o Random2 é cifrado com uma chave K1, que é calculada através do SHA-224 do username, de um texto (“fcp”) e do identificador do livro. Este SHA é a password e o Random2 o texto, aplicando-se assim a função PBKDF2 (recomendado na apresentação), com o valor por defeito de 1000 iterações, obtendo-se assim a chave pretendida, K1. O cálculo desta chave K1 é possível de ser efetuado tanto do lado do servidor como do cliente.
 
 Posto isto, o resultado obtido da cifra de Random2 com a chave K1, RD1, vai ser cifrado com uma nova chave K2, sendo esta apenas calculada pelo servidor. Esta é calculada praticamente como a K1, sendo diferente por no SHA-224 utilizar um outro texto (“deti”) e um \textit{random1}, em vez de \textit{random2}, apenas disponível no servidor, em vez de usar o identificador do livro. Aplica-se igualmente a função PBKDF2, com o SHA como password e o \textit{random1} como texto, de forma a obter K2 para se poder cifrar o valor de RD1.
 
@@ -167,7 +168,7 @@ Os Random2, Random1 e Initialization Vectors passam todos por um processo de cif
 \center
  \includegraphics[width=50mm,scale=1]{book-decipher-process.pdf}
  \caption{\\ Processo de decifra de um livro}
- \label{fig:eer}
+ \label{fig:decifra_livro}
 \end{figure}
 
 Tal como no processo de cifra de um livro, a Random2 Key é calculada, mas desta vez no lado do cliente para este conseguir decifrar o random2 que recebeu cifrado, obtendo assim o valor original que vai ser utilizado para o cálculo da File Key usando também um processo de challenge.
@@ -176,10 +177,10 @@ Tal como no processo de cifra de um livro, a Random2 Key é calculada, mas desta
 \center
  \includegraphics[width=80mm,scale=1]{challengefilekey.pdf}
  \caption{\\Challenge entre Player e Servidor na derivação da File Key}
- \label{fig:eer}
+ \label{fig:challange_player_server}
 \end{figure}
 
-O processo de derivação da File Key no lado do servidor e do cliente é feito da mesma maneira, apenas mudando, que quando o Player está a gerar a File Key, precisa de questionar o servidor (Figura 7), pois ele é o único capaz de calcular o valor de RD2, obtido através da cifra de RD1 (cifra de Random2 com K1) com uma chave K2 calculada com um random1 que só o servidor conhece (Figura 5). 
+O processo de derivação da File Key no lado do servidor e do cliente é feito da mesma maneira, apenas mudando, que quando o Player está a gerar a File Key, precisa de questionar o servidor (figura \ref{fig:challange_player_server}), pois ele é o único capaz de calcular o valor de RD2, obtido através da cifra de RD1 (cifra de Random2 com K1) com uma chave K2 calculada com um random1 que só o servidor conhece (figura \ref{fig:decifra_livro}). 
 
 Este "challenge", que é um processo de pergunta e resposta, em que a pergunta tem de vir bem formulada, consiste na pergunta que o Cliente faz ao servidor, como já mencionado e na resposta, com o valor que calculou, para que o cliente prossiga o processo de derivação da File Key. 
 
@@ -241,8 +242,7 @@ Quando um player é utilizado pela primeira vez num determinado device, no momen
 
 \begin{itemize}
 \item Identificador único
-\item Modelo de CPU
-\item Modelo do PC
+\item Modelo de CPU e PC
 \item IP
 \item País
 \item Hora
@@ -260,10 +260,6 @@ No momento de aquisição do livro não há nenhuma cifra, apenas um registo na 
 
 \subsection{Restrições na visualização de um livro}
 
-Para a visualização de um livro criaram-se dois tipos de restrições, por país e por hora de utilização.
-
-Isto permite que os conteúdos não possam ser acedidos a qualquer momento e em qualquer lado caso existam restrições nesse livro.
-
 \begin{figure}[!htb]
 \center
  \includegraphics[width=100mm,scale=1]{country_restriction.pdf}
@@ -271,11 +267,16 @@ Isto permite que os conteúdos não possam ser acedidos a qualquer momento e em 
  \label{fig:eer}
 \end{figure}
 
+Para a visualização de um livro criaram-se dois tipos de restrições, por país e por hora de utilização.
+
+Isto permite que os conteúdos não possam ser acedidos a qualquer momento e em qualquer lado caso existam restrições nesse livro.
+
 \subsubsection{Gestão de restrições}
 
 Para ser mais simples gerir as restrições por parte do administrador do sistema foi criada uma interface de linha de comandos com várias possibilidades. 
 Para adicionar uma restrição a um livro:
-\shellcmd{python manage.py restriction add restrict{\_}book book{\_}identifier\linebreak restriction{\_}name}
+\shellcmd{python manage.py restriction add restrict{\_}book book{\_}identifier \linebreak restriction{\_}name}
+\linebreak
 Para adicionar uma nova restrição no sistema:
 \shellcmd{python manage.py restriction add restriction restriction{\_}name\linebreak restrictionFunction cause}
 Para remover uma restrição a um livro:
@@ -285,7 +286,7 @@ Para listar os livros disponíveis:
 
 \section{Instalação}
 
-Para uso e instalação do sistema, criou-se uma pasta /installation que tem um ficheiro \textit{Vagrantfile} que permite criar um servidor ubuntu trusty 64bits que cria uma pasta partilhada neste em /var/www que irá servir para lançar o servidor IEDCS com recurso ao Apache2. O ficheiro \textit{server-bootstrap.sh} servirá para instalar todas as bibliotecas necessárias, todos os pacotes do python, a configuração do Apache2 para o site que está no ficheiro \textit{iedcs.rafaelferreira.pt.conf} e \textit{default-ssl.conf}, também para instalar os certificados necessários para o HTTPS nas pastas usadas para esse efeito e para criar a base de dados com os livros e restrições exemplo.
+Para uso e instalação do sistema, criou-se uma pasta /installation que tem um ficheiro \textit{Vagrantfile} que permite criar um servidor ubuntu trusty 64bits que cria uma pasta partilhada em /var/www que irá servir para lançar o servidor IEDCS com recurso ao Apache2. O ficheiro \textit{server-bootstrap.sh} servirá para instalar todas as bibliotecas necessárias, todos os pacotes do python, a configuração do Apache2 para o site que está no ficheiro \textit{iedcs.rafaelferreira.pt.conf} e \textit{default-ssl.conf}, também para instalar os certificados necessários para o HTTPS nas pastas usadas para esse efeito e para criar a base de dados com os livros e restrições exemplo.
 	
 O ficheiro \textit{iedcs.rafaelferreira.pt.conf} serve apenas para redirecionar todos os pedidos HTTP para HTTPS. O ficheiro \textit{default-ssl.conf} tem todas as configurações necessárias para o uso de HTTPS e para usar o modWSGI do Apache2 para o Django.
 
