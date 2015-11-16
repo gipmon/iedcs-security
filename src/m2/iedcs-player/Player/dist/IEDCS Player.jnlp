@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="IEDCS Player.jnlp">
+  <information>
+    <title>IEDCS Player</title>
+    <vendor>p4g1</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="Player.jar" size="292239" download="eager" />
+    <jar href="lib/bcpkix-jdk15on-153.jar" size="671075" download="eager" />
+    <jar href="lib/bcprov-jdk15on-153.jar" size="3259402" download="eager" />
+    <jar href="lib/commons-codec-1.9.jar" size="263965" download="eager" />
+    <jar href="lib/commons-logging-1.2.jar" size="61829" download="eager" />
+    <jar href="lib/fluent-hc-4.5.1.jar" size="31295" download="eager" />
+    <jar href="lib/httpclient-4.5.1.jar" size="732765" download="eager" />
+    <jar href="lib/httpclient-cache-4.5.1.jar" size="158982" download="eager" />
+    <jar href="lib/httpclient-win-4.5.1.jar" size="17369" download="eager" />
+    <jar href="lib/httpcore-4.4.3.jar" size="326594" download="eager" />
+    <jar href="lib/httpmime-4.5.1.jar" size="40698" download="eager" />
+    <jar href="lib/jna-4.1.0.jar" size="914597" download="eager" />
+    <jar href="lib/jna-platform-4.1.0.jar" size="1464423" download="eager" />
+    <jar href="lib/log4j.jar" size="350115" download="eager" />
+    <jar href="lib/org.json-20120521.jar" size="40375" download="eager" />
+    <jar href="lib/sigar.jar" size="428580" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="IEDCS Player" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="player.Player"  name="IEDCS Player" />
+  <update check="always"/>
+</jnlp>
