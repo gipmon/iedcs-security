@@ -8,6 +8,8 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -30,7 +32,7 @@ import player.api.Utils;
 public class DecryptBook {
     
     private byte[] r2;
-    private String bs;
+    private String book_signed;
     private String book_identifier;
     private byte[] book_ciphered_bytes;
     private byte[] iv_array;
@@ -47,9 +49,12 @@ public class DecryptBook {
         Result rs = Requests.getBook(identifier);
         BookContent bc = (BookContent) rs.getResult();
         
+        String verify_book_content = "";
+        
         for(Header h : bc.getHeaders()){
             switch (h.getName()) {
                 case "r2":
+                    verify_book_content = h.getValue();
                     byte[] f = Base64.getDecoder().decode(h.getValue());
                     byte[] tmp1 = new byte[32];
                     System.arraycopy(f, 0, tmp1, 0, 32);
@@ -58,8 +63,8 @@ public class DecryptBook {
                     System.arraycopy(f, 32, tmp2, 0, f.length-32);
                     this.r2 = tmp2;
                     break;
-                case "bs":
-                    this.bs = h.getValue();
+                case "book_signed":
+                    this.book_signed = h.getValue();
                     break;
                 case "identifier":
                     this.book_identifier = h.getValue();
@@ -72,7 +77,22 @@ public class DecryptBook {
             }
         }
         
+        this.verify_book_content(verify_book_content);
         this.book_ciphered_bytes = bc.getContent().getBytes();
+    }
+    
+    public void verify_book_content(String book_content_ciphered){
+        try {
+            Signature signature1 = Signature.getInstance("SHA256withRSA");
+            signature1.initVerify(PlayerPublicKey.getKey());
+            signature1.update(book_content_ciphered.getBytes());
+            boolean result = signature1.verify(Base64.getDecoder().decode(this.book_signed));
+            System.err.print("ok");
+        } catch (NoSuchAlgorithmException | SignatureException ex) {
+            Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidKeyException ex) {
+            Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public String getContent(long page){
@@ -243,7 +263,7 @@ public class DecryptBook {
             
             int bs = 16;
             long skyp_bytes;
-            
+             
             skyp_bytes = this.last_skyp_bytes[(int) page-1];
             if(skyp_bytes>=bs){
                 book_ciphered.skip(skyp_bytes-(page-1)*bs);

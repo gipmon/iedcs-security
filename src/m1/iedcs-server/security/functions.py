@@ -53,11 +53,6 @@ def encrypt_book_content(book, user, device):
     file_key = rd3
     key = PBKDF2(file_key, random2).read(32)
 
-    # get or set the book signed
-    private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/private.key').read()
-    priv_key = rsa.PrivateKey.load_pkcs1(private_key_player)
-    book_signed = base64.b64encode(rsa.sign(default_storage.open(book.get_file_path()), priv_key, 'SHA-256'))
-
     # cipher with AES
     k1 = PBKDF2(user.username + "jnpc" + book.identifier, book.identifier).read(32)
     random2 = AESCipher.encrypt(random2, k1)
@@ -80,6 +75,11 @@ def encrypt_book_content(book, user, device):
     else:
         book_content_ciphered_iv = base64.b64decode(get_database_content_by_user_and_book("book_content_ciphered_iv", user, book))
         book_content_ciphered = AESCipher.encrypt(book_content, key, book_content_ciphered_iv)
+
+    # get or set the book signed
+    private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/private.key').read()
+    priv_key = rsa.PrivateKey.load_pkcs1(private_key_player)
+    book_signed = base64.b64encode(rsa.sign(book_content_ciphered, priv_key, 'SHA-256'))
 
     return BookSecurityResult(rdn2=random2, bs=book_signed, bc=book_content_ciphered)
 
