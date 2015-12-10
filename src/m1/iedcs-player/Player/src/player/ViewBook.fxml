@@ -13,16 +13,18 @@
         <items>
           <Button mnemonicParsing="false" onAction="#handleUserBtn" text="User" />
             <Button mnemonicParsing="false" onAction="#handleMyBooksBtn" text="My Books" />
-            <Button mnemonicParsing="false" disable="true"  fx:id="backward" onAction="#handleBackwardBtn" text="&lt;" />
+            <Button fx:id="backward" disable="true" mnemonicParsing="false" onAction="#handleBackwardBtn" text="&lt;" />
             <Label fx:id="page" contentDisplay="CENTER" prefHeight="17.0" prefWidth="24.0" text="1" textAlignment="CENTER">
                <font>
                   <Font size="11.0" />
                </font>
             </Label>
-            <Button mnemonicParsing="false" disable="false" fx:id="forward" onAction="#handleForwardBtn" text="&gt;" />
+            <Button fx:id="forward" disable="false" mnemonicParsing="false" onAction="#handleForwardBtn" text="&gt;" />
             <Label fx:id="title" prefHeight="17.0" prefWidth="350.0" text="Label" />
         </items>
       </ToolBar>
-          <TextArea fx:id="textZone" layoutY="39.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="39.0" />
+          <TextArea fx:id="textZone" layoutY="39.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="39.0">
+          </TextArea>
+      <AnchorPane layoutY="39.0" prefHeight="540.0" prefWidth="575.0" />
    </children>
 </AnchorPane>

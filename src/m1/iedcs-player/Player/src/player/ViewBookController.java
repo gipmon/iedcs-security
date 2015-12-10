@@ -20,11 +20,13 @@ import javafx.scene.control.Label;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
 import player.security.BookRestricted;
 import player.security.DecryptBook;
 
 public class ViewBookController implements Initializable {
     @FXML private TextArea textZone;
+    @FXML private AnchorPane anchor;
     @FXML private Label title;
     @FXML private Label page;
     @FXML private Button backward;
@@ -48,7 +50,6 @@ public class ViewBookController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         textZone.setEditable(false);
-        
     }    
     
     @FXML
