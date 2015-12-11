@@ -24,7 +24,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
     def list(self, request, *args, **kwargs):
         """
         B{List} user devices
-        B{URL:} ../api/v1/devices/
+        B{URL:} ../api/v1/player/devices/
         """
         devices = DeviceOwner.objects.filter(owner=request.user)
         serializer = self.serializer_class([device.device for device in devices], many=True)
@@ -33,7 +33,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
     def create(self, request, *args, **kwargs):
         """
         B{Create} a device
-        B{URL:} ../api/v1/devices/
+        B{URL:} ../api/v1/player/devices/
 
         :type  unique_identifier: str
         :param unique_identifier: the device unique identifier
@@ -108,7 +108,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
     def update(self, request, *args, **kwargs):
         """
         B{Update} the device
-        B{URL:} ../api/v1/devices/<random_string>/
+        B{URL:} ../api/v1/player/devices/<random_string>/
 
         :type  unique_identifier: str
         :param unique_identifier: the unique identifier
@@ -158,7 +158,7 @@ class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def create(self, request, *args, **kwargs):
         """
         B{Retrieve} a device
-        B{URL:} ../api/v1/retrieveDevice/
+        B{URL:} ../api/v1/player/retrieveDevice/
 
         :type  unique_identifier: str
         :param unique_identifier: the device unique identifier

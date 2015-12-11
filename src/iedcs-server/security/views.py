@@ -22,7 +22,7 @@ class ExchangeRd1Rd2ViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def create(self, request, *args, **kwargs):
         """
         B{Create} decipher process
-        B{URL:} ../api/v1/security_exchange_r1r2/
+        B{URL:} ../api/v1/player/security_exchange_r1r2/
 
         :type  book_identifier: str
         :param book_identifier: the book unique identifier
