@@ -2,7 +2,7 @@ package player;
 
 public class IEDCSPlayer {
     
-    private static final String baseURL_https = "https://iedcs.rafaelferreira.pt/";
+    private static final String baseURL_https = "https://iedcs.rafaelferreira.pt:8080/";
     private static final String baseURL_http = "http://localhost:8000/";
     
     // change here to http or https
