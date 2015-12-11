@@ -28,6 +28,7 @@ import player.api.BookContent;
 import player.api.Requests;
 import player.api.Result;
 import player.api.Utils;
+import java.security.PublicKey;
 
 public class DecryptBook {
     
@@ -45,7 +46,7 @@ public class DecryptBook {
     private static final long number_of_blocks_per_page = 50;
     final protected static char[] hexArray = "0123456789abcdef".toCharArray();
     
-    public DecryptBook(String identifier) throws BookRestricted{
+    public DecryptBook(String identifier) throws BookRestricted, SecurityException{
         Result rs = Requests.getBook(identifier);
         BookContent bc = (BookContent) rs.getResult();
         
@@ -74,22 +75,26 @@ public class DecryptBook {
             }
         }
         
-        this.verify_book_content(bc.getContent().getBytes());
+        if(!verify_book_content(bc.getContent().getBytes())){
+            throw new SecurityException("Something went wrong, please contact the admin.");
+        }
         this.book_ciphered_bytes = bc.getContent().getBytes();
     }
     
-    public void verify_book_content(byte[] book_content_ciphered){
+    public boolean verify_book_content(byte[] book_content_ciphered){
         try {
             Signature signature1 = Signature.getInstance("SHA256withRSA");
-            signature1.initVerify(PlayerPublicKey.getKey());
+            PublicKey pk = PlayerPublicKey.getKey();
+            signature1.initVerify(pk);
             signature1.update(book_content_ciphered);
             boolean result = signature1.verify(Base64.getDecoder().decode(this.book_signed));
-            System.err.print("ok");
+            return result;
         } catch (NoSuchAlgorithmException | SignatureException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvalidKeyException ex) {
             Logger.getLogger(DecryptBook.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return false;
     }
     
     public String getContent(long page){

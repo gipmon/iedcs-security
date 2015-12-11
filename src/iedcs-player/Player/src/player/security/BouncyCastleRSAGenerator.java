@@ -1,51 +1,56 @@
-/* http://www.txedo.me/blog/java-generate-rsa-keys-write-pem-file/ */
 package player.security;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.Key;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class BouncyCastleRSAGenerator {
-
-    public static final int KEY_SIZE = 1024;
-
-    public static void main(String[] args) throws FileNotFoundException, IOException, NoSuchAlgorithmException, NoSuchProviderException {
-      Security.addProvider(new BouncyCastleProvider());
-      System.err.println("BouncyCastle provider added.");
-
-      KeyPair keyPair = generateRSAKeyPair();
-      RSAPrivateKey priv = (RSAPrivateKey) keyPair.getPrivate();
-      RSAPublicKey pub = (RSAPublicKey) keyPair.getPublic();
-
-      writePemFile(priv, "RSA PRIVATE KEY", "id_rsa");
-      writePemFile(pub, "RSA PUBLIC KEY", "id_rsa.pub");
-    }
-
-    private static KeyPair generateRSAKeyPair() throws NoSuchAlgorithmException, NoSuchProviderException {
-      KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA", "BC");
-      generator.initialize(KEY_SIZE);
-
-      KeyPair keyPair = generator.generateKeyPair();
-      System.err.println("RSA key pair generated.");
-      return keyPair;
-    }
-
-    private static void writePemFile(Key key, String description, String filename) throws FileNotFoundException, IOException {
-      PemFile pemFile = new PemFile(key, description);
-      pemFile.write(filename);
-
-      System.err.println(String.format("%s successfully writen in file %s.", description, filename));
-    }
     
+    public static void main(String[] args) throws IOException, FileNotFoundException, NoSuchAlgorithmException{
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(2048);
+        KeyPair kp = kpg.genKeyPair();
+        PrivateKey private_key = kp.getPrivate();
+        PublicKey public_key = kp.getPublic();
+
+        File fprivate = new File("player");
+        File fpublic = new File("player.pub");
+
+        // write to private key
+        PrivateKeyInfo pkInfo = PrivateKeyInfo.getInstance(private_key.getEncoded());
+        ASN1Encodable privateKeyPKCS1ASN1Encodable = pkInfo.parsePrivateKey();
+        ASN1Primitive privateKeyPKCS1ASN1 = privateKeyPKCS1ASN1Encodable.toASN1Primitive();
+        byte[] privateKeyPKCS1 = privateKeyPKCS1ASN1.getEncoded();
+
+        PemObject pemObject = new PemObject("RSA PRIVATE KEY", privateKeyPKCS1);
+        StringWriter stringWriter = new StringWriter();
+        PemWriter pemWriter = new PemWriter(stringWriter);
+        pemWriter.writeObject(pemObject);
+        pemWriter.close();
+        String pemString = stringWriter.toString();
+
+        PrintWriter ptwriter = new PrintWriter(fprivate);
+        ptwriter.print(pemString);
+        ptwriter.close();
+
+        // write to public key
+        FileOutputStream fos = new FileOutputStream(fpublic);
+        fos.write(public_key.getEncoded());
+        fos.close();
+    }
+   
 }
-
-

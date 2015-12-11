@@ -23,6 +23,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import player.security.BookRestricted;
 import player.security.DecryptBook;
+import player.security.SecurityException;
 
 public class ViewBookController implements Initializable {
     @FXML private TextArea textZone;
@@ -98,7 +99,7 @@ public class ViewBookController implements Initializable {
         forward.setDisable(false);
     }
     
-    public void setIdentifier(String identifier) throws BookRestricted{
+    public void setIdentifier(String identifier) throws BookRestricted, SecurityException{
         db = new DecryptBook(identifier);
         textZone.setText(db.getContent(1));
         title.setText(db.title);
