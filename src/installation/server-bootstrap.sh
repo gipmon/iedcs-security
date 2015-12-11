@@ -18,6 +18,7 @@ if [ ! -f db.sqlite3 ]; then
 fi
 
 echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/servername.conf
+sudo cp ports.conf /etc/apache2/ports.conf
 sudo a2enconf servername
 sudo service apache2 restart
 
@@ -31,6 +32,10 @@ sudo rm /etc/apache2/sites-available/000-default.conf
 sudo cp /vagrant/ssl/iedcs.rafaelferreira.pt.key /etc/ssl/certs/iedcs.rafaelferreira.pt.key
 sudo cp /vagrant/ssl/iedcs_rafaelferreira_pt.ca-bundle /etc/ssl/certs/iedcs_rafaelferreira_pt.ca-bundle
 sudo cp /vagrant/ssl/iedcs_rafaelferreira_pt.crt /etc/ssl/certs/iedcs_rafaelferreira_pt.crt
+
+sudo cp /vagrant/CA/192.168.33.10.pem /etc/ssl/private/192.168.33.10.pem
+sudo cp /vagrant/CA/iedcs.rafaelferreira.pt.crt /etc/ssl/private/iedcs.rafaelferreira.pt.crt
+sudo cp /vagrant/CA/IEDCS-CA.pem /etc/ssl/certs/IEDCS-CA.pem
 
 sudo cp /vagrant/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
 a2ensite default-ssl.conf

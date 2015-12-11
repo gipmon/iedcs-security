@@ -1,6 +1,6 @@
 # environment
 env
-src/m1/iedcs-server/venv/*
+src/iedcs-server/venv/*
 
 #latex
 *.aux
