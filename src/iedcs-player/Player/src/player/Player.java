@@ -7,7 +7,6 @@ import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
@@ -16,7 +15,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import player.api.Utils;
-import player.security.PlayerPublicKey;
 
 public class Player extends Application {
     
@@ -80,8 +78,6 @@ public class Player extends Application {
                 PlayerKeyStore.storeKey("privateKeyDevice", privateKeyDevice);
             }
             
-            // public key player
-            PublicKey key_Test_apagar = PlayerPublicKey.getKey();
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Player.class.getName()).log(Level.SEVERE, null, ex);
         }

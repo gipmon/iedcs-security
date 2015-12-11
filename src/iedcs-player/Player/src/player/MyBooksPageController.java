@@ -33,6 +33,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import player.security.BookRestricted;
+import player.security.SecurityException;
 
 
 public class MyBooksPageController implements Initializable {
@@ -121,6 +122,12 @@ public class MyBooksPageController implements Initializable {
                                 } catch (BookRestricted ex) {
                                     Alert alert = new Alert(AlertType.INFORMATION);
                                     alert.setTitle("Book restricted!");
+                                    alert.setHeaderText(null);
+                                    alert.setContentText(ex.cause());
+                                    alert.showAndWait();
+                                } catch (SecurityException ex) {
+                                    Alert alert = new Alert(AlertType.INFORMATION);
+                                    alert.setTitle("Ups!");
                                     alert.setHeaderText(null);
                                     alert.setContentText(ex.cause());
                                     alert.showAndWait();
