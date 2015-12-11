@@ -104,7 +104,7 @@ class BookView(views.APIView):
     def get(request, identifier):
         """
         B{Retrieve} the book
-        B{URL:} ../api/v1/get_book/<identifier>/
+        B{URL:} ../api/v1/player/get_book/<identifier>/
 
         :type  identifier: str
         :param identifier: The identifier
