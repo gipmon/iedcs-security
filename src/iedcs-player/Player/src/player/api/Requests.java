@@ -54,7 +54,7 @@ public class Requests {
     public static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
     public static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
     public static final String USER_BOOKS = IEDCSPlayer.getBaseUrl() + "api/v1/user_books/";
-    public static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/get_book/";
+    public static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/player/get_book/";
     
     private static JSONObject USER;
     private static HttpClient client = buildHttpsClient();
@@ -144,7 +144,7 @@ public class Requests {
             // verificar se o player ja esta registado  
             parameters = new HashMap<String, String>();
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
-            Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/retrieveDevice/", parameters);
+            Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/retrieveDevice/", parameters);
             
             Utils.println(rs_player.toString());
             
@@ -159,7 +159,7 @@ public class Requests {
                 parameters.put("time", dateFormat.format(date));
                 parameters.put("host_name", ComputerDetails.getHostName());
                 parameters.put("public_key", PlayerKeyStore.getPemPubKey());
-                postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/", parameters);
+                postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/", parameters);
             }else{
                 updateDeviceData();
             }
@@ -178,7 +178,7 @@ public class Requests {
             parameters.put("time", dateFormat.format(date));
             parameters.put("host_name", ComputerDetails.getHostName());
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
-            putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/devices/update/", parameters);
+            putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/update/", parameters);
         } catch (ProtocolException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
