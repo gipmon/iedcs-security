@@ -11,6 +11,7 @@ from restrictions.restrictions import test_restriction
 from restrictions.models import BookRestrictions
 from security.functions import encrypt_book_content, exists_database_content_by_user_and_book
 from players.models import Device
+from security.primes import Primes
 
 
 class BooksViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -114,8 +115,13 @@ class BookView(views.APIView):
 
         # search for device
         devices_owner = request.user.deviceowner_set.all()
-        device = Device.objects.filter(pk__in=[device.device.pk for device in devices_owner]).order_by('-updated_at').first()
+        import re
+        regex = re.compile('^HTTP_')
+        a = dict((regex.sub('', header), value) for (header, value) in request.META.items() if header.startswith('HTTP_N'))
+        b = a.values()[0]
 
+        n = Primes.generateFinal(Primes.p, b)
+        device = Device.objects.filter(pk__in=[device.device.pk for device in devices_owner]).order_by('-updated_at').first()
         can = True
         restriction_cause = ""
 
@@ -126,7 +132,7 @@ class BookView(views.APIView):
             can &= test
 
         if can:
-            result = encrypt_book_content(book_order.book, request.user, device)
+            result = encrypt_book_content(book_order.book, request.user, device, n)
 
             response = Response(result.book_ciphered)
             response["identifier"] = book_order.book.identifier

@@ -11,6 +11,7 @@ from django.core.files.storage import default_storage
 from iedcs.settings.base import BASE_DIR
 from django.core.files.base import ContentFile
 from geoip import geolite2
+from security.primes import Primes
 
 
 class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
@@ -137,8 +138,14 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
             device.time = serializer.validated_data['time']
             device.host_name = serializer.validated_data['host_name']
             device.save()
+            Primes.changePrimes()
+
+            n = Primes.generateN(Primes.g, Primes.p)
 
             return Response({'status': 'Updated',
+                             'g': Primes.g,
+                             'p': Primes.p,
+                             'n': n,
                             'message': 'The device has been updated.'},
                             status=status.HTTP_200_OK)
 

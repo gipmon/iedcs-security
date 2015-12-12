@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 rm -rf cacerts.keystore
-keytool -import -alias alias -keystore cacerts.keystore -file ssl/iedcs_rafaelferreira_pt.crt
+keytool -import -alias alias -keystore cacerts.keystore -file CA/iedcs.rafaelferreira.pt.crt

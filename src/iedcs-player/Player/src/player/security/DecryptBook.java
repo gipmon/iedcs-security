@@ -129,8 +129,7 @@ public class DecryptBook {
             String rd2_server = jso.getString("rd2");
             
             byte[] rd3 = rd3_process(rd2_server.getBytes(), n, rd2_bytes);
-            
-            PBKDF2 pbk = new PBKDF2(new String(rd3), new String(rd2_bytes));
+            PBKDF2 pbk = new PBKDF2(new String(rd3), new String(rd2_bytes), Requests.fin);
             byte[] filekey = pbk.read(32);
             
             byte[] contentText = decryptStreamAES(filekey, page);

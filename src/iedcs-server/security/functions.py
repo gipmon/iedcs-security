@@ -12,7 +12,7 @@ import base64
 max_iterations = 10
 
 
-def encrypt_book_content(book, user, device):
+def encrypt_book_content(book, user, device, fin):
     book_content = default_storage.open(book.get_file_path()).read()
 
     # get or set the random 2
@@ -51,7 +51,8 @@ def encrypt_book_content(book, user, device):
     iv_array += base64.b64decode(rd3)[:AES.block_size]
 
     file_key = rd3
-    key = PBKDF2(file_key, random2).read(32)
+    print fin
+    key = PBKDF2(file_key, random2, fin).read(32)
 
     # cipher with AES
     k1 = PBKDF2(user.username + "jnpc" + book.identifier, book.identifier).read(32)
@@ -67,14 +68,7 @@ def encrypt_book_content(book, user, device):
     rd2 = str(iv_array) + base64.b64decode(random2)
     random2 = base64.b64encode(rd2)
 
-    if not exists_database_content_by_user_and_book("book_content_ciphered_iv", user, book):
-        book_content_ciphered = AESCipher.encrypt(content=book_content, key=key)
-        book_content_ciphered_iv = base64.b64decode(book_content_ciphered)[:AES.block_size]
-        book_content_ciphered_iv = base64.b64encode(book_content_ciphered_iv)
-        store_database_content_by_user_and_book("book_content_ciphered_iv", book_content_ciphered_iv, user, book)
-    else:
-        book_content_ciphered_iv = base64.b64decode(get_database_content_by_user_and_book("book_content_ciphered_iv", user, book))
-        book_content_ciphered = AESCipher.encrypt(book_content, key, book_content_ciphered_iv)
+    book_content_ciphered = AESCipher.encrypt(content=book_content, key=key)
 
     # get or set the book signed
     private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/player').read()

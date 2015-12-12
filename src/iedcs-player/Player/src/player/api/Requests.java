@@ -47,6 +47,7 @@ import player.IEDCSPlayer;
 import player.security.ComputerDetails;
 import player.security.PBKDF2;
 import player.security.PlayerKeyStore;
+import player.security.Primes;
 
 
 public class Requests {
@@ -59,6 +60,7 @@ public class Requests {
     private static JSONObject USER;
     private static HttpClient client = buildHttpsClient();
     private static String csrftoken = "";
+    public static int fin;
     
     private static HttpClient buildHttpsClient(){
         if(!IEDCSPlayer.isHttps()){
@@ -167,7 +169,7 @@ public class Requests {
         return rs;
     }
     
-    private static void updateDeviceData(){
+    private static Result updateDeviceData(){
         HashMap<String, String> parameters = new HashMap<String, String>();
         try {
             parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
@@ -178,7 +180,7 @@ public class Requests {
             parameters.put("time", dateFormat.format(date));
             parameters.put("host_name", ComputerDetails.getHostName());
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
-            putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/update/", parameters);
+            return putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/update/", parameters);
         } catch (ProtocolException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -186,6 +188,7 @@ public class Requests {
         } catch (JSONException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return null;
     }
     
     public static JSONObject getUser(){
@@ -247,7 +250,7 @@ public class Requests {
         post.setHeader("Content-Type", "application/json;charset=UTF-8");
         
         if(IEDCSPlayer.isHttps()){
-            post.setHeader("Referer", "https://iedcs.rafaelferreira.pt/");
+            post.setHeader("Referer", IEDCSPlayer.getBaseUrl());
         }
         
         if(csrftoken.length()>0){
@@ -391,13 +394,24 @@ public class Requests {
     public static Result getBook(String book_identifier){
         BufferedReader rd = null;
         try {
-            updateDeviceData();
+            Result r = updateDeviceData();
+            String tmp = r.getResult().toString();
+            JSONObject jsonObject = new JSONObject(tmp);
+            int p = jsonObject.getInt("p");
+            int g = jsonObject.getInt("g");
+            int n = jsonObject.getInt("n");
+            
+            int m = Primes.generateN(g, p);
+            
+            fin = Primes.generateFinal(p, n);
+            
             HttpGet get = new HttpGet(Requests.VIEW_BOOK+book_identifier+"/");
             
             // add header
             get.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
             get.setHeader("Accept-Language", "application/json");
             get.setHeader("Content-Type", "application/json;charset=UTF-8");
+            get.setHeader("n", String.valueOf(m));
             
             HttpResponse response = client.execute(get);
             
@@ -430,6 +444,8 @@ public class Requests {
             BookContent book = new BookContent(headers, result.toString());
             return (new Result(response.getStatusLine().getStatusCode(), book));
         } catch (IOException | UnsupportedOperationException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
