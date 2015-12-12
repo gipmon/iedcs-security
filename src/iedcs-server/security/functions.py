@@ -71,7 +71,7 @@ def encrypt_book_content(book, user, device, fin):
     book_content_ciphered = AESCipher.encrypt(content=book_content, key=key)
 
     # get or set the book signed
-    private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/player').read()
+    private_key_player = default_storage.open(BASE_DIR + '/media/player/v00/player.key').read()
     priv_key = rsa.PrivateKey.load_pkcs1(private_key_player)
     book_signed = base64.b64encode(rsa.sign(book_content_ciphered, priv_key, 'SHA-256'))
 
