@@ -12,6 +12,8 @@ from restrictions.models import BookRestrictions
 from security.functions import encrypt_book_content, exists_database_content_by_user_and_book
 from players.models import Device
 from security.primes import Primes
+import re
+
 
 
 class BooksViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -115,7 +117,8 @@ class BookView(views.APIView):
 
         # search for device
         devices_owner = request.user.deviceowner_set.all()
-        import re
+
+        #http://stackoverflow.com/questions/3889769/how-can-i-get-all-the-request-headers-in-django
         regex = re.compile('^HTTP_')
         a = dict((regex.sub('', header), value) for (header, value) in request.META.items() if header.startswith('HTTP_N'))
         b = a.values()[0]
@@ -146,5 +149,3 @@ class BookView(views.APIView):
             response = Response("")
             response["restriction"] = "Restriction cause: " + restriction_cause
             return response
-
-

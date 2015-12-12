@@ -7,6 +7,7 @@ class Primes(object):
 
     @staticmethod
     def generatePrimes():
+        #partially used: http://stackoverflow.com/questions/21043075/generating-large-prime-numbers-in-python
         while True:
             p = random.randrange(11, 10000, 2)
             if all(p % n != 0 for n in range(3, int((p ** 0.5) + 1), 2)):
@@ -27,5 +28,3 @@ class Primes(object):
     def generateFinal(p, n):
         tmp =  int(n) ** Primes.secret
         return tmp % p
-
-

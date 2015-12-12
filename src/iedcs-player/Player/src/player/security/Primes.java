@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 public class Primes {
     protected static int secret;
+    //partially used: http://stackoverflow.com/questions/28846174/generating-two-random-prime-numbers-in-java
     public static int generatePrime(){
         int random;
         while (true) {
