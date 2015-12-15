@@ -1,4 +1,5 @@
 import json
+from django.core.files.base import ContentFile
 
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets, views, status, permissions
@@ -7,7 +8,9 @@ from django.contrib.auth import authenticate, login, logout
 
 from .permissions import UserIsUser, IsAccountOwner
 from .models import Account
-from .serializers import AccountSerializer, PasswordSerializer
+from .serializers import AccountSerializer, PasswordSerializer, AccountPEMSerializer
+
+import uuid
 
 
 class AccountViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
@@ -195,3 +198,34 @@ class MyDetails(views.APIView):
         """
         serializer = self.serializer_class(request.user)
         return Response(serializer.data)
+
+
+class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = Account.objects.filter()
+    serializer_class = AccountPEMSerializer
+
+    def get_permissions(self):
+        return permissions.IsAuthenticated(),
+
+    def create(self, request, *args, **kwargs):
+        """
+        B{Create} a device
+        B{URL:} ../api/v1/player/citizen_authentication/
+
+        :type  public_key: str
+        :param public_key: the public_key
+        """
+        serializer = AccountPEMSerializer(data=request.data)
+
+        if serializer.is_valid():
+            public_key = serializer.data["public_key"]
+
+            request.user.citizen_card.save(str(uuid.uuid4()) + ".pub", ContentFile(public_key))
+
+            return Response({'status': 'Good request',
+                             'message': 'The citizen card has been added!'},
+                            status=status.HTTP_200_OK)
+
+        return Response({'status': 'Bad Request',
+                         'message': serializer.errors},
+                        status=status.HTTP_400_BAD_REQUEST)

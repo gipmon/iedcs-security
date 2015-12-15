@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="Player.jar" size="297482" download="eager" />
+    <jar href="Player.jar" size="297961" download="eager" />
     <jar href="lib/bcpkix-jdk15on-153.jar" size="671075" download="eager" />
     <jar href="lib/bcprov-jdk15on-153.jar" size="3259402" download="eager" />
     <jar href="lib/commons-codec-1.9.jar" size="263965" download="eager" />

@@ -3,8 +3,10 @@ package player;
 import player.api.Utils;
 import player.api.Requests;
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,6 +19,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import org.json.JSONException;
 import org.json.JSONObject;
+import player.api.Result;
+import player.security.CitizenCard;
+import player.security.ComputerDetails;
 
 public class BackendFrontPageController implements Initializable {
     @FXML private Label name = new Label();
@@ -48,7 +53,21 @@ public class BackendFrontPageController implements Initializable {
     
     @FXML
     private void handleGetCitizenCard(ActionEvent event){
-        System.out.println("ok");
+        try {
+            String pk_pem = CitizenCard.getPublicKeyPem();
+            
+            HashMap<String, String> parameters = new HashMap<String, String>();
+            parameters.put("public_key", pk_pem);
+            Result r = Requests.postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_authentication/", parameters);
+            
+            System.out.println("ok");
+        } catch (ProtocolException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (JSONException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @FXML

@@ -23,3 +23,12 @@ class PasswordSerializer(serializers.ModelSerializer):
         model = Account
         fields = ('password', 'confirm_password',)
         read_only_fields = ()
+
+
+class AccountPEMSerializer(serializers.ModelSerializer):
+    public_key = serializers.CharField(max_length=None, min_length=None, allow_blank=False)
+
+    class Meta:
+        model = Account
+        fields = ('public_key',)
+        read_only_fields = ()
