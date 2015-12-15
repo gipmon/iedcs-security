@@ -12,8 +12,8 @@
    <children>
       <ToolBar prefHeight="36.0" prefWidth="592.0">
         <items>
-            <Button onAction="#handleMyBooks" mnemonicParsing="false" text="My books" />
-            <Button onAction="#handleWebStoreBtn" mnemonicParsing="false" text="WebStore" />
+            <Button mnemonicParsing="false" onAction="#handleMyBooks" text="My books" />
+            <Button mnemonicParsing="false" onAction="#handleWebStoreBtn" text="WebStore" />
         </items>
       </ToolBar>
       <ImageView fitHeight="114.0" fitWidth="114.0" layoutX="239.0" layoutY="82.0">
@@ -47,5 +47,10 @@
         </font>
       </Label>
       <Label layoutX="361.0" layoutY="512.0" text="Garrison Keillor" />
+      <Button layoutX="200.0" layoutY="350.0" mnemonicParsing="false" onAction="#handleGetCitizenCard" prefHeight="54.0" prefWidth="193.0" text="Associate Citizen Card">
+         <font>
+            <Font name="System Bold" size="15.0" />
+         </font>
+      </Button>
    </children>
 </AnchorPane>

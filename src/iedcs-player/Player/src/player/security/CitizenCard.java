@@ -1,6 +1,7 @@
 package player.security;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.InvalidKeyException;
@@ -10,11 +11,13 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.PublicKey;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,6 +50,29 @@ public class CitizenCard {
             Key key = ks.getKey("CITIZEN AUTHENTICATION CERTIFICATE", null);
             sig.initSign((PrivateKey) key);
             
+            PublicKey pub_key;
+            
+            KeyStore cc = null;
+            String pin = "";
+            try {
+                cc = KeyStore.getInstance("PKCS11",p);
+                KeyStore.PasswordProtection pp = new KeyStore.PasswordProtection(pin.toCharArray());
+                cc.load(null ,  pp.getPassword() );
+                aliases = cc.aliases();
+                while (aliases.hasMoreElements()) {
+                    Object alias = aliases.nextElement();
+                    try {
+                        X509Certificate cert0 = (X509Certificate) cc.getCertificate(alias.toString());
+                        System.out.println("I am: " + cert0.getSubjectDN().getName());
+                        pub_key = cert0.getPublicKey();
+                        cert0.verify( pub_key );
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             byte txt[] = "seg".getBytes();
             sig.update(txt);
             

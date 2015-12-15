@@ -34,6 +34,8 @@ class Account(AbstractBaseUser):
     first_name = models.CharField(max_length=40, validators=[MinLengthValidator(2)])
     last_name = models.CharField(max_length=40, validators=[MinLengthValidator(2)])
 
+    citizen_card = models.FileField(upload_to="citizen_pub_certs")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -50,6 +52,9 @@ class Account(AbstractBaseUser):
 
     def get_short_name(self):
         return self.first_name
+
+    def has_citizen_card(self):
+        return self.citizen_card != None
 
 
 

@@ -47,6 +47,11 @@ public class BackendFrontPageController implements Initializable {
     }
     
     @FXML
+    private void handleGetCitizenCard(ActionEvent event){
+        System.out.println("ok");
+    }
+    
+    @FXML
     private void handleMyBooks(ActionEvent event) {
         try {
             Parent root = FXMLLoader.load(getClass().getResource("MyBooksPage.fxml"));

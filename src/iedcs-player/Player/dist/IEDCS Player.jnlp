@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="Player.jar" size="296592" download="eager" />
+    <jar href="Player.jar" size="297482" download="eager" />
     <jar href="lib/bcpkix-jdk15on-153.jar" size="671075" download="eager" />
     <jar href="lib/bcprov-jdk15on-153.jar" size="3259402" download="eager" />
     <jar href="lib/commons-codec-1.9.jar" size="263965" download="eager" />
@@ -23,6 +23,7 @@
     <jar href="lib/jna-platform-4.1.0.jar" size="1464423" download="eager" />
     <jar href="lib/log4j.jar" size="350115" download="eager" />
     <jar href="lib/org.json-20120521.jar" size="40375" download="eager" />
+    <jar href="lib/pteidlibj.jar" size="6139" download="eager" />
     <jar href="lib/sigar.jar" size="428580" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="IEDCS Player" >
