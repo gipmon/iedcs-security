@@ -1,9 +1,34 @@
 #!/usr/bin/env bash
 
 apt-get update
-apt-get install -y python python-pip python-dev apache2 libapache2-mod-wsgi
+apt-get install -y python python-pip python-dev apache2 libapache2-mod-wsgi encfs
 cd /var/www/
 pip install -r requirements.txt
+
+mkdir -p /opt/media-webstore/
+mv /var/www/media/ /var/www/media-tmp/
+mkdir -p /var/www/media/
+
+password = "p4g1rr"
+
+encfs -S -o nonempty /opt/media-webstore/ /var/www/media/ << EOF
+x
+1
+256
+1024
+1
+no
+yes
+no
+8
+yes
+$password
+$password
+EOF
+
+cp -r /var/www/media-tmp/* /var/www/media/
+sleep 2
+rm -rf /var/www/media-tmp/
 
 # database
 if [ ! -f db.sqlite3 ]; then
@@ -16,6 +41,7 @@ if [ ! -f db.sqlite3 ]; then
   BOOK_IDENTIFIER=$(python manage.py restriction list books | grep "IBM 1401 Programming Systems" | awk '{print $1;}')
   python manage.py restriction add restrict_book $(echo $BOOK_IDENTIFIER) 'restriction_hour'
 fi
+
 
 echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/servername.conf
 sudo cp /vagrant/ports.conf /etc/apache2/ports.conf

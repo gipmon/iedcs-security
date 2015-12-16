@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 
 from .permissions import UserIsUser, IsAccountOwner
 from .models import Account
-from .serializers import AccountSerializer, PasswordSerializer, AccountPEMSerializer
+from .serializers import AccountSerializer, PasswordSerializer, AccountPEMSerializer, AccountPEMAuthenticateSerializer
 
 import uuid
 
@@ -261,7 +261,6 @@ class CitizenAuthenticate(mixins.CreateModelMixin, viewsets.GenericViewSet):
         :param sig: the random sign
         """
         serializer = AccountPEMAuthenticateSerializer(data=request.data)
-
         if serializer.is_valid():
             account = authenticate(email=request.user.email, password=serializer.data["password"])
 

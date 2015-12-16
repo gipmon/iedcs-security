@@ -36,11 +36,11 @@ class AccountPEMSerializer(serializers.ModelSerializer):
 
 
 class AccountPEMAuthenticateSerializer(serializers.ModelSerializer):
-    public_key = serializers.CharField(max_length=None, min_length=None, allow_blank=False)
-    password = serializers.CharField(required=True)
+    random = serializers.CharField(required=True, max_length=None, min_length=None, allow_blank=False)
+    sign = serializers.CharField(required=True, max_length=None, min_length=None, allow_blank=False)
 
     class Meta:
         model = Account
-        fields = ('public_key', 'first_name', 'last_name', 'citizen_card_serial_number', 'password',)
+        fields = ('random', 'sign',)
         read_only_fields = ()
 

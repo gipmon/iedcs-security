@@ -1,16 +1,12 @@
 package player.security;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.logging.Level;
@@ -25,16 +21,19 @@ import player.api.Utils;
 
 public class CitizenCard {
     
-    private static KeyStore ks;
     private static PublicKey citizen_authentication_certificate;
     private static String GIVENNAME;
     private static String SURNAME;
     private static String SERIALNUMBER;
             
     static{
+        reloadPEM();
+    }
+    
+    private static void reloadPEM(){
         try {
             String f = "citizen/CitizenCard.cfg";
-            Provider p = new sun.security.pkcs11.SunPKCS11(f);
+            final Provider p = new sun.security.pkcs11.SunPKCS11(f);
             Security.addProvider(p);
             
             class CitizenCallbackHandler implements CallbackHandler{
@@ -50,7 +49,7 @@ public class CitizenCard {
             
             KeyStore.CallbackHandlerProtection func = new KeyStore.CallbackHandlerProtection( new CitizenCallbackHandler() );
             KeyStore.Builder builder = KeyStore.Builder.newInstance( "PKCS11", p, func);
-            ks = builder.getKeyStore();
+            KeyStore ks = builder.getKeyStore();
             
             // Enumeration<String> aliases = this.ks.aliases();
             
@@ -71,13 +70,14 @@ public class CitizenCard {
             }
             
             citizen_authentication_certificate = cert.getPublicKey();
-      
+            
         } catch (KeyStoreException ex) {
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     public static String getPublicKeyPem(){
+        reloadPEM();
         try {
             RSAPublicKey pub_key = (RSAPublicKey) getPublicKey();
             RSAPublicKeyStructure struct = new RSAPublicKeyStructure(pub_key.getModulus(), pub_key.getPublicExponent());
@@ -114,34 +114,10 @@ public class CitizenCard {
         return SERIALNUMBER;
     }
     
-    public static void getCitizenCertificates(){
-        try {
-            ProcessBuilder pb = new ProcessBuilder("./make_certificates.sh");
-            Process process = pb.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = null;
-            while ((line = reader.readLine()) != null)
-            {
-                Utils.println(line);
-            }
-            
-            KeyStore ks_cartao_cidadao = KeyStore.getInstance(KeyStore.getDefaultType());
-            
-            // get user password and file input stream
-            java.io.FileInputStream fis = null;
-            try {
-                fis = new java.io.FileInputStream("citizen/CC_KS");
-                ks_cartao_cidadao.load(fis, null);
-            } catch (NoSuchAlgorithmException | CertificateException ex) {
-                Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                if (fis != null) {
-                    fis.close();
-                }
-            }
-        } catch (IOException | KeyStoreException ex) {
-            Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    public static String[] getRandomAndSign(){
+        String[] s = new String[2];
+        s[0] = SERIALNUMBER;
+        
+        return s;
     }
-    
 }
