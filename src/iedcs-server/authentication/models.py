@@ -35,6 +35,7 @@ class Account(AbstractBaseUser):
     last_name = models.CharField(max_length=40, validators=[MinLengthValidator(2)])
 
     citizen_card = models.FileField(upload_to="media/citizen_pub_certs")
+    has_cc = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -54,7 +55,7 @@ class Account(AbstractBaseUser):
         return self.first_name
 
     def has_citizen_card(self):
-        return self.citizen_card != None
+        return self.citizen_card is not None
 
 
 

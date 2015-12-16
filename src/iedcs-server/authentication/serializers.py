@@ -10,7 +10,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('email', 'username', 'first_name', 'last_name', 'password', 'confirm_password',
+        fields = ('email', 'username', 'first_name', 'last_name', 'password', 'confirm_password', 'has_cc',
                   'created_at', 'updated_at',)
         read_only_fields = ('created_at', 'updated_at')
 

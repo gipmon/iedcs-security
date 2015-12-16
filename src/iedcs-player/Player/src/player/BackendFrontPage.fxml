@@ -52,5 +52,10 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </Button>
+      <Label layoutX="202.0" fx:id="citizenAssociated" layoutY="405.0" text="Your citizen card is associated!" textFill="#59ae1b">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

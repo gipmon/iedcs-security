@@ -27,6 +27,7 @@ public class BackendFrontPageController implements Initializable {
     @FXML private Label name = new Label();
     @FXML private Label email = new Label();
     @FXML private Label username = new Label();
+    @FXML private Label citizenAssociated = new Label();
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -35,6 +36,12 @@ public class BackendFrontPageController implements Initializable {
             name.setText("Name: " + user.getString("first_name") + " " + user.getString("last_name"));
             email.setText("E-mail: " + user.getString("email"));
             username.setText("Username: " + user.getString("username"));
+            
+            if(user.getBoolean("has_cc")){
+                citizenAssociated.setVisible(true);
+            }else{
+                citizenAssociated.setVisible(false);
+            }
         } catch (JSONException ex) {
             Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -60,7 +67,11 @@ public class BackendFrontPageController implements Initializable {
             parameters.put("public_key", pk_pem);
             Result r = Requests.postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_authentication/", parameters);
             
-            System.out.println("ok");
+            if(r.getStatusCode()==200){
+                citizenAssociated.setVisible(true);
+            }else{
+                citizenAssociated.setVisible(false);
+            }
         } catch (ProtocolException ex) {
             Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {

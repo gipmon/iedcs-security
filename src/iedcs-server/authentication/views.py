@@ -221,6 +221,8 @@ class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericView
             public_key = serializer.data["public_key"]
 
             request.user.citizen_card.save(str(uuid.uuid4()) + ".pub", ContentFile(public_key))
+            request.user.has_cc = True
+            request.user.save()
 
             return Response({'status': 'Good request',
                              'message': 'The citizen card has been added!'},
