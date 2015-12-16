@@ -71,7 +71,6 @@ public class MyBooksPageController implements Initializable {
         public String getAuthor() {
             return author.get();
         }
-        
     }
     
     @Override
@@ -135,17 +134,13 @@ public class MyBooksPageController implements Initializable {
                             } catch (IOException ex) {
                                 Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                                
                         }
-                       
                     }
                 }
             });
         } catch (ProtocolException ex) {
             Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (JSONException ex) {
+        } catch (IOException | JSONException ex) {
             Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -155,9 +150,7 @@ public class MyBooksPageController implements Initializable {
     private void handleWebStoreBtn(ActionEvent event) {
         try {
             Utils.openBrowser(IEDCSPlayer.getBaseUrl());
-        } catch (IOException ex) {
-            Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (URISyntaxException ex) {
+        } catch (IOException | URISyntaxException ex) {
             Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

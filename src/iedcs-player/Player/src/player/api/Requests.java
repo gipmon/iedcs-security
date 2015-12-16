@@ -66,6 +66,7 @@ public class Requests {
         if(!IEDCSPlayer.isHttps()){
             return HttpClientBuilder.create().build();
         }
+        
         try {
             FileInputStream fis = null;
             fis = new FileInputStream("keystore/cacerts.keystore");
@@ -73,8 +74,7 @@ public class Requests {
             char[] pwd = "p4g1rr".toCharArray();
             keystore.load(fis, pwd);
             
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(
-                    TrustManagerFactory.getDefaultAlgorithm());
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(keystore);
             TrustManager[] tm = tmf.getTrustManagers();
             
@@ -84,9 +84,6 @@ public class Requests {
             KeyManager[] km = kmfactory.getKeyManagers();
             
             SSLContext sslcontext = SSLContext.getInstance("SSL");
-            sslcontext.init(km, tm, null);
-
-            // set up a TrustManager that trusts everything
             sslcontext.init(km, tm, new SecureRandom());
             
             HttpClientBuilder builder = HttpClientBuilder.create();
@@ -102,19 +99,11 @@ public class Requests {
             builder.setConnectionManager(ccm);
 
             return builder.build();
-        }catch (KeyStoreException ex) {
+        }catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | KeyManagementException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (CertificateException ex) {
-            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnrecoverableKeyException ex) {
-            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (KeyManagementException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         }
         return HttpClientBuilder.create().build();

@@ -220,14 +220,62 @@ class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericView
         if serializer.is_valid():
             public_key = serializer.data["public_key"]
 
-            request.user.citizen_card.save(str(uuid.uuid4()) + ".pub", ContentFile(public_key))
-            request.user.has_cc = True
-            request.user.save()
+            account = authenticate(email=request.user.email, password=serializer.data["password"])
 
-            return Response({'status': 'Good request',
-                             'message': 'The citizen card has been added!'},
-                            status=status.HTTP_200_OK)
+            if account is not None:
+                request.user.citizen_card.save(str(uuid.uuid4()) + ".pub", ContentFile(public_key))
+                request.user.has_cc = True
+                request.user.first_name = serializer.data["first_name"]
+                request.user.last_name = serializer.data["last_name"]
+                request.user.citizen_card_serial_number = serializer.data["citizen_card_serial_number"]
+                request.user.save()
+
+                return Response({'status': 'Good request',
+                                 'message': 'The citizen card has been added!'},
+                                status=status.HTTP_200_OK)
+            else:
+                return Response({'status': 'Bad Request',
+                                 'message': {"password_wrong": ["The password is wrong!"]}},
+                                status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'status': 'Bad Request',
                          'message': serializer.errors},
                         status=status.HTTP_400_BAD_REQUEST)
+
+
+class CitizenAuthenticate(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    queryset = Account.objects.filter()
+    serializer_class = AccountPEMAuthenticateSerializer
+
+    def get_permissions(self):
+        return permissions.IsAuthenticated(),
+
+    def create(self, request, *args, **kwargs):
+        """
+        B{Create} a device
+        B{URL:} ../api/v1/player/citizen_authenticate/
+
+        :type  random: str
+        :param random: the random
+        :type  sign: str
+        :param sig: the random sign
+        """
+        serializer = AccountPEMAuthenticateSerializer(data=request.data)
+
+        if serializer.is_valid():
+            account = authenticate(email=request.user.email, password=serializer.data["password"])
+
+            if account is not None:
+
+                return Response({'status': 'Good request',
+                                 'message': 'The citizen card has been added!'},
+                                status=status.HTTP_200_OK)
+            else:
+                return Response({'status': 'Bad Request',
+                                 'message': {"password_wrong": ["The password is wrong!"]}},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'status': 'Bad Request',
+                         'message': serializer.errors},
+                        status=status.HTTP_400_BAD_REQUEST)
+

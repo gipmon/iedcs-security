@@ -27,6 +27,9 @@ public class CitizenCard {
     
     private static KeyStore ks;
     private static PublicKey citizen_authentication_certificate;
+    private static String GIVENNAME;
+    private static String SURNAME;
+    private static String SERIALNUMBER;
             
     static{
         try {
@@ -52,53 +55,23 @@ public class CitizenCard {
             // Enumeration<String> aliases = this.ks.aliases();
             
             X509Certificate cert = (X509Certificate) ks.getCertificate("CITIZEN AUTHENTICATION CERTIFICATE");
-            // System.out.println("I am: " + cert.getSubjectDN().getName());
+            cert.getSubjectDN();
+            
+            String[] alias = cert.getSubjectDN().getName().split(",");
+            for(String alia : alias){
+                String[] key_values = alia.split("=");
+                String key = key_values[0].trim();
+                if(key.equals("SERIALNUMBER")){
+                    SERIALNUMBER = key_values[1];
+                }else if(key.equals("GIVENNAME")){
+                    GIVENNAME = key_values[1];
+                }else if(key.equals("SURNAME")){
+                    SURNAME = key_values[1];
+                }
+            }
+            
             citizen_authentication_certificate = cert.getPublicKey();
-            
-            
-//
-//            while (aliases.hasMoreElements()) {
-//                Object alias = aliases.nextElement();
-//                try {
-//                } catch (Exception e) {
-//                    continue;
-//                }
-//            }
-            
-            // sign
-            
-            // Signature sig = Signature.getInstance("SHA1withRSA");
-            // Key key = ks.getKey("CITIZEN AUTHENTICATION CERTIFICATE", null);
-            // sig.initSign((PrivateKey) key);
-//            
-//            
-//            KeyStore cc = null;
-//            String pin = "";
-//            try {
-//                cc = KeyStore.getInstance("PKCS11",p);
-//                KeyStore.PasswordProtection pp = new KeyStore.PasswordProtection(pin.toCharArray());
-//                cc.load(null ,  pp.getPassword() );
-//                aliases = cc.aliases();
-//                while (aliases.hasMoreElements()) {
-//                    Object alias = aliases.nextElement();
-//                    try {
-//                        X509Certificate cert0 = (X509Certificate) cc.getCertificate(alias.toString());
-//                        System.out.println("I am: " + cert0.getSubjectDN().getName());
-//                        pub_key = cert0.getPublicKey();
-//                        cert0.verify( pub_key );
-//                    } catch (Exception e) {
-//                        continue;
-//                    }
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            byte txt[] = "seg".getBytes();
-//            sig.update(txt);
-//            
-//            byte signed[] = sig.sign();
-//            Utils.println(signed);
-            
+      
         } catch (KeyStoreException ex) {
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -127,6 +100,18 @@ public class CitizenCard {
     
     public static PublicKey getPublicKey(){
         return citizen_authentication_certificate;
+    }
+    
+    public static String getSurName(){
+        return SURNAME;
+    }
+    
+    public static String getGivenName(){
+        return GIVENNAME;
+    }
+    
+    public static String getSerialNumber(){
+        return SERIALNUMBER;
     }
     
     public static void getCitizenCertificates(){
