@@ -6,12 +6,13 @@ from rest_framework import mixins, viewsets, views, status, permissions
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
 import rsa
+import os
 import base64
 
 from .permissions import UserIsUser, IsAccountOwner
 from .models import Account, TokenForCitizenAuthentication
 from .serializers import AccountSerializer, PasswordSerializer, AccountPEMSerializer, AccountPEMAuthenticateSerializer, \
-    TokenForCitizenAuthenticationSerializer
+    TokenForCitizenAuthenticationSerializer, AccountPEMUpdateSerializer
 
 import uuid
 
@@ -214,20 +215,25 @@ class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericView
 
     def create(self, request, *args, **kwargs):
         """
-        B{Create} a device
+        B{Create} a citizen_authentication
         B{URL:} ../api/v1/player/citizen_authentication/
 
         :type  public_key: str
         :param public_key: the public_key
         """
-        serializer = AccountPEMSerializer(data=request.data)
-
+        if request.data["disassociate"] == 'false':
+            disassociate = False
+            serializer = AccountPEMSerializer(data=request.data)
+        else:
+            disassociate = True
+            serializer = AccountPEMUpdateSerializer(data=request.data)
         if serializer.is_valid():
-            public_key = serializer.data["public_key"]
+            if disassociate is False:
+                public_key = serializer.data["public_key"]
 
             account = authenticate(email=request.user.email, password=serializer.data["password"])
 
-            if account is not None:
+            if account is not None and disassociate is False:
                 request.user.citizen_card.save(str(uuid.uuid4()) + ".pub", ContentFile(public_key))
                 request.user.has_cc = True
                 request.user.first_name = serializer.data["first_name"]
@@ -238,6 +244,18 @@ class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericView
                 return Response({'status': 'Good request',
                                  'message': 'The citizen card has been added!'},
                                 status=status.HTTP_200_OK)
+            elif account is not None and disassociate is True:
+                os.remove(account.citizen_card.path)
+                request.user.citizen_card = None
+                request.user.has_cc = False
+                request.user.citizen_card_serial_number = None
+                request.user.save()
+
+                return Response({'status': 'Good request',
+                                 'message': 'The citizen card has been removed!'},
+                                status=status.HTTP_200_OK)
+
+
             else:
                 return Response({'status': 'Bad Request',
                                  'message': {"password_wrong": ["The password is wrong!"]}},

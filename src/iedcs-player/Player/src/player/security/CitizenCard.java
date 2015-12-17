@@ -160,8 +160,6 @@ public class CitizenCard {
             parameters.put("random", result.getString("identifier"));
             parameters.put("citizen_card_serial_number", SERIALNUMBER);
             
-
-
             Signature sig = Signature.getInstance("SHA256withRSA", p);
             sig.initSign((PrivateKey) private_key);
 

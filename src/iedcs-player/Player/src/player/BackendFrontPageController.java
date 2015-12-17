@@ -73,7 +73,87 @@ public class BackendFrontPageController implements Initializable {
     
     @FXML
     private void handleDisassociateCitizenCard(ActionEvent event){
-        
+        try {            
+            HashMap<String, String> parameters = new HashMap<String, String>();
+            parameters.put("public_key", "");
+            parameters.put("first_name", "");
+            parameters.put("last_name", "");
+            parameters.put("citizen_card_serial_number", "");
+            parameters.put("disassociate", "true");
+            
+            // Create the custom dialog.
+            Dialog<Pair<String, String>> dialog = new Dialog<>();
+            dialog.setTitle("Verification");
+            dialog.setHeaderText("We need your password!");
+
+            // Set the button types.
+            ButtonType loginButtonType = new ButtonType("Verificate", ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+
+            // Create the username and password labels and fields.
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+
+            PasswordField password = new PasswordField();
+            password.setPromptText("Password");
+
+            grid.add(new Label("Password:"), 0, 1);
+            grid.add(password, 1, 1);
+
+            // Enable/Disable login button depending on whether a username was entered.
+            Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
+            dialog.getDialogPane().setContent(grid);
+
+            // Traditional way to get the response value.
+            Optional<Pair<String, String>> result = dialog.showAndWait();
+            if (result.isPresent()){
+                PBKDF2 password_pbkdf2 = new PBKDF2(password.getText(), password.getText(), 500);
+                String pass = new String (Base64.getEncoder().encode(password_pbkdf2.read(32)));
+                parameters.put("password", pass);
+                Result r = Requests.postJSON(Requests.CITIZEN_AUTHENTICATION, parameters);
+
+                if(r.getStatusCode()==200){
+                    citizenAssociated.setVisible(false);
+                    handleLogout(null);
+                }else if(r.getStatusCode()==400){
+                    if(!citizenAssociated.visibleProperty().get()){
+                        citizenAssociated.setVisible(false);
+                    }
+                    
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Ups!");
+                    alert.setHeaderText(null);
+                    JSONObject r_o = (JSONObject)r.getResult();
+                    r_o = r_o.getJSONObject("message");
+                    
+                    Iterator itr = r_o.keys();
+                    
+                    String message = "";
+                    
+                    while(itr.hasNext()){
+                        String key = (String)itr.next();
+                        JSONArray field = r_o.getJSONArray(key);
+                        String line = key.replaceAll("_", " ");
+                        
+                        message += Character.toUpperCase(line.charAt(0)) + line.substring(1) + ":\n";
+                        
+                        for(int i=0; i<field.length(); i++){
+                            message += field.getString(i) + "\n";
+                        }
+                        
+                    }
+                    alert.setContentText(message);
+                    alert.showAndWait();
+                }else{
+                    citizenAssociated.setVisible(false);
+                }    
+            }
+        } catch (ProtocolException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | JSONException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @FXML
@@ -97,7 +177,8 @@ public class BackendFrontPageController implements Initializable {
             parameters.put("first_name", CitizenCard.getGivenName());
             parameters.put("last_name", CitizenCard.getSurName());
             parameters.put("citizen_card_serial_number", CitizenCard.getSerialNumber());
-            
+            parameters.put("disassociate", "false");
+
             // Create the custom dialog.
             Dialog<Pair<String, String>> dialog = new Dialog<>();
             dialog.setTitle("Verification");

@@ -31,7 +31,15 @@ class AccountPEMSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('public_key', 'first_name', 'last_name', 'citizen_card_serial_number', 'password',)
+        fields = ('public_key', 'first_name', 'last_name', 'citizen_card_serial_number', 'password', )
+        read_only_fields = ()
+
+class AccountPEMUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True)
+
+    class Meta:
+        model = Account
+        fields = ('password', )
         read_only_fields = ()
 
 
