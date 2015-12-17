@@ -1,5 +1,4 @@
 import json
-import hashlib
 from django.core.files.base import ContentFile
 
 from django.shortcuts import get_object_or_404
@@ -10,8 +9,9 @@ import rsa
 import base64
 
 from .permissions import UserIsUser, IsAccountOwner
-from .models import Account
-from .serializers import AccountSerializer, PasswordSerializer, AccountPEMSerializer, AccountPEMAuthenticateSerializer
+from .models import Account, TokenForCitizenAuthentication
+from .serializers import AccountSerializer, PasswordSerializer, AccountPEMSerializer, AccountPEMAuthenticateSerializer, \
+    TokenForCitizenAuthenticationSerializer
 
 import uuid
 
@@ -127,6 +127,7 @@ class LoginView(views.APIView):
     - #### URL: **/api/v1/auth/login/**
     - #### Permissions: **Allow any**
     """
+
     def post(self, request):
         """
         B{Login} an user
@@ -168,6 +169,7 @@ class LogoutView(views.APIView):
     - #### URL: **/api/v1/auth/logout/**
     - #### Permissions: **Is authenticated**
     """
+
     def get_permissions(self):
         return permissions.IsAuthenticated(),
 
@@ -246,6 +248,20 @@ class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericView
                         status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetRandomToken(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = TokenForCitizenAuthentication.objects.all()
+    serializer_class = TokenForCitizenAuthenticationSerializer
+
+    def list(self, request, *args, **kwargs):
+        """
+        Get the token for authentication
+        B{URL:} ../api/v1/player/citizen_token/
+        """
+        token = TokenForCitizenAuthentication.objects.create()
+        serializer = self.serializer_class(token)
+        return Response(serializer.data)
+
+
 class CitizenAuthenticate(views.APIView):
     """
     B{Create} a device
@@ -258,14 +274,17 @@ class CitizenAuthenticate(views.APIView):
     :type  citizen_card_serial_number: str
     :param citizen_card_serial_number: citizen_card_serial_number
     """
+
     def post(self, request):
         serializer = AccountPEMAuthenticateSerializer(data=request.data)
 
         if serializer.is_valid():
             if Account.objects.filter(citizen_card_serial_number=serializer.data["citizen_card_serial_number"]).count() == 1:
+                random = serializer.data["random"]
+                token = get_object_or_404(TokenForCitizenAuthentication.objects.all(), identifier=random)
+                token.delete()
                 user = Account.objects.get(citizen_card_serial_number=serializer.data["citizen_card_serial_number"])
 
-                random = serializer.data["random"]
                 pub_key = rsa.PublicKey.load_pkcs1(user.citizen_card.read())
 
                 try:
@@ -279,4 +298,3 @@ class CitizenAuthenticate(views.APIView):
         return Response({'status': 'Unauthorized',
                          'message': 'The citizen card that you have is not associated with any account!'
                          }, status=status.HTTP_401_UNAUTHORIZED)
-

@@ -3,6 +3,7 @@ package player.security;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.net.ProtocolException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -17,6 +18,8 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
@@ -30,6 +33,10 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.x509.RSAPublicKeyStructure;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
+import org.json.JSONException;
+import org.json.JSONObject;
+import player.api.Requests;
+import player.api.Result;
 
 public class CitizenCard {
     
@@ -68,6 +75,7 @@ public class CitizenCard {
             private_key = ks.getKey("CITIZEN AUTHENTICATION CERTIFICATE", null);
             
             X509Certificate cert = (X509Certificate) ks.getCertificate("CITIZEN AUTHENTICATION CERTIFICATE");
+            cert.checkValidity();
             cert.getSubjectDN();
             
             String[] alias = cert.getSubjectDN().getName().split(",");
@@ -90,7 +98,7 @@ public class CitizenCard {
             cc_is_inserted = false;
             Security.removeProvider("SunPKCS11");
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException | UnrecoverableKeyException ex) {
+        } catch (NoSuchAlgorithmException | UnrecoverableKeyException | CertificateExpiredException | CertificateNotYetValidException ex) {
             cc_is_inserted = false;
             Security.removeProvider("SunPKCS11");
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
@@ -138,9 +146,11 @@ public class CitizenCard {
     public static HashMap<String, String> getRandomAndSign(){
         try {
             HashMap<String, String> parameters = new HashMap<String, String>();
-            SecureRandom random = new SecureRandom();
             
-            parameters.put("random", new BigInteger(500, random).toString(32));
+            Result rs = Requests.getJson(Requests.GET_TOKEN);
+            JSONObject result = (JSONObject)rs.getResult();
+            
+            parameters.put("random", result.getString("identifier"));
             parameters.put("citizen_card_serial_number", SERIALNUMBER);
             
             Signature sig = Signature.getInstance("SHA256withRSA");
@@ -150,7 +160,11 @@ public class CitizenCard {
             
             parameters.put("sign", new String(Base64.getEncoder().encode(signed)));
             return parameters;
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException ex) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | JSONException ex) {
+            Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ProtocolException ex) {
+            Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         }
         

@@ -115,7 +115,7 @@ public class BackendFrontPageController implements Initializable {
                 PBKDF2 password_pbkdf2 = new PBKDF2(password.getText(), password.getText(), 500);
                 String pass = new String (Base64.getEncoder().encode(password_pbkdf2.read(32)));
                 parameters.put("password", pass);
-                Result r = Requests.postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_authentication/", parameters);
+                Result r = Requests.postJSON(Requests.CITIZEN_AUTHENTICATION, parameters);
 
                 if(r.getStatusCode()==200){
                     citizenAssociated.setVisible(true);

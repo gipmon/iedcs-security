@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from authentication.models import Account
+from authentication.models import Account, TokenForCitizenAuthentication
 
 from django.core.validators import MinLengthValidator
 
@@ -45,3 +45,10 @@ class AccountPEMAuthenticateSerializer(serializers.ModelSerializer):
         fields = ('random', 'sign', 'citizen_card_serial_number',)
         read_only_fields = ()
 
+
+class TokenForCitizenAuthenticationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TokenForCitizenAuthentication
+        fields = ('identifier',)
+        read_only_fields = ('identifier',)
