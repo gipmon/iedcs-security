@@ -2,6 +2,8 @@
 env
 src/iedcs-server/venv/*
 
+src/iedcs-player/Player/dist/*
+
 #latex
 *.aux
 *.glo
