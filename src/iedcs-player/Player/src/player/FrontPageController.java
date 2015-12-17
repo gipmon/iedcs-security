@@ -33,7 +33,7 @@ public class FrontPageController implements Initializable {
     @FXML
     private void handleRegister(ActionEvent event) {
         try {
-            Utils.openBrowser(IEDCSPlayer.getBaseUrl());
+            Utils.openBrowser(IEDCSPlayer.getRegisterUrl());
         } catch (IOException | URISyntaxException ex) {
             Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
