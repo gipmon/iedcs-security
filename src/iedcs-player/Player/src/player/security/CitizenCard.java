@@ -11,6 +11,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.ProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -37,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import player.api.Requests;
 import player.api.Result;
+import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 public class CitizenCard {
     
@@ -46,6 +48,8 @@ public class CitizenCard {
     private static String SERIALNUMBER;
     private static Key private_key;
     public static boolean cc_is_inserted = true;
+    public static boolean canceled = false;
+
     private static  Provider p;
     
     static{
@@ -147,6 +151,7 @@ public class CitizenCard {
     public static HashMap<String, String> getRandomAndSign(){
         reloadPEM();
         try {
+            canceled = false;
             HashMap<String, String> parameters = new HashMap<String, String>();
             
             Result rs = Requests.getJson(Requests.GET_TOKEN);
@@ -155,21 +160,23 @@ public class CitizenCard {
             parameters.put("random", result.getString("identifier"));
             parameters.put("citizen_card_serial_number", SERIALNUMBER);
             
+
+
             Signature sig = Signature.getInstance("SHA256withRSA", p);
             sig.initSign((PrivateKey) private_key);
+
             sig.update(parameters.get("random").getBytes());
-            byte signed[] = sig.sign();
             
+            byte signed[] = sig.sign();
+
+
             parameters.put("sign", new String(Base64.getEncoder().encode(signed)));
             return parameters;
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | JSONException ex) {
+        }catch(IOException | JSONException | NoSuchAlgorithmException | InvalidKeyException | SignatureException ex){
             cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ProtocolException ex) {
-            cc_is_inserted = false;
-            Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            cc_is_inserted = false;
+        } catch (ProviderException ex) {
+            canceled = true;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         }
         

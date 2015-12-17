@@ -46,13 +46,15 @@ public class FrontPageController implements Initializable {
         
         Result r = Requests.login_with_cc();
         if(r == null | r.getStatusCode()!=200){
-            if(!CitizenCard.cc_is_inserted){
+            if(!CitizenCard.cc_is_inserted && !CitizenCard.canceled){
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Wait!");
                 alert.setHeaderText(null);
                 alert.setContentText("Please enter your citizen card and re-open the Player!");
                 alert.showAndWait();
-            }else{
+                login_button.setDisable(false);
+                citizen_card_login.setDisable(false);     
+            }else if(CitizenCard.cc_is_inserted && !CitizenCard.canceled){
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Wait!");
                 alert.setHeaderText(null);
