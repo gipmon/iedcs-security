@@ -1,10 +1,13 @@
 import json
+import hashlib
 from django.core.files.base import ContentFile
 
 from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets, views, status, permissions
 from rest_framework.response import Response
 from django.contrib.auth import authenticate, login, logout
+import rsa
+import base64
 
 from .permissions import UserIsUser, IsAccountOwner
 from .models import Account
@@ -243,38 +246,37 @@ class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericView
                         status=status.HTTP_400_BAD_REQUEST)
 
 
-class CitizenAuthenticate(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    queryset = Account.objects.filter()
-    serializer_class = AccountPEMAuthenticateSerializer
+class CitizenAuthenticate(views.APIView):
+    """
+    B{Create} a device
+    B{URL:} ../api/v1/player/citizen_authenticate/
 
-    def get_permissions(self):
-        return permissions.IsAuthenticated(),
-
-    def create(self, request, *args, **kwargs):
-        """
-        B{Create} a device
-        B{URL:} ../api/v1/player/citizen_authenticate/
-
-        :type  random: str
-        :param random: the random
-        :type  sign: str
-        :param sig: the random sign
-        """
+    :type  random: str
+    :param random: the random
+    :type  sign: str
+    :param sign: the random sign
+    :type  citizen_card_serial_number: str
+    :param citizen_card_serial_number: citizen_card_serial_number
+    """
+    def post(self, request):
         serializer = AccountPEMAuthenticateSerializer(data=request.data)
+
         if serializer.is_valid():
-            account = authenticate(email=request.user.email, password=serializer.data["password"])
+            if Account.objects.filter(citizen_card_serial_number=serializer.data["citizen_card_serial_number"]).count() == 1:
+                user = Account.objects.get(citizen_card_serial_number=serializer.data["citizen_card_serial_number"])
 
-            if account is not None:
+                random = serializer.data["random"]
+                pub_key = rsa.PublicKey.load_pkcs1(user.citizen_card.read())
 
-                return Response({'status': 'Good request',
-                                 'message': 'The citizen card has been added!'},
-                                status=status.HTTP_200_OK)
-            else:
-                return Response({'status': 'Bad Request',
-                                 'message': {"password_wrong": ["The password is wrong!"]}},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({'status': 'Bad Request',
-                         'message': serializer.errors},
-                        status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    rsa.verify(random, base64.b64decode(serializer.data["sign"]), pub_key)
+                    user.backend = 'django.contrib.auth.backends.ModelBackend'
+                    login(request, user)
+                    serialized = AccountSerializer(user)
+                    return Response(serialized.data)
+                except rsa.pkcs1.VerificationError, e:
+                    pass
+        return Response({'status': 'Unauthorized',
+                         'message': 'The citizen card that you have is not associated with any account!'
+                         }, status=status.HTTP_401_UNAUTHORIZED)
 

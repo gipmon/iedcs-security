@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.views.generic.base import TemplateView
 
-from authentication.views import AccountViewSet, LoginView, LogoutView, SavePEMCitizenAuthentication, MyDetails
+from authentication.views import AccountViewSet, LoginView, LogoutView, SavePEMCitizenAuthentication, MyDetails, \
+    CitizenAuthenticate
 from books.views import BooksViewSet, OrderViewSet, BookView
 from rest_framework import routers
 from players.views import DeviceViewSet, DeviceRetrieveView
@@ -28,6 +29,7 @@ urlpatterns = patterns('',
                        url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
                        # PLAYER > SERVER
                        url(r'^api/v1/player/', include(router_base_player.urls)),
+                       url(r"^api/v1/player/citizen_authenticate/$", CitizenAuthenticate.as_view(), name="login_citizen_card"),
                        url(r'^api/v1/player/get_book/(?P<identifier>.+)/$', BookView.as_view(), name="Get json round file"),
                        url('^.*$', TemplateView.as_view(template_name='index.html'), name='index')
                        )

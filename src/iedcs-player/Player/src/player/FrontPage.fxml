@@ -14,7 +14,7 @@
       <Label layoutX="125.0" layoutY="214.0" text="E-mail" />
       <Label layoutX="104.0" layoutY="254.0" text="Password:" />
       <PasswordField fx:id="login_password" layoutX="178.0" layoutY="249.0" prefHeight="27.0" prefWidth="255.0" />
-      <Separator layoutX="26.0" layoutY="340.0" prefHeight="0.0" prefWidth="541.0" />
+      <Separator layoutX="26.0" layoutY="368.0" prefHeight="0.0" prefWidth="541.0" />
       <Label layoutX="60.0" layoutY="153.0" text="Login:">
           <font>
            <Font name="Verdana" size="24.0" />
@@ -39,12 +39,13 @@
             <Image url="@img/1445058743_User.png" />
          </image>
       </ImageView>
-      <Button fx:id="login_button" onAction="#handleLogin" layoutX="255.0" layoutY="284.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="76.0" text="Login" />
+      <Button fx:id="login_button" layoutX="259.0" layoutY="283.0" mnemonicParsing="false" onAction="#handleLogin" prefHeight="30.0" prefWidth="76.0" text="Login" />
       <Label layoutX="129.0" layoutY="391.0" text="You don't have an account?">
          <font>
             <Font name="Verdana" size="24.0" />
          </font>
       </Label>
-      <Button fx:id="register_button" onAction="#handleRegister"  layoutX="200.0" layoutY="434.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="193.0" text="Make your account here!" />
+      <Button fx:id="register_button" layoutX="200.0" layoutY="434.0" mnemonicParsing="false" onAction="#handleRegister" prefHeight="42.0" prefWidth="193.0" text="Make your account here!" />
+      <Button fx:id="citizen_card_login" layoutX="206.0" layoutY="330.0" mnemonicParsing="false" onAction="#handleCitizenCardLogin" prefHeight="30.0" prefWidth="180.0" text="Login with Citizen Card" />
    </children>
 </AnchorPane>

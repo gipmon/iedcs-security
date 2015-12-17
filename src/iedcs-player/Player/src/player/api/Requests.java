@@ -44,6 +44,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import player.IEDCSPlayer;
+import player.security.CitizenCard;
 import player.security.ComputerDetails;
 import player.security.PBKDF2;
 import player.security.PlayerKeyStore;
@@ -109,8 +110,47 @@ public class Requests {
         return HttpClientBuilder.create().build();
     }
     
+    public static Result login_with_cc(){
+        try {
+            Result rs = Requests.postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_authenticate/", CitizenCard.getRandomAndSign());
+            
+            if(rs.getStatusCode()==200){
+                USER = (JSONObject)rs.getResult();
+
+                // verificar se o player ja esta registado  
+                HashMap<String, String> parameters = new HashMap<String, String>();
+                parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
+                Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/retrieveDevice/", parameters);
+
+                Utils.println(rs_player.toString());
+
+                if(rs_player.getStatusCode()!=200){
+                    parameters = new HashMap<>();
+                    parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
+                    parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
+                    parameters.put("op_system", ComputerDetails.getCpu_model());
+                    parameters.put("ip", ComputerDetails.getPublicIP());
+                    DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                    Date date = new Date();
+                    parameters.put("time", dateFormat.format(date));
+                    parameters.put("host_name", ComputerDetails.getHostName());
+                    parameters.put("public_key", PlayerKeyStore.getPemPubKey());
+                    postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/", parameters);
+                }else{
+                    updateDeviceData();
+                }
+            }
+            return rs;
+        } catch (ProtocolException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | JSONException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
     public static Result login(String email, String password) throws MalformedURLException, ProtocolException, IOException, JSONException{
-        HashMap<String, String> parameters = new HashMap<String, String>();
+        HashMap<String, String> parameters = new HashMap<>();
         
         parameters.put("email", email);
         PBKDF2 password_pbkdf2 = new PBKDF2(password, password, 500);
@@ -140,7 +180,7 @@ public class Requests {
             Utils.println(rs_player.toString());
             
             if(rs_player.getStatusCode()!=200){
-                parameters = new HashMap<String, String>();
+                parameters = new HashMap<>();
                 parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
                 parameters.put("cpu_model", ComputerDetails.getCpu_vendor());
                 parameters.put("op_system", ComputerDetails.getCpu_model());
@@ -172,9 +212,7 @@ public class Requests {
             return putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/update/", parameters);
         } catch (ProtocolException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (JSONException ex) {
+        } catch (IOException | JSONException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
