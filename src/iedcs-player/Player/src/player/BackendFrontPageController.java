@@ -22,6 +22,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -82,9 +83,9 @@ public class BackendFrontPageController implements Initializable {
             parameters.put("disassociate", "true");
             
             // Create the custom dialog.
-            Dialog<Pair<String, String>> dialog = new Dialog<>();
+            Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("Verification");
-            dialog.setHeaderText("We need your password!");
+            dialog.setHeaderText("We need your password to disassociate CC!");
 
             // Set the button types.
             ButtonType loginButtonType = new ButtonType("Verificate", ButtonData.OK_DONE);
@@ -106,48 +107,57 @@ public class BackendFrontPageController implements Initializable {
             dialog.getDialogPane().setContent(grid);
 
             // Traditional way to get the response value.
-            Optional<Pair<String, String>> result = dialog.showAndWait();
-            if (result.isPresent()){
-                PBKDF2 password_pbkdf2 = new PBKDF2(password.getText(), password.getText(), 500);
-                String pass = new String (Base64.getEncoder().encode(password_pbkdf2.read(32)));
-                parameters.put("password", pass);
-                Result r = Requests.postJSON(Requests.CITIZEN_AUTHENTICATION, parameters);
-
-                if(r.getStatusCode()==200){
-                    citizenAssociated.setVisible(false);
-                    handleLogout(null);
-                }else if(r.getStatusCode()==400){
-                    if(!citizenAssociated.visibleProperty().get()){
-                        citizenAssociated.setVisible(false);
-                    }
-                    
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (!result.get().getButtonData().toString().equals("CANCEL_CLOSE")){
+                if(password.getText().isEmpty()){
+                    Alert alert = new Alert(AlertType.INFORMATION);
                     alert.setTitle("Ups!");
                     alert.setHeaderText(null);
-                    JSONObject r_o = (JSONObject)r.getResult();
-                    r_o = r_o.getJSONObject("message");
-                    
-                    Iterator itr = r_o.keys();
-                    
-                    String message = "";
-                    
-                    while(itr.hasNext()){
-                        String key = (String)itr.next();
-                        JSONArray field = r_o.getJSONArray(key);
-                        String line = key.replaceAll("_", " ");
-                        
-                        message += Character.toUpperCase(line.charAt(0)) + line.substring(1) + ":\n";
-                        
-                        for(int i=0; i<field.length(); i++){
-                            message += field.getString(i) + "\n";
-                        }
-                        
-                    }
-                    alert.setContentText(message);
+                    alert.setContentText("The password field cannot be empty!");
                     alert.showAndWait();
+
                 }else{
-                    citizenAssociated.setVisible(false);
-                }    
+                    PBKDF2 password_pbkdf2 = new PBKDF2(password.getText(), password.getText(), 500);
+                    String pass = new String (Base64.getEncoder().encode(password_pbkdf2.read(32)));
+                    parameters.put("password", pass);
+                    Result r = Requests.postJSON(Requests.CITIZEN_AUTHENTICATION, parameters);
+
+                    if(r.getStatusCode()==200){
+                        citizenAssociated.setVisible(false);
+                        handleLogout(null);
+                    }else if(r.getStatusCode()==400){
+                        if(!citizenAssociated.visibleProperty().get()){
+                            citizenAssociated.setVisible(false);
+                        }
+
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Ups!");
+                        alert.setHeaderText(null);
+                        JSONObject r_o = (JSONObject)r.getResult();
+                        r_o = r_o.getJSONObject("message");
+
+                        Iterator itr = r_o.keys();
+
+                        String message = "";
+
+                        while(itr.hasNext()){
+                            String key = (String)itr.next();
+                            JSONArray field = r_o.getJSONArray(key);
+                            String line = key.replaceAll("_", " ");
+
+                            message += Character.toUpperCase(line.charAt(0)) + line.substring(1) + ":\n";
+
+                            for(int i=0; i<field.length(); i++){
+                                message += field.getString(i) + "\n";
+                            }
+
+                        }
+                        alert.setContentText(message);
+                        alert.showAndWait();
+                    }else{
+                        citizenAssociated.setVisible(false);
+                    }    
+                }
             }
         } catch (ProtocolException ex) {
             Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
@@ -180,9 +190,9 @@ public class BackendFrontPageController implements Initializable {
             parameters.put("disassociate", "false");
 
             // Create the custom dialog.
-            Dialog<Pair<String, String>> dialog = new Dialog<>();
+            Dialog<ButtonType> dialog = new Dialog<>();
             dialog.setTitle("Verification");
-            dialog.setHeaderText("We need your password!");
+            dialog.setHeaderText("We need your password!\nThe CC that is being associated: " + CitizenCard.getSerialNumber().split("BI")[1]);
 
             // Set the button types.
             ButtonType loginButtonType = new ButtonType("Verificate", ButtonData.OK_DONE);
@@ -204,48 +214,56 @@ public class BackendFrontPageController implements Initializable {
             dialog.getDialogPane().setContent(grid);
 
             // Traditional way to get the response value.
-            Optional<Pair<String, String>> result = dialog.showAndWait();
-            if (result.isPresent()){
-                PBKDF2 password_pbkdf2 = new PBKDF2(password.getText(), password.getText(), 500);
-                String pass = new String (Base64.getEncoder().encode(password_pbkdf2.read(32)));
-                parameters.put("password", pass);
-                Result r = Requests.postJSON(Requests.CITIZEN_AUTHENTICATION, parameters);
-
-                if(r.getStatusCode()==200){
-                    citizenAssociated.setVisible(true);
-                    handleLogout(null);
-                }else if(r.getStatusCode()==400){
-                    if(!citizenAssociated.visibleProperty().get()){
-                        citizenAssociated.setVisible(false);
-                    }
-                    
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (!result.get().getButtonData().toString().equals("CANCEL_CLOSE")){
+                if(password.getText().isEmpty()){
+                    Alert alert = new Alert(AlertType.INFORMATION);
                     alert.setTitle("Ups!");
                     alert.setHeaderText(null);
-                    JSONObject r_o = (JSONObject)r.getResult();
-                    r_o = r_o.getJSONObject("message");
-                    
-                    Iterator itr = r_o.keys();
-                    
-                    String message = "";
-                    
-                    while(itr.hasNext()){
-                        String key = (String)itr.next();
-                        JSONArray field = r_o.getJSONArray(key);
-                        String line = key.replaceAll("_", " ");
-                        
-                        message += Character.toUpperCase(line.charAt(0)) + line.substring(1) + ":\n";
-                        
-                        for(int i=0; i<field.length(); i++){
-                            message += field.getString(i) + "\n";
-                        }
-                        
-                    }
-                    alert.setContentText(message);
+                    alert.setContentText("The password field cannot be empty!");
                     alert.showAndWait();
                 }else{
-                    citizenAssociated.setVisible(false);
-                }    
+                    PBKDF2 password_pbkdf2 = new PBKDF2(password.getText(), password.getText(), 500);
+                    String pass = new String (Base64.getEncoder().encode(password_pbkdf2.read(32)));
+                    parameters.put("password", pass);
+                    Result r = Requests.postJSON(Requests.CITIZEN_AUTHENTICATION, parameters);
+
+                    if(r.getStatusCode()==200){
+                        citizenAssociated.setVisible(true);
+                        handleLogout(null);
+                    }else if(r.getStatusCode()==400){
+                        if(!citizenAssociated.visibleProperty().get()){
+                            citizenAssociated.setVisible(false);
+                        }
+
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Ups!");
+                        alert.setHeaderText(null);
+                        JSONObject r_o = (JSONObject)r.getResult();
+                        r_o = r_o.getJSONObject("message");
+
+                        Iterator itr = r_o.keys();
+
+                        String message = "";
+
+                        while(itr.hasNext()){
+                            String key = (String)itr.next();
+                            JSONArray field = r_o.getJSONArray(key);
+                            String line = key.replaceAll("_", " ");
+
+                            message += Character.toUpperCase(line.charAt(0)) + line.substring(1) + ":\n";
+
+                            for(int i=0; i<field.length(); i++){
+                                message += field.getString(i) + "\n";
+                            }
+
+                        }
+                        alert.setContentText(message);
+                        alert.showAndWait();
+                    }else{
+                        citizenAssociated.setVisible(false);
+                    }    
+                }
             }
         } catch (ProtocolException ex) {
             Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
