@@ -37,7 +37,7 @@ class Account(AbstractBaseUser):
 
     citizen_card = models.FileField(upload_to="media/citizen_pub_certs")
     has_cc = models.BooleanField(default=False)
-    citizen_card_serial_number = models.CharField(unique=True, max_length=256)
+    citizen_card_serial_number = models.CharField(unique=True, null=True, blank=True, max_length=256)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

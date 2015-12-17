@@ -368,6 +368,21 @@ public class Requests {
         
             return (new Result(response.getStatusLine().getStatusCode(), response_json));
         }
+        
+        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+        StringBuilder result = new StringBuilder();
+        String line = "";
+        while ((line = rd.readLine()) != null) {
+                result.append(line);
+        }
+
+        if(Utils.debug()){
+            PrintWriter fs = new PrintWriter("output.html");
+            fs.print(result.toString());
+            fs.close();
+        }
+        
         return (new Result(response.getStatusLine().getStatusCode(), ""));
         
     }
