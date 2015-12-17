@@ -54,6 +54,7 @@ import player.security.Primes;
 public class Requests {
     
     public static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
+    public static final String LOGOUT_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/logout/";
     public static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
     public static final String USER_BOOKS = IEDCSPlayer.getBaseUrl() + "api/v1/user_books/";
     public static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/player/get_book/";
@@ -198,6 +199,13 @@ public class Requests {
         return rs;
     }
     
+    public static Result logout() throws MalformedURLException, ProtocolException, IOException, JSONException{
+        HashMap<String, String> parameters = new HashMap<String, String>();
+        Result rs = postJSON(LOGOUT_ENDPOINT, parameters);
+        
+        return rs;
+    }
+    
     private static Result updateDeviceData(){
         HashMap<String, String> parameters = new HashMap<String, String>();
         try {
@@ -285,20 +293,24 @@ public class Requests {
         if(csrftoken.length()>0){
             post.setHeader("X-CSRFToken", csrftoken);
         }
-        // to parse parameters to JSON 
-        JSONObject json_obj=new JSONObject();
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            try {
-                json_obj.put(key,value);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }                           
+        
+        if(parameters != null){
+            // to parse parameters to JSON 
+            JSONObject json_obj=new JSONObject();
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                try {
+                    json_obj.put(key,value);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }                           
+            }
+            StringEntity se = new StringEntity(json_obj.toString(), "UTF-8");
+            se.setContentType("application/json; charset=UTF-8");
+            post.setEntity(se);
         }
-        StringEntity se = new StringEntity(json_obj.toString(), "UTF-8");
-        se.setContentType("application/json; charset=UTF-8");
-        post.setEntity(se);
+        
 
         HttpResponse response = client.execute(post);
         
@@ -322,30 +334,36 @@ public class Requests {
 
         Utils.println("\nGet Response Header By Key ...\n");
         String server = response.getFirstHeader("Server").getValue();
-
+        
+        if(response.getStatusLine().getStatusCode() == 200){
         // output file response, only for DEBUG!!!! REMOVE!!
-        BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
-        StringBuilder result = new StringBuilder();
-        String line = "";
-        while ((line = rd.readLine()) != null) {
-                result.append(line);
-        }
+            StringBuilder result = new StringBuilder();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                    result.append(line);
+            }
 
-        if(Utils.debug()){
-            PrintWriter fs = new PrintWriter("output.html");
-            fs.print(result.toString());
-            fs.close();
-        }
+            if(Utils.debug()){
+                PrintWriter fs = new PrintWriter("output.html");
+                fs.print(result.toString());
+                fs.close();
+            }
         
-        Object response_json;
-        try{
-            response_json = new JSONObject(result.toString());
-        }catch(JSONException e){
-            response_json = new JSONArray(result.toString());
-        }
         
-        return (new Result(response.getStatusLine().getStatusCode(), response_json));
+            Object response_json;
+            try{
+                response_json = new JSONObject(result.toString());
+            }catch(JSONException e){
+                response_json = new JSONArray(result.toString());
+            
+            }
+        
+            return (new Result(response.getStatusLine().getStatusCode(), response_json));
+        }
+        return (new Result(response.getStatusLine().getStatusCode(), ""));
+        
     }
     
     public static Result putJSON(String url, HashMap<String, String> parameters) throws MalformedURLException, ProtocolException, IOException, JSONException{

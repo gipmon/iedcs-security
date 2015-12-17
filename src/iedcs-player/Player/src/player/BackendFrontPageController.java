@@ -169,4 +169,24 @@ public class BackendFrontPageController implements Initializable {
             Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    @FXML
+    private void handleLogout(ActionEvent event){
+        Result r = null;
+        try {
+            r = Requests.logout();
+        } catch (IOException | JSONException ex) {
+            Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        if(r.getStatusCode()==204){
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("FrontPage.fxml"));
+                Scene scene = new Scene(root);
+                Player.thestage.setScene(scene);
+            } catch (IOException ex) {
+                Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+            }       
+        }
+    }
 }

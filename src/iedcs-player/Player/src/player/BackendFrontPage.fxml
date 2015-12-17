@@ -10,10 +10,12 @@
 
 <AnchorPane id="AnchorPane" prefHeight="595.0" prefWidth="592.0" stylesheets="@css/anchorpane.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="player.BackendFrontPageController">
    <children>
-      <ToolBar prefHeight="36.0" prefWidth="592.0">
+      <ToolBar nodeOrientation="LEFT_TO_RIGHT" prefHeight="36.0" prefWidth="592.0">
         <items>
             <Button mnemonicParsing="false" onAction="#handleMyBooks" text="My books" />
             <Button mnemonicParsing="false" onAction="#handleWebStoreBtn" text="WebStore" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
         </items>
       </ToolBar>
       <ImageView fitHeight="114.0" fitWidth="114.0" layoutX="239.0" layoutY="82.0">
@@ -52,7 +54,7 @@
             <Font name="System Bold" size="15.0" />
          </font>
       </Button>
-      <Label layoutX="202.0" fx:id="citizenAssociated" layoutY="405.0" text="Your citizen card is associated!" textFill="#59ae1b">
+      <Label fx:id="citizenAssociated" layoutX="202.0" layoutY="405.0" text="Your citizen card is associated!" textFill="#59ae1b">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
