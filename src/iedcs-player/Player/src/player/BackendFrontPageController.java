@@ -22,6 +22,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -44,6 +45,8 @@ public class BackendFrontPageController implements Initializable {
     @FXML private Label email = new Label();
     @FXML private Label username = new Label();
     @FXML private Label citizenAssociated = new Label();
+    @FXML private Button associate = new Button();
+    @FXML private Button disassociate = new Button();
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -55,13 +58,23 @@ public class BackendFrontPageController implements Initializable {
             
             if(user.getBoolean("has_cc")){
                 citizenAssociated.setVisible(true);
+                associate.setVisible(false);
+                disassociate.setVisible(true);
+                
             }else{
                 citizenAssociated.setVisible(false);
+                associate.setVisible(true);
+                disassociate.setVisible(false);
             }
         } catch (JSONException ex) {
             Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }    
+    
+    @FXML
+    private void handleDisassociateCitizenCard(ActionEvent event){
+        
+    }
     
     @FXML
     private void handleWebStoreBtn(ActionEvent event) {
@@ -119,6 +132,7 @@ public class BackendFrontPageController implements Initializable {
 
                 if(r.getStatusCode()==200){
                     citizenAssociated.setVisible(true);
+                    handleLogout(null);
                 }else if(r.getStatusCode()==400){
                     if(!citizenAssociated.visibleProperty().get()){
                         citizenAssociated.setVisible(false);
