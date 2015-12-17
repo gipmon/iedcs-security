@@ -3,6 +3,7 @@ from .models import Device, DeviceOwner
 
 
 class CreateDeviceSerializer(serializers.ModelSerializer):
+    unique_identifier = serializers.CharField(max_length=254)
     public_key = serializers.CharField(max_length=512, required=False)
 
     class Meta:
@@ -11,6 +12,7 @@ class CreateDeviceSerializer(serializers.ModelSerializer):
 
 
 class DeviceSerializer(serializers.ModelSerializer):
+    unique_identifier = serializers.CharField(max_length=254)
 
     class Meta:
         model = Device

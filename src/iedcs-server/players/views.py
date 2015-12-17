@@ -157,7 +157,7 @@ class DeviceViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Upd
 
 class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = Device.objects.filter()
-    serializer_class = DeviceSerializer
+    serializer_class = DeviceRetrieveSerializer
 
     def get_permissions(self):
         return permissions.IsAuthenticated(),
@@ -171,7 +171,7 @@ class DeviceRetrieveView(mixins.CreateModelMixin, viewsets.GenericViewSet):
         :param unique_identifier: the device unique identifier
         """
 
-        serializer=DeviceRetrieveSerializer(data=request.data)
+        serializer = DeviceRetrieveSerializer(data=request.data)
         if serializer.is_valid():
 
             device = get_object_or_404(Device.objects.all(), unique_identifier=serializer.data["unique_identifier"])
