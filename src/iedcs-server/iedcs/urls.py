@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.views.generic.base import TemplateView
 
 from authentication.views import AccountViewSet, LoginView, LogoutView, SavePEMCitizenAuthentication, MyDetails, \
-    CitizenAuthenticate
+    CitizenAuthenticate, GetRandomToken
 from books.views import BooksViewSet, OrderViewSet, BookView
 from rest_framework import routers
 from players.views import DeviceViewSet, DeviceRetrieveView
@@ -19,6 +19,8 @@ router_base_player.register(r'retrieveDevice', DeviceRetrieveView)
 router_base_player.register(r'devices', DeviceViewSet)
 router_base_player.register(r'security_exchange_r1r2', ExchangeRd1Rd2ViewSet)
 router_base_player.register(r'citizen_authentication', SavePEMCitizenAuthentication)
+router_base_player.register(r'citizen_token', GetRandomToken)
+
 
 urlpatterns = patterns('',
                        # ALL

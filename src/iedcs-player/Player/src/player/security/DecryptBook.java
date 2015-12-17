@@ -123,7 +123,7 @@ public class DecryptBook {
             parameters.put("book_identifier", this.book_identifier);
             parameters.put("rd1", new String(rd1));
             parameters.put("device_identifier", ComputerDetails.getUniqueIdentifier());
-            Result r = Requests.postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/security_exchange_r1r2/", parameters);
+            Result r = Requests.postJSON(Requests.SECURITY_EXCHANGE_R1_R2, parameters);
             
             JSONObject jso = (JSONObject) r.getResult();
             String rd2_server = jso.getString("rd2");

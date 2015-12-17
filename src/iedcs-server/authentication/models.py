@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
@@ -59,5 +60,6 @@ class Account(AbstractBaseUser):
         return self.citizen_card is not None
 
 
-
+class TokenForCitizenAuthentication(models.Model):
+    identifier = models.CharField(max_length=100, blank=False, unique=True, default=uuid.uuid4)
 

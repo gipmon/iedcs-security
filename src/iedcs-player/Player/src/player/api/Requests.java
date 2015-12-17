@@ -58,6 +58,13 @@ public class Requests {
     public static final String ME_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/me/";
     public static final String USER_BOOKS = IEDCSPlayer.getBaseUrl() + "api/v1/user_books/";
     public static final String VIEW_BOOK = IEDCSPlayer.getBaseUrl() + "api/v1/player/get_book/";
+    public static final String CITIZEN_AUTHENTICATION = IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_authentication/";
+    public static final String CITIZEN_AUTHENTICATE = IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_authenticate/";
+    public static final String RETRIEVE_DEVICE = IEDCSPlayer.getBaseUrl() + "api/v1/player/retrieveDevice/";
+    public static final String DEVICES = IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/";
+    public static final String UPDATE_DEVICE = IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/update/";
+    public static final String SECURITY_EXCHANGE_R1_R2 = IEDCSPlayer.getBaseUrl() + "api/v1/player/security_exchange_r1r2/";
+    public static final String GET_TOKEN = IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_token/";
     
     private static JSONObject USER;
     private static HttpClient client = buildHttpsClient();
@@ -113,7 +120,7 @@ public class Requests {
     
     public static Result login_with_cc(){
         try {
-            Result rs = Requests.postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/citizen_authenticate/", CitizenCard.getRandomAndSign());
+            Result rs = Requests.postJSON(Requests.CITIZEN_AUTHENTICATE, CitizenCard.getRandomAndSign());
             
             if(rs.getStatusCode()==200){
                 USER = (JSONObject)rs.getResult();
@@ -121,7 +128,7 @@ public class Requests {
                 // verificar se o player ja esta registado  
                 HashMap<String, String> parameters = new HashMap<String, String>();
                 parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
-                Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/retrieveDevice/", parameters);
+                Result rs_player = postJSON(RETRIEVE_DEVICE, parameters);
 
                 Utils.println(rs_player.toString());
 
@@ -136,7 +143,7 @@ public class Requests {
                     parameters.put("time", dateFormat.format(date));
                     parameters.put("host_name", ComputerDetails.getHostName());
                     parameters.put("public_key", PlayerKeyStore.getPemPubKey());
-                    postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/", parameters);
+                    postJSON(DEVICES, parameters);
                 }else{
                     updateDeviceData();
                 }
@@ -176,7 +183,7 @@ public class Requests {
             // verificar se o player ja esta registado  
             parameters = new HashMap<String, String>();
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
-            Result rs_player = postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/retrieveDevice/", parameters);
+            Result rs_player = postJSON(RETRIEVE_DEVICE, parameters);
             
             Utils.println(rs_player.toString());
             
@@ -191,7 +198,7 @@ public class Requests {
                 parameters.put("time", dateFormat.format(date));
                 parameters.put("host_name", ComputerDetails.getHostName());
                 parameters.put("public_key", PlayerKeyStore.getPemPubKey());
-                postJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/", parameters);
+                postJSON(DEVICES, parameters);
             }else{
                 updateDeviceData();
             }
@@ -217,7 +224,7 @@ public class Requests {
             parameters.put("time", dateFormat.format(date));
             parameters.put("host_name", ComputerDetails.getHostName());
             parameters.put("unique_identifier", ComputerDetails.getUniqueIdentifier());
-            return putJSON(IEDCSPlayer.getBaseUrl() + "api/v1/player/devices/update/", parameters);
+            return putJSON(UPDATE_DEVICE, parameters);
         } catch (ProtocolException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException | JSONException ex) {
