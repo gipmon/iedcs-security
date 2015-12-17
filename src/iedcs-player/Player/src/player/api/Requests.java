@@ -341,8 +341,8 @@ public class Requests {
 
         Utils.println("\nGet Response Header By Key ...\n");
         String server = response.getFirstHeader("Server").getValue();
-        
-        if(response.getStatusLine().getStatusCode() == 200){
+
+        if(response.getStatusLine().getStatusCode() >= 200  && response.getStatusLine().getStatusCode() < 500){
         // output file response, only for DEBUG!!!! REMOVE!!
             BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
@@ -351,14 +351,13 @@ public class Requests {
             while ((line = rd.readLine()) != null) {
                     result.append(line);
             }
-
+            
             if(Utils.debug()){
                 PrintWriter fs = new PrintWriter("output.html");
                 fs.print(result.toString());
                 fs.close();
             }
-        
-        
+         
             Object response_json;
             try{
                 response_json = new JSONObject(result.toString());
