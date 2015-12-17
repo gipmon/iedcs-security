@@ -46,6 +46,7 @@ public class CitizenCard {
     private static String SERIALNUMBER;
     private static Key private_key;
     public static boolean cc_is_inserted = true;
+    private static  Provider p;
     
     static{
         reloadPEM();
@@ -54,7 +55,7 @@ public class CitizenCard {
     private static void reloadPEM(){
         try {
             String f = "citizen/CitizenCard.cfg";
-            Provider p = new sun.security.pkcs11.SunPKCS11(f);
+            p = new sun.security.pkcs11.SunPKCS11(f);
             Security.addProvider(p);
             
             class CitizenCallbackHandler implements CallbackHandler{
@@ -93,14 +94,14 @@ public class CitizenCard {
             
             citizen_authentication_certificate = cert.getPublicKey();
             cc_is_inserted = true;
-            Security.removeProvider("SunPKCS11");
         } catch (KeyStoreException ex) {
             cc_is_inserted = false;
-            Security.removeProvider("SunPKCS11");
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException | UnrecoverableKeyException | CertificateExpiredException | CertificateNotYetValidException ex) {
             cc_is_inserted = false;
-            Security.removeProvider("SunPKCS11");
+            Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex){
+            cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -144,6 +145,7 @@ public class CitizenCard {
     }
     
     public static HashMap<String, String> getRandomAndSign(){
+        reloadPEM();
         try {
             HashMap<String, String> parameters = new HashMap<String, String>();
             
@@ -153,7 +155,7 @@ public class CitizenCard {
             parameters.put("random", result.getString("identifier"));
             parameters.put("citizen_card_serial_number", SERIALNUMBER);
             
-            Signature sig = Signature.getInstance("SHA256withRSA");
+            Signature sig = Signature.getInstance("SHA256withRSA", p);
             sig.initSign((PrivateKey) private_key);
             sig.update(parameters.get("random").getBytes());
             byte signed[] = sig.sign();
@@ -161,10 +163,13 @@ public class CitizenCard {
             parameters.put("sign", new String(Base64.getEncoder().encode(signed)));
             return parameters;
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | JSONException ex) {
+            cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ProtocolException ex) {
+            cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         }
         
