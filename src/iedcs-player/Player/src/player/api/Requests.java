@@ -342,7 +342,7 @@ public class Requests {
         Utils.println("\nGet Response Header By Key ...\n");
         String server = response.getFirstHeader("Server").getValue();
 
-        if(response.getStatusLine().getStatusCode() >= 200  && response.getStatusLine().getStatusCode() < 500){
+        if(response.getStatusLine().getStatusCode() >= 200  && response.getStatusLine().getStatusCode() < 500 && response.getStatusLine().getStatusCode() != 204){
         // output file response, only for DEBUG!!!! REMOVE!!
             BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
