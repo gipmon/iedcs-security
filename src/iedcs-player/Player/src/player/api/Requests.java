@@ -254,9 +254,11 @@ public class Requests {
                 result.append(line);
         }
 
-        PrintWriter fs = new PrintWriter("output.html");
-        fs.print(result.toString());
-        fs.close();
+        if(Utils.debug()){
+            PrintWriter fs = new PrintWriter("output.html");
+            fs.print(result.toString());
+            fs.close();
+        }
         
         Object response_json;
         try{
@@ -330,9 +332,11 @@ public class Requests {
                 result.append(line);
         }
 
-        PrintWriter fs = new PrintWriter("output.html");
-        fs.print(result.toString());
-        fs.close();
+        if(Utils.debug()){
+            PrintWriter fs = new PrintWriter("output.html");
+            fs.print(result.toString());
+            fs.close();
+        }
         
         Object response_json;
         try{
