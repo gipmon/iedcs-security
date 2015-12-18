@@ -2,16 +2,16 @@
 
 apt-get update
 apt-get install -y python python-pip python-dev apache2 libapache2-mod-wsgi encfs
-cd /var/www/
+cd /var/www/site/
 pip install -r requirements.txt
 
 mkdir -p /opt/media-webstore/
-mv /var/www/media/ /var/www/media-tmp/
-mkdir -p /var/www/media/
+mv /var/www/site/media/ /var/www/site/media-tmp/
+mkdir -p /var/www/site/media/
 
 password = "p4g1rr"
 
-encfs -S -o nonempty /opt/media-webstore/ /var/www/media/ << EOF
+encfs -S -o nonempty /opt/media-webstore/ /var/www/site/media/ << EOF
 x
 1
 256
@@ -26,9 +26,9 @@ $password
 $password
 EOF
 
-cp -r /var/www/media-tmp/* /var/www/media/
+cp -r /var/www/site/media-tmp/* /var/www/site/media/
 sleep 2
-rm -rf /var/www/media-tmp/
+rm -rf /var/www/site/media-tmp/
 
 # database
 if [ ! -f db.sqlite3 ]; then
@@ -68,6 +68,5 @@ a2ensite default-ssl.conf
 
 # mod_rewrite
 sudo a2enmod rewrite
-
 
 sudo service apache2 restart

@@ -15,7 +15,6 @@ from security.primes import Primes
 import re
 
 
-
 class BooksViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Book.objects.filter()
     serializer_class = BookSerializer
