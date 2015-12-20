@@ -9,7 +9,7 @@ public class IEDCSPlayer {
     private static final String registerURL_https = "https://iedcs.rafaelferreira.pt/";
 
     // change here to http or https
-    private static final boolean https = false;
+    private static final boolean https = true;
     public static boolean DEBUG = true;
             
     public static String getBaseUrl(){
