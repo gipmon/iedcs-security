@@ -18,7 +18,7 @@ docker exec apache service apache2 start
 echo "192.168.33.10   iedcs.rafaelferreira.pt" > /etc/hosts
 
 echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/servername.conf
-sudo cp /vagrant/ports.conf /etc/apache2/ports.conf
+sudo cp /vagrant/Apache/ports.conf /etc/apache2/ports.conf
 sudo a2enconf servername
 sudo service apache2 restart
 
