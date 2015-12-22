@@ -50,7 +50,6 @@ import player.security.PBKDF2;
 import player.security.PlayerKeyStore;
 import player.security.Primes;
 
-
 public class Requests {
     
     public static final String LOGIN_ENDPOINT = IEDCSPlayer.getBaseUrl() + "api/v1/auth/login/";
@@ -96,7 +95,7 @@ public class Requests {
             sslcontext.init(km, tm, new SecureRandom());
             
             HttpClientBuilder builder = HttpClientBuilder.create();
-            SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslcontext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslcontext); 
             builder.setSSLSocketFactory(sslConnectionFactory);
 
             Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()

@@ -29,7 +29,7 @@ public class FrontPageController implements Initializable {
     @FXML private PasswordField login_password = new PasswordField();
     @FXML private Button login_button = new Button();
     @FXML private Button citizen_card_login = new Button();
-    
+
     @FXML
     private void handleRegister(ActionEvent event) {
         try {
@@ -125,7 +125,8 @@ public class FrontPageController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        System.out.println(System.getProperty("java.library.path"));
+
     }    
     
 }
