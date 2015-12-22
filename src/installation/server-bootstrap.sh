@@ -3,6 +3,20 @@
 apt-get update
 apt-get install -y docker.io apache2 libapache2-mod-proxy-html libxml2-dev
 
+cd /vagrant/Docker/python/site
+
+# database
+if [ ! -f db.sqlite3 ]; then
+  python manage.py migrate
+  python manage.py insert_books
+  python manage.py restriction add restriction 'restriction_country' 'restriction_country' 'You are restricted by country!'
+  python manage.py restriction add restriction 'restriction_hour' 'restriction_hour' 'You are restricted by hour!'
+  BOOK_IDENTIFIER=$(python manage.py restriction list books | grep "Household organization" | awk '{print $1;}')
+  python manage.py restriction add restrict_book $(echo $BOOK_IDENTIFIER) 'restriction_country'
+  BOOK_IDENTIFIER=$(python manage.py restriction list books | grep "IBM 1401 Programming Systems" | awk '{print $1;}')
+  python manage.py restriction add restrict_book $(echo $BOOK_IDENTIFIER) 'restriction_hour'
+fi
+
 cd /vagrant/Docker/python
 docker build -t ubuntu/iedcs .
 docker run -d -it -p 8002:80 --name apache -t ubuntu/iedcs
