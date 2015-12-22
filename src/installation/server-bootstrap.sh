@@ -62,6 +62,8 @@ sudo cp /vagrant/ssl/iedcs_rafaelferreira_pt.crt /etc/ssl/certs/iedcs_rafaelferr
 sudo cp /vagrant/CA/192.168.33.10.pem /etc/ssl/private/192.168.33.10.pem
 sudo cp /vagrant/CA/iedcs.rafaelferreira.pt.crt /etc/ssl/private/iedcs.rafaelferreira.pt.crt
 sudo cp /vagrant/CA/IEDCS-CA.pem /etc/ssl/certs/IEDCS-CA.pem
+sudo mkdir /etc/ssl/certs/PTEIDCC
+sudo cp /vagrant/CA/CC/PTEID_CA_Bundle.crt /etc/ssl/certs/PTEIDCC
 
 sudo cp /vagrant/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
 a2ensite default-ssl.conf

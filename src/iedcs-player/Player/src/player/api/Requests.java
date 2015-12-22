@@ -1,33 +1,63 @@
 package player.api;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.PrintWriter;
+import static java.lang.System.out;
+import java.math.BigInteger;
+import static java.nio.channels.spi.AsynchronousChannelProvider.provider;
+import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStore.Builder;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.Security;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.KeyStoreBuilderParameters;
+import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
 import org.json.*;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -46,10 +76,10 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import player.IEDCSPlayer;
 import player.security.CitizenCard;
 import player.security.ComputerDetails;
+import player.security.MyTrustManager;
 import player.security.PBKDF2;
 import player.security.PlayerKeyStore;
 import player.security.Primes;
-
 
 public class Requests {
     
@@ -79,45 +109,86 @@ public class Requests {
         try {
             FileInputStream fis = null;
             fis = new FileInputStream("keystore/cacerts.keystore");
-            KeyStore keystore  = KeyStore.getInstance("JKS");
+            KeyStore keystore  = KeyStore.getInstance(KeyStore.getDefaultType());
             char[] pwd = "p4g1rr".toCharArray();
-            keystore.load(fis, pwd);
+            keystore.load(fis, pwd);  
             
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keystore);
-            TrustManager[] tm = tmf.getTrustManagers();
+            FileInputStream fis1 = null;
+            fis1 = new FileInputStream("citizen/CC_KS");
+            KeyStore keystore1  = KeyStore.getInstance(KeyStore.getDefaultType());
+            char[] pwd1 = "password".toCharArray();
+            keystore1.load(fis1, pwd1);  
             
-            KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
-                    KeyManagerFactory.getDefaultAlgorithm());
-            kmfactory.init(keystore, pwd);
+            
+            CitizenCard.reloadPEM();
+            class CitizenCallbackHandler implements CallbackHandler{
+            public CitizenCallbackHandler(){
+            }
+            @Override            
+            public void handle(Callback[] callbacks) {
+            }
+            }
+            
+            String f = "citizen/CitizenCard.cfg";
+            CitizenCard.p = new sun.security.pkcs11.SunPKCS11(f);
+            Security.addProvider(CitizenCard.p);
+            KeyStore.CallbackHandlerProtection func = new KeyStore.CallbackHandlerProtection( new CitizenCallbackHandler() );
+            KeyStore.Builder builders = KeyStore.Builder.newInstance( "PKCS11", CitizenCard.p, func);
+            KeyStore ks = builders.getKeyStore();
+       
+            Enumeration<String> a = ks.aliases();
+            
+            while(a.hasMoreElements()){
+                String alias = a.nextElement();
+                System.out.println(alias);
+                keystore1.setCertificateEntry(alias, ks.getCertificate(alias));
+            }
+
+            MyTrustManager mtm = new MyTrustManager(keystore1, keystore);
+            TrustManager[] tm = new TrustManager[1];
+            tm[0] = mtm;
+                        
+            KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmfactory.init(ks, null);
             KeyManager[] km = kmfactory.getKeyManagers();
             
-            SSLContext sslcontext = SSLContext.getInstance("SSL");
-            sslcontext.init(km, tm, new SecureRandom());
-            
-            HttpClientBuilder builder = HttpClientBuilder.create();
-            SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslcontext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            builder.setSSLSocketFactory(sslConnectionFactory);
+            SSLContext sslcontext = SSLContext.getInstance("TLS");
+            sslcontext.init(km, tm, null);
+            final SSLEngine engine = sslcontext.createSSLEngine();
+            final SSLParameters sslParams = new SSLParameters();
+            sslParams.setNeedClientAuth(true);
 
+            engine.setSSLParameters(sslParams);
+            engine.setUseClientMode(true);
+
+
+            HttpClientBuilder builder = HttpClientBuilder.create();
+            SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslcontext); 
+            builder.setSSLSocketFactory(sslConnectionFactory);
+           
             Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
                     .register("https", sslConnectionFactory)
                     .build();
-
             HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
 
             builder.setConnectionManager(ccm);
 
             return builder.build();
-        }catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | UnrecoverableKeyException | KeyManagementException ex) {
+        }catch (NoSuchAlgorithmException | KeyStoreException | CertificateException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnrecoverableKeyException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (KeyManagementException ex) {
+            Logger.getLogger(Requests.class.getName()).log(Level.SEVERE, null, ex);
         }
         return HttpClientBuilder.create().build();
     }
     
+
     public static Result login_with_cc(){
         try {
             Result rs = Requests.postJSON(Requests.CITIZEN_AUTHENTICATE, CitizenCard.getRandomAndSign());
@@ -397,6 +468,10 @@ public class Requests {
         put.setHeader("Accept-Language", "application/json");
         put.setHeader("Content-Type", "application/json;charset=UTF-8");
         
+        if(IEDCSPlayer.isHttps()){
+            put.setHeader("Referer", IEDCSPlayer.getBaseUrl());
+        }
+        
         if(csrftoken.length()>0){
             put.setHeader("X-CSRFToken", csrftoken);
         }
@@ -528,4 +603,22 @@ public class Requests {
         }
         return null;
     }
+    
+    private static TrustManager[] addElement(TrustManager[] a, TrustManager[] e){
+        for (TrustManager e1 : e) {
+            a  = Arrays.copyOf(a, a.length + 1);
+            a[a.length - 1] = e1;
+        }
+        return a;
+    }
+    
+    private static KeyManager[] addElementKF(KeyManager[] a, KeyManager[] e){
+        for (KeyManager e1 : e) {
+            a  = Arrays.copyOf(a, a.length + 1);
+            a[a.length - 1] = e1;
+        }
+        return a;
+    }
+    
 }
+    

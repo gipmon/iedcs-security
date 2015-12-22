@@ -2,14 +2,14 @@ package player;
 
 public class IEDCSPlayer {
     
-    private static final String baseURL_https = "https://iedcs.rafaelferreira.pt:8080/";
+    private static final String baseURL_https = "https://iedcs.rafaelferreira.pt:8000/";
     private static final String baseURL_http = "http://localhost:8000/";
     
     private static final String registerURL_http = "http://localhost:8000/";
     private static final String registerURL_https = "https://iedcs.rafaelferreira.pt/";
 
     // change here to http or https
-    private static final boolean https = false;
+    private static final boolean https = true;
     public static boolean DEBUG = true;
             
     public static String getBaseUrl(){

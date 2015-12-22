@@ -52,15 +52,24 @@ keystore:
 		touch newCert; \
 	    ) \
 	done
+	@for i in $(CC_AUTH_CERT_FILES); do\
+		openssl x509 -in $$i -inform DER -out $$i.pem -outform PEM; \
+	done
+	@for i in $(CC_SIGN_CERT_FILES); do\
+		openssl x509 -in $$i -inform DER -out $$i.pem -outform PEM; \
+	done
+	@for i in $(CC_CERT_FILES); do\
+		openssl x509 -in $$i -inform DER -out $$i.pem -outform PEM; \
+	done
 	@if [ ! -f $(CCKS) ]; then touch newCert; else if [ -f newCert ]; then rm $(CCKS); fi fi
 	@if [ -f newCert ]; then \
-	    for i in /usr/local/bin/eidstore/certs/*.der; do \
-		a=`basename $$i | sed -e s/.der//g`; \
+	    for i in /usr/local/bin/eidstore/certs/*.pem; do \
+		a=`basename $$i | sed -e s/.pem//g`; \
 		echo "Add certificate with alias" $$a; \
 		$(KEYTOOL) -importcert  -storepass $(KS_PWD) -noprompt -keystore $(CCKS) -file $$i -alias "$$a"; \
 	    done; \
 	    for i in $(CC_ALL_CERT_FILES); do \
-		a=`echo $$i | sed -e s/.cer//g | sed -e s/-//g`; \
+		a=`echo $$i | sed -e s/.pem//g | sed -e s/-//g`; \
 		echo "Add certificate with alias" $$a; \
 		$(KEYTOOL) -importcert  -storepass $(KS_PWD) -noprompt -keystore $(CCKS) -file $$i -alias "$$a"; \
 	    done; \
@@ -73,4 +82,3 @@ clean:
 deepclean:
 	$(MAKE) clean
 	-rm *.cer
-

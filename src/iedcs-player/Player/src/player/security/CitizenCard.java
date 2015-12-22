@@ -50,13 +50,13 @@ public class CitizenCard {
     public static boolean cc_is_inserted = true;
     public static boolean canceled = false;
 
-    private static  Provider p;
+    public static  Provider p;
     
     static{
         reloadPEM();
     }
     
-    private static void reloadPEM(){
+    public static void reloadPEM(){
         try {
             String f = "citizen/CitizenCard.cfg";
             p = new sun.security.pkcs11.SunPKCS11(f);
