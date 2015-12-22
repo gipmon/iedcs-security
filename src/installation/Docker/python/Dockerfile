@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y python python-pip python-dev apache2 li
 
 RUN mkdir -p /var/www
 
-ADD site /var/www
+ADD site/requirements.txt /var/www/requirements.txt
 
 WORKDIR /var/www
 
@@ -22,3 +22,5 @@ RUN a2dissite 000-default.conf
 RUN sudo rm /etc/apache2/sites-available/000-default.conf
 
 RUN sudo a2enmod rewrite
+
+ADD site /var/www
