@@ -15,10 +15,11 @@ import java.security.cert.*;
 import javax.security.auth.x500.*;
 
 import iaik.pkcs.pkcs11.wrapper.*;
+import player.FrontPageController;
 
 /**
  *
- * @author André Zúquete
+ * @author André Zúquete with some changes made by Rodrigo Cunha and Rafael Ferreira
  */
 public class ccCertValidate {
 
@@ -38,11 +39,10 @@ public class ccCertValidate {
         certificates = module.C_FindObjects ( sessHandle,  1 );
         module.C_FindObjectsFinal( sessHandle );
         
-        System.out.println ( "Found " + certificates.length + " certificate objects with label \"" + label + "\"" );
         return certificates[0];
     }
 
-    private static X509Certificate getCertificate ( PKCS11 module, long token, String certLabel )
+    private static X509Certificate getCertificate ( PKCS11 module, long token, String certLabel ) throws ccException
     {
         long sessHandle; // session handle
         long certHandle; // certificate handle
@@ -68,7 +68,8 @@ public class ccCertValidate {
         module.C_CloseSession ( sessHandle );
 
         } catch (PKCS11Exception e) {
-            System.out.println ( "PKCS#11 error: " + e );
+            String a = "PKCS#11 error: " + e.getLocalizedMessage();
+            throw new ccException(a);
 	}
 
 	try {
@@ -104,7 +105,7 @@ public class ccCertValidate {
 	return cert;
     }
 
-    private static ArrayList<X509Certificate> loadCertPath ( String certsPath )
+    private static ArrayList<X509Certificate> loadCertPath ( String certsPath ) throws ccException
     {
         ArrayList<X509Certificate> certs = new ArrayList<X509Certificate> ();
         String [] fileNames = {
@@ -121,25 +122,27 @@ public class ccCertValidate {
 		certs.add ( 0, cert );
             }
 	    else {
-	        System.out.println ( "Could not load certificate from " + path );
+	        String a = "Could not load certificate from " + path;
+                throw new ccException(a);
 	    }
 	}
 
 	return certs;
     }
 
-    private static X509Certificate loadCertPathRoot ( String certsPath )
+    private static X509Certificate loadCertPathRoot ( String certsPath ) throws ccException
     {
 	String path = certsPath + "/BaltimoreCyberTrustRoot.der";
 	X509Certificate cert = loadCertFromFile ( path );
 	if (cert == null) {
-	    System.out.println ( "Could not load root certificate from " + path );
+	    String a = "Could not load root certificate from " + path ;
+            throw new ccException(a);
 	}
 
 	return cert;
     }
 
-    private static X509CRL getCRL ( String crlUrl, X509Certificate issuer )
+    private static X509CRL getCRL ( String crlUrl, X509Certificate issuer ) throws ccException
     {
 	X509CRL crl = null;
 	CertificateFactory cf;
@@ -156,27 +159,35 @@ public class ccCertValidate {
 	crl.verify ( issuer.getPublicKey () );
 
 	} catch (MalformedURLException e) {
-	    System.out.println ( "Invalid URL for getting a CRL:" + e );
+	    String a = "Invalid URL for getting a CRL:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	} catch (IOException e) {
-	    System.out.println ( "Cannot access URL for getting a CRL:" + e );
+	    String a ="Cannot access URL for getting a CRL:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	} catch (CertificateException e) {
-	    System.out.println ( "Cannot create a certificate factory:" + e );
+	    String a = "Cannot create a certificate factory:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	} catch (CRLException e) {
-	    System.out.println ( "Cannot build a local CRL:" + e );
+	    String a = "Cannot build a local CRL:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	} catch (NoSuchAlgorithmException e) {
-	    System.out.println ( "Invalid algorithm for validating the CRL:" + e );
+	    String a = "Invalid algorithm for validating the CRL:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	} catch (InvalidKeyException e) {
-	    System.out.println ( "Invalid key for validating the CRL:" + e );
+	    String a = "Invalid key for validating the CRL:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	} catch (NoSuchProviderException e) {
-	    System.out.println ( "Invalid provider for validating the CRL:" + e );
+	    String a = "Invalid provider for validating the CRL:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	} catch (SignatureException e) {
-	    System.out.println ( "Invalid signature in CRL:" + e );
+	    String a = "Invalid signature in CRL:" + e.getLocalizedMessage();
+            throw new ccException(a);
 	}
 
         return crl;
     }
 
-    private static boolean validateCRL ( List<X509Certificate> certs )
+    private static boolean validateCRL ( List<X509Certificate> certs ) throws ccException
     {
 	X509Certificate cert, issuer;
     	Set<String> extensions;
@@ -220,8 +231,9 @@ public class ccCertValidate {
 
 	    entry = crl.getRevokedCertificate ( cert );
 	    if (entry != null) {
-		System.out.println ( "Certificate " + cert.getSubjectX500Principal () +
-					" revoked: " + entry.getRevocationReason () );
+		String a = "Certificate " + cert.getSubjectX500Principal () +
+					" revoked: " + entry.getRevocationReason () ;
+                throw new ccException(a);
 	    }
 
 
@@ -232,8 +244,9 @@ public class ccCertValidate {
 
 		entry = crl.getRevokedCertificate ( cert );
 		if (entry != null) {
-		    System.out.println ( "Certificate " + cert.getSubjectX500Principal () +
-					" revoked: " + entry.getRevocationReason () );
+		    String a = "Certificate " + cert.getSubjectX500Principal () +
+					" revoked: " + entry.getRevocationReason ();
+                    throw new ccException(a);
 	    	}
 	    }
 	}
@@ -241,7 +254,7 @@ public class ccCertValidate {
         return true;
     }
 
-    private static void validateCertificate ( PKCS11 module, long token, String certLabel, String issuerLabel )
+    public static void validateCertificate ( PKCS11 module, long token, String certLabel, String issuerLabel ) throws ccException
     {
 	Set<String> extensions;
 	byte [] extension;
@@ -256,13 +269,15 @@ public class ccCertValidate {
 	issuer = getCertificate ( module, token, issuerLabel );
 	
 	// Check validity
-
+        
 	try {
 	    cert.checkValidity ();
 	} catch (CertificateExpiredException e) {
-	    System.out.println ( "Certificate has already expired (at " + cert.getNotAfter () + ")" );
+	    String a = "Certificate has already expired (at " + cert.getNotAfter () + ")";
+            throw new ccException(a);
 	} catch (CertificateNotYetValidException e) {
-	    System.out.println ( "Certificate has not yet started (only at " + cert.getNotBefore () + ")" );
+	    String a = "Certificate has not yet started (only at " + cert.getNotBefore () + ")";
+            throw new ccException(a);
 	}
 
 	root = loadCertPathRoot ( "citizen" );
@@ -277,7 +292,9 @@ public class ccCertValidate {
 	//System.out.println ( "Certificate validation path:" + cp );
 
 	} catch (CertificateException e) {
-	    System.out.println ( "Problem while building certificate path:" + e );
+	    String a = "Problem while building certificate path:" + e.getLocalizedMessage();
+            throw new ccException(a);
+
 	}
 
 	try {
@@ -289,58 +306,27 @@ public class ccCertValidate {
 
 	cpv.validate ( cp, vp );
 
-	} catch (Exception e) {
-	    System.out.println ( "Certificate path validation error:" + e );
+	} catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException | CertPathValidatorException e) {
+            String a = "Certificate path validation error: " + e.getLocalizedMessage() ;
+            throw new ccException(a);
 	}
        
 	List<X509Certificate> certsList = (List<X509Certificate>) cp.getCertificates ();
         validateCRL ( certsList );
-}
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args)
-    {
-        long [] tokens;
-        
-        try {
-        
-        // Select the correct PKCS#11 module for dealing with Citizen Card tokens
-        PKCS11 module = PKCS11Connector.connectToPKCS11Module ( System.getProperty ( "os.name" ).contains ( "Mac OS X" ) ?
-								"pteidpkcs11.dylib" : "/usr/local/lib/libpteidpkcs11.dylib" );
-      
-        // Initialize module
-        module.C_Initialize(null);
-        
-        // Find all Citizen Card tokens
-        tokens = module.C_GetSlotList(true);
-        
-        if (tokens.length == 0) {
-            System.out.println ( "No card inserted" );
-            return;
+    }
+    public static class ccException extends Exception{
+        private String message;
+        public ccException(String e){
+            super();
+            this.message = e;
         }
+        public String getMessage(){
+            return this.message;
+        }   
         
-        // Perform a challenge-response operation using the authentication key pair
-        for (int i = 0; i < tokens.length; i++) {
-            CK_TOKEN_INFO tokenInfo = module.C_GetTokenInfo ( tokens[i] );
-            System.out.println ( "Token label = \"" + new String ( tokenInfo.label ) + "\"" );
-            if (String.valueOf ( tokenInfo.label ).startsWith ( "CARTAO DE CIDADAO" )) {
-                System.out.println ( "Found CC, model " + new String ( tokenInfo.model ) );
-                
-                validateCertificate ( module, tokens[i], "CITIZEN AUTHENTICATION CERTIFICATE", "AUTHENTICATION SUB CA" );
-                validateCertificate ( module, tokens[i], "CITIZEN SIGNATURE CERTIFICATE", "SIGNATURE SUB CA" );
-            }
         
-        }
-        module.C_Finalize ( null );
-        
-        } catch (IOException e) {
-            System.out.println ( "I/O error: " + e );
-        }
-        catch (PKCS11Exception e) {
-            System.out.println ( "PKCS#11 error: " + e );
-        }
     }
 }
+
+
 

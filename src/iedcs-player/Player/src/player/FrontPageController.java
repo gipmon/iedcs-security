@@ -1,5 +1,8 @@
 package player;
 
+import iaik.pkcs.pkcs11.wrapper.CK_TOKEN_INFO;
+import iaik.pkcs.pkcs11.wrapper.PKCS11;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Connector;
 import player.api.Utils;
 import player.api.Requests;
 import player.api.Result;
@@ -23,12 +26,15 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import org.json.JSONException;
 import player.security.CitizenCard;
+import iaik.pkcs.pkcs11.wrapper.*;
+import player.security.ccCertValidate;
+import player.security.ccCertValidate.ccException;
 
 public class FrontPageController implements Initializable {
-    @FXML private TextField login_email = new TextField();
-    @FXML private PasswordField login_password = new PasswordField();
-    @FXML private Button login_button = new Button();
-    @FXML private Button citizen_card_login = new Button();
+    @FXML private static TextField login_email = new TextField();
+    @FXML private static PasswordField login_password = new PasswordField();
+    @FXML private static Button login_button = new Button();
+    @FXML private static Button citizen_card_login = new Button();
 
     @FXML
     private void handleRegister(ActionEvent event) {
@@ -43,6 +49,36 @@ public class FrontPageController implements Initializable {
     private void handleCitizenCardLogin(ActionEvent event){
         login_button.setDisable(true);
         //citizen_card_login.setDisable(true);
+        try{
+        // Select the correct PKCS#11 module for dealing with Citizen Card tokens
+            PKCS11 module = PKCS11Connector.connectToPKCS11Module ( System.getProperty ( "os.name" ).contains ( "Mac OS X" ) ?
+                                                                    "pteidpkcs11.dylib" : "pteidpkcs11" );
+
+            
+            // Find all Citizen Card tokens
+            long[] tokens = module.C_GetSlotList(true);
+
+            if (tokens.length == 0) {
+                handleException("No card inserted" );
+                return;
+            }
+
+            // Perform a challenge-response operation using the authentication key pair
+            for (int i = 0; i < tokens.length; i++) {
+                CK_TOKEN_INFO tokenInfo = module.C_GetTokenInfo ( tokens[i] );
+                if (String.valueOf ( tokenInfo.label ).startsWith ( "CARTAO DE CIDADAO" )) {
+                    ccCertValidate.validateCertificate ( module, tokens[i], "CITIZEN AUTHENTICATION CERTIFICATE", "AUTHENTICATION SUB CA" );
+                }
+
+            }
+        } catch (ccException ex) {
+            handleException(ex.getMessage());
+            return;
+        } catch (IOException | PKCS11Exception ex) {
+            Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Throwable ex) {
+            Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         Result r = Requests.login_with_cc();
         if(r == null | r.getStatusCode()!=200){
@@ -71,6 +107,7 @@ public class FrontPageController implements Initializable {
                 Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
         
         login_button.setDisable(false);
         citizen_card_login.setDisable(false);
@@ -125,8 +162,18 @@ public class FrontPageController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        System.out.println(System.getProperty("java.library.path"));
 
-    }    
+    }   
+    
+    public static void handleException(String e){
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Wait!");
+        alert.setHeaderText(null);
+        alert.setContentText(e);
+        alert.showAndWait();
+        login_button.setDisable(false);
+        citizen_card_login.setDisable(false); 
+    }
+    
     
 }

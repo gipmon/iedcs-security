@@ -1,6 +1,9 @@
 package player;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import player.security.PlayerKeyStore;
 import java.security.Key;
@@ -45,9 +48,9 @@ public class Player extends Application {
             */
             
             // verificar assinatura
-            /*
-            String s = null;
             
+            String s = null;
+            /*
             File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             Utils.println(codeBase.getPath());
             Process p = Runtime.getRuntime().exec("jarsigner -verify -keystore JarSignature.KeyStore " + codeBase.getPath());

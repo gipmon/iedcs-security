@@ -1,5 +1,8 @@
 package player.security;
 
+import iaik.pkcs.pkcs11.wrapper.CK_TOKEN_INFO;
+import iaik.pkcs.pkcs11.wrapper.PKCS11;
+import iaik.pkcs.pkcs11.wrapper.PKCS11Connector;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -39,6 +42,9 @@ import org.json.JSONObject;
 import player.api.Requests;
 import player.api.Result;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
+import iaik.pkcs.pkcs11.wrapper.*;
+import static player.security.ccCertValidate.validateCertificate;
+
 
 public class CitizenCard {
     
@@ -80,7 +86,7 @@ public class CitizenCard {
             private_key = ks.getKey("CITIZEN AUTHENTICATION CERTIFICATE", null);
             
             X509Certificate cert = (X509Certificate) ks.getCertificate("CITIZEN AUTHENTICATION CERTIFICATE");
-            cert.checkValidity();
+            
             cert.getSubjectDN();
             
             String[] alias = cert.getSubjectDN().getName().split(",");
@@ -101,7 +107,7 @@ public class CitizenCard {
         } catch (KeyStoreException ex) {
             cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException | UnrecoverableKeyException | CertificateExpiredException | CertificateNotYetValidException ex) {
+        } catch (NoSuchAlgorithmException | UnrecoverableKeyException ex) {
             cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex){
@@ -148,7 +154,7 @@ public class CitizenCard {
         return SERIALNUMBER;
     }
     
-    public static HashMap<String, String> getRandomAndSign(){
+    public static HashMap<String, String> getRandomAndSign() throws IOException{
         reloadPEM();
         try {
             canceled = false;
@@ -164,13 +170,17 @@ public class CitizenCard {
             sig.initSign((PrivateKey) private_key);
 
             sig.update(parameters.get("random").getBytes());
+            long [] tokens;
+        
             
+        
             byte signed[] = sig.sign();
-
 
             parameters.put("sign", new String(Base64.getEncoder().encode(signed)));
             return parameters;
-        }catch(IOException | JSONException | NoSuchAlgorithmException | InvalidKeyException | SignatureException ex){
+        }catch (SignatureException ex) {
+            Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);            
+        }catch(JSONException | NoSuchAlgorithmException | InvalidKeyException ex){
             cc_is_inserted = false;
             Logger.getLogger(CitizenCard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ProviderException ex) {
