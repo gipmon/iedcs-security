@@ -38,6 +38,8 @@ import player.api.Requests;
 import player.api.Result;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 import iaik.pkcs.pkcs11.wrapper.*;
+import player.FrontPageController;
+import static player.FrontPageController.handleException;
 import static player.security.ccCertValidate.validateCertificate;
 
 
@@ -59,6 +61,36 @@ public class CitizenCard {
     
     private static void reloadPEM(){
         try {
+            try{
+                // Select the correct PKCS#11 module for dealing with Citizen Card tokens
+                PKCS11 module = PKCS11Connector.connectToPKCS11Module ( System.getProperty ( "os.name" ).contains ( "Mac OS X" ) ?
+                                                                        "pteidpkcs11.dylib" : "pteidpkcs11" );
+
+
+                // Find all Citizen Card tokens
+                long[] tokens = module.C_GetSlotList(true);
+
+                if (tokens.length == 0) {
+                    handleException("No card inserted" );
+                    return;
+                }
+
+                // Perform a challenge-response operation using the authentication key pair
+                for (int i = 0; i < tokens.length; i++) {
+                    CK_TOKEN_INFO tokenInfo = module.C_GetTokenInfo ( tokens[i] );
+                    if (String.valueOf ( tokenInfo.label ).startsWith ( "CARTAO DE CIDADAO" )) {
+                        ccCertValidate.validateCertificate ( module, tokens[i], "CITIZEN AUTHENTICATION CERTIFICATE", "AUTHENTICATION SUB CA" );
+                    }
+
+                }
+            } catch (ccCertValidate.ccException ex) {
+                handleException(ex.getMessage());
+                return;
+            } catch (IOException | iaik.pkcs.pkcs11.wrapper.PKCS11Exception ex) {
+                Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Throwable ex) {
+                Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+            }
             String f = "citizen/CitizenCard.cfg";
             p = new sun.security.pkcs11.SunPKCS11(f);
             Security.addProvider(p);
