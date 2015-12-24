@@ -2,8 +2,6 @@ package player.security;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.math.BigInteger;
-import java.net.ProtocolException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -13,19 +11,16 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.ProviderException;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.callback.Callback;
@@ -38,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import player.api.Requests;
 import player.api.Result;
-import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 public class CitizenCard {
     

@@ -13,14 +13,14 @@ RUN pip install -r requirements.txt
 RUN echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/servername.conf
 RUN sudo a2enconf servername
 
-ADD ./Apache/docker.conf /etc/apache2/sites-available/docker.conf
-
-RUN a2dismod deflate
-RUN a2ensite docker.conf
-
 RUN a2dissite 000-default.conf
 RUN sudo rm /etc/apache2/sites-available/000-default.conf
 
+RUN a2dismod deflate
+
 RUN sudo a2enmod rewrite
+
+ADD ./Apache/docker.conf /etc/apache2/sites-available/docker.conf
+RUN a2ensite docker.conf
 
 ADD site /var/www

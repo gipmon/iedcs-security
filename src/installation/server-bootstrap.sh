@@ -29,6 +29,11 @@ docker exec apache service apache2 start
 # docker ps -a
 # docker rm -f $container_id
 
+#IPTABLES
+iptables -I FORWARD  --dport 8002 -j DROP
+iptables -I DOCKER -p tcp --dport 8002 -j DROP
+iptables -I INPUT -p tcp --dport 8002 -j DROP
+
 echo "192.168.33.10   iedcs.rafaelferreira.pt" > /etc/hosts
 
 echo "ServerName localhost" | sudo tee /etc/apache2/conf-available/servername.conf
