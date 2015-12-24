@@ -1,6 +1,6 @@
 FROM ubuntu
 
-RUN apt-get update && apt-get install -y python python-pip python-dev apache2 libapache2-mod-wsgi
+RUN apt-get update && apt-get install -y python python-pip python-dev apache2 libapache2-mod-wsgi encfs
 
 RUN mkdir -p /var/www
 
@@ -24,3 +24,9 @@ ADD ./Apache/docker.conf /etc/apache2/sites-available/docker.conf
 RUN a2ensite docker.conf
 
 ADD site /var/www
+
+ADD ./encfs.sh /opt/encfs.sh
+
+RUN chown www-data:www-data db.sqlite3
+RUN chown www-data:www-data -R media/
+RUN chown www-data. .
