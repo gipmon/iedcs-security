@@ -27,6 +27,9 @@ import javafx.scene.control.Alert.AlertType;
 import org.json.JSONException;
 import player.security.CitizenCard;
 import iaik.pkcs.pkcs11.wrapper.*;
+import java.util.Iterator;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import player.security.ccCertValidate;
 import player.security.ccCertValidate.ccException;
 
@@ -86,7 +89,20 @@ public class FrontPageController implements Initializable {
                 Alert alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("Wait!");
                 alert.setHeaderText(null);
-                alert.setContentText("Please enter your citizen card and re-open the Player!");
+                JSONObject object = new JSONObject(r);
+                JSONArray b = object.names();
+                JSONObject c = null;
+                try {
+                    c = object.toJSONArray(b).getJSONObject(0);
+                } catch (JSONException ex) {
+                    Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                //String a = b.next().toString();
+                try {
+                    alert.setContentText(c.getString("message"));
+                } catch (JSONException ex) {
+                    Logger.getLogger(FrontPageController.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 alert.showAndWait();
                 login_button.setDisable(false);
                 citizen_card_login.setDisable(false);     
