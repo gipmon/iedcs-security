@@ -1,9 +1,34 @@
 #!/usr/bin/env bash
 
 apt-get update
-apt-get install -y docker.io apache2 libapache2-mod-proxy-html libxml2-dev
+apt-get install -y docker.io apache2 libapache2-mod-proxy-html libxml2-dev encfs
 
 cd /vagrant/Docker/python/site
+
+mkdir -p /opt/media-webstore/
+mv /vagrant/Docker/python/site/media/ /vagrant/Docker/python/site/media-tmp/
+mkdir -p /vagrant/Docker/python/site/media/
+
+password="p4g1rr"
+
+encfs -S -o nonempty /opt/media-webstore/ /vagrant/Docker/python/site/media/ << EOF
+x
+1
+256
+1024
+1
+no
+yes
+no
+8
+yes
+$password
+$password
+EOF
+
+cp -r /vagrant/Docker/python/site/media-tmp/* /vagrant/Docker/python/site/media/
+sleep 2
+rm -rf /vagrant/Docker/python/site/media-tmp/
 
 # database
 if [ ! -f db.sqlite3 ]; then
@@ -19,15 +44,11 @@ fi
 
 cd /vagrant/Docker/python
 docker build -t ubuntu/iedcs .
-docker run -d -it -p 8002:80 --name apache -t ubuntu/iedcs
+docker run -d -it --cap-add SYS_ADMIN -p 8002:80 --name apache -t ubuntu/iedcs
 docker start apache
+docker exec apache sh /opt/encfs.sh
+docker exec apache rm /opt/encfs.sh
 docker exec apache service apache2 start
-
-# docker exec apache sh /opt/encfs.sh
-
-# to remove one container:
-# docker ps -a
-# docker rm -f $container_id
 
 #IPTABLES
 iptables -I FORWARD  --dport 8002 -j DROP
