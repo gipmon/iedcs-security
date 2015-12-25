@@ -330,6 +330,99 @@ Outra possibilidade seria um atacante/cliente que usasse ferramentas de análise
 \end{itemize}
 
 \newpage
+
+\section{Segunda entrega, síntese de melhorias}
+
+um género de introdução para a segunda entrega do trabalho <====
+
+\section{Pequenas melhorias implementadas}
+
+\subsection{New Secret Key}
+Foram tidas em conta algumas considerações sobre o servidor Django. Muitas aplicações Django mantêm a "Secret Key" \footnote{\label{url1} \url{https://docs.djangoproject.com/en/1.9/ref/settings/\#secret-key}} a inicial que vem com outras instalações \footnote{\label{url1} \url{http://exfiltrated.com/research-Instagram-RCE.php}} da mesma framework, no entanto, para evitar algum problema, decidiu-se gerar uma nova chave privada para este projeto. 
+
+\subsection{Django Rest Framework}
+A DRF\footnote{\label{url1} \url{http://www.django-rest-framework.org/}} tem uma "browsable API"\footnote{\label{url1} \url{http://www.django-rest-framework.org/topics/browsable-api/}} que é usada para o utilizador que pretender  usar a API poder procurar, no entanto expor dessa forma endpoints não é aconselhável, por isso mesmo, foi retirado.
+
+
+\subsection{Melhoria do Debug do Player}
+Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falha-se fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham ficado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, sendo isto não aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
+
+\subsection{Copy/ Paste da janela do Player}
+ALGO
+
+
+\section{Confinamento}
+Foram realizadas várias tentativas para fazer o confinamento da aplicação e limitar ao máximo o que a aplicação poderia fazer caso fosse comprometida e executasse código malicioso. Para isso, inicialmente, realizaram-se várias tentativas para implementar uma solução com \textit{chroot} e para a solução final usou-se Docker.
+
+\subsection{Chroot with Apache}
+O mod\_wsg\footnote{\label{url1} \url{https://code.google.com/p/modwsgi/}} na versão 0300\footnote{\label{url1} \url{https://code.google.com/p/modwsgi/wiki/ChangesInVersion0300}} anunciou a implementação de uma diretiva que permitia fazer o chroot de um \textit{WSGIProcess}. No entanto, esta funcionalidade está muito pouco documentada \footnote{\label{url1} \url{https://groups.google.com/d/msg/modwsgi/sOrtcm7JV50/YmriFHUmHI8J}}.
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=100mm,scale=1]{apache_chroot_config.png}
+ \caption{\\Parte da implementação do chroot}
+ \label{fig:apache_chroot_config}
+\end{figure}
+
+No entanto, tentou-se a implementação, representada na figura \ref{fig:apache_chroot_config}, usando esta diretiva, os resultados obtidos usando a configuração, estão apresentados na figura ~ 
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=100mm,scale=1]{import_error.png}
+ \caption{\\Import Error: No module named site}
+ \label{fig:import_Error}
+\end{figure}
+
+Com isto, foi abandonada a implementação de chroot com o apache para impedir que o python executa-se código de forma maliciosa e procurou-se outra solução.
+
+\newpage
+\subsection{Docker}
+Para obter resultados semelhantes a um chroot pensou-se em usar o Docker. No entanto não se pode pensar só em usar Docker, teve-se de pensar numa arquitetura para o servidor e o contentor docker. Para isso, a principal preocupação, foi em ter as chaves privadas do servidor usadas para o HTTPS, fora do contentor, retirando assim possibilidades a que o script python, que disponibiliza o serviço web tivesse possibilidades de aceder a tais chaves.
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=60mm,scale=1]{docker.pdf}
+ \caption{\\Arquitetura servidor e docker container}
+ \label{fig:docker_c}
+\end{figure}
+
+Quando um cliente acede pelo browser ao site da loja, é-lhe fornecido um certificado assinado pela COMODO, Free SSL, que o cliente usará para navegar no site sem problemas. Este pedido, que é negociado com o Apache no servidor principal, é depois redirecionado por HTTP para o Docker container que é responsável por receber e tratar os pedidos junto com o código python (Django). Desta forma, como os pedidos apenas são tratados no container e a negociação para o HTTPS é negociada fora do container, as chaves privadas estão seguras em relação ao container.
+
+Já quando o Player comunica com o servidor, apenas aceita pedidos do servidor que lhe apresente um certificado específico que foi anteriormente assinado pela nossa entidade certificadora criada para o efeito. Estes pedidos são depois encaminhados de igual modo para o container Docker.
+
+\subsubsection{Utilização:}
+Quando se inicia a máquina depois de fazer um "vagrant halt" deve-se executar o script "/vagrant/start-up.sh". 
+
+\subsubsection{Comportamentos observados}
+Foram realizados alguns testes com código python inserido de forma intencional no código do servidor e observou-se:
+
+\begin{itemize}
+\item Apenas tem privilégios para criar diretórios e ficheiros em pastas que pertençam ao utilizador ou grupo "www-data".
+\item Não tem acesso as chaves privadas usadas para o HTTPS
+\item Tem acesso à chave do Player e a todas as chaves públicas de cada device
+\item Consegue ver e listar os diretórios do docker container
+\item Consegue aceder à base de dados
+\end{itemize}
+
+\subsubsection{Proibição de determinados URL no Apache}
+
+Foi tida em conta a preocupação para que o utilizador apenas conseguisse usar os endpoints para o Player na porta destinada isso, a porta 8080, para isso foi criada uma regra na porta 443 para que pedidos para os endpoints que são utilizados pelo Player fossem descartados e não fosse feito o forward para o Docker container.
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=60mm,scale=1]{player_denied.png}
+ \caption{\\Proibição de acesso a endpoints do player na porta 443}
+ \label{fig:docker_c}
+\end{figure}
+
+\subsubsection{Acesso ao container Docker apenas de dentro}
+
+Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fazer o forward dos pedidos HTTP) usou-se as iptables do Ubuntu para fazer deny a todos os pedidos para a porta 8002. No entanto, como estamos a usar um "Host-only adapter" o IP que o host da máquina virtual tem é o mesmo da máquina e impossibilitou que fosse testado de maneira simples.
+\shellcmd{iptables -I FORWARD  --dport 8002 -j DROP}
+\shellcmd{iptables -I DOCKER -p tcp --dport 8002 -j DROP}
+\shellcmd{iptables -I INPUT -p tcp --dport 8002 -j DROP}
+
+\newpage
 \section{Conclusão}
 
 Esta conclusão não é uma conclusão final, pois este projeto será realizado em duas partes.
