@@ -419,7 +419,6 @@ Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem 
 
 Uma nova funcionalidade que não tínhamos disponibilizado na primeira entrega é a possibilidade de fazer logout para trocar de conta na nossa aplicação do Player.
 
-
 \section{Confinamento}
 Foram realizadas várias tentativas para fazer o confinamento da aplicação e limitar ao máximo o que a aplicação poderia fazer caso fosse comprometida e executasse código malicioso. Para isso, inicialmente, realizaram-se várias tentativas para implementar uma solução com \textit{chroot} e para a solução final usou-se Docker.
 
@@ -529,6 +528,27 @@ Numa última alternativa, foram colocados numa KeyStore todos os certificados ob
 
 Depois de vários dias perdidos a investir nesta funcionalidade, decidiu-se desistir da ideia, de forma a ser possível avançar na realização do trabalho. Para isto através de uma classe criada pelo Professor André Zúquete e editada por nós de forma a adaptar-se ao nosso projeto, antes de cada pedido ao servidor onde é utilizado o Cartão de Cidadão, este é validado, percorrendo toda a cadeia de certificados e CRL’s de forma a verificar que nada no cartão está fora de validade, ou foi revogado.
 Posto isto, caso o cartão seja verificado com sucesso, a operação desejada é efectuada, caso contrário é apresentado o erro ao utilizador.
+
+\newpage
+\section{Instalação}
+
+Para uso e instalação do sistema, criou-se uma pasta /installation que tem um ficheiro \textit{Vagrantfile} que permite criar um servidor ubuntu trusty 64bits que cria uma pasta partilhada em /var/www que irá servir para lançar o servidor IEDCS com recurso ao Apache2. O ficheiro \textit{server-bootstrap.sh} servirá para instalar todas as bibliotecas necessárias, todos os pacotes do python, a configuração do Apache2 para o site que está no ficheiro \textit{iedcs.rafaelferreira.pt.conf} e \textit{default-ssl.conf}, também para instalar os certificados necessários para o HTTPS nas pastas usadas para esse efeito e para criar a base de dados com os livros e restrições exemplo.
+	
+O ficheiro \textit{iedcs.rafaelferreira.pt.conf} serve apenas para redirecionar todos os pedidos HTTP para HTTPS. O ficheiro \textit{default-ssl.conf} tem todas as configurações necessárias para o uso de HTTPS e para usar o modWSGI do Apache2 para o Django.
+
+Criou-se um package de settings para o Django para ter definições de development e outras de servidor. Usando o hostname do servidor sabe-se em que modo deve estar, sendo assim nesse servidor iniciado com Vagrant o servidor estará em modo produção, ou seja, não irá lançar output de debug para o utilizador.
+
+O \textit{install{\_}cert.sh} é usado para criar uma keystore que será usada pelo Java para armazenar os certificados em que ele confia ao usar HTTPS.	
+	
+Para usar o servidor, além de ter o \href{https://www.vagrantup.com/downloads.html}{Vagrant} intalado, é apenas necessário fazer:
+\shellcmd{vagrant up}
+
+A password caso seja pedida é sempre vagrant e para aceder à máquina é apenas necessário fazer: \shellcmd{vagrant ssh}
+
+O site pode ser acessível em: \url{https://iedcs.rafaelferreira.pt/}
+
+Para fazer download do Player apenas é preciso registar na webstore e depois clicar em "Player" que será feito o download do Player. A implementação do Player está apenas disponível para Mac OS X, com uma aplicaçãnative application  tendo como base uma aplicação JavaFX. Testado com o java version "1.8.0{\_}60".
+
 
 \newpage
 \section{Conclusão}
