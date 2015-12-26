@@ -9,6 +9,7 @@ import rsa
 import os
 import base64
 
+from security.models import ContentCiphered
 from .permissions import UserIsUser, IsAccountOwner
 from .models import Account, TokenForCitizenAuthentication
 from .serializers import AccountSerializer, PasswordSerializer, AccountPEMSerializer, AccountPEMAuthenticateSerializer, \
@@ -228,6 +229,8 @@ class SavePEMCitizenAuthentication(mixins.CreateModelMixin, viewsets.GenericView
             disassociate = True
             serializer = AccountPEMUpdateSerializer(data=request.data)
         if serializer.is_valid():
+            ContentCiphered.objects.filter(user=request.user).delete()
+
             if disassociate is False:
                 public_key = serializer.data["public_key"]
 
