@@ -341,10 +341,10 @@ um género de introdução para a segunda entrega do trabalho <====
 Foram tidas em conta algumas considerações sobre o servidor Django. Muitas aplicações Django mantêm a "Secret Key" \footnote{\label{url1} \url{https://docs.djangoproject.com/en/1.9/ref/settings/\#secret-key}} a inicial que vem com outras instalações \footnote{\label{url1} \url{http://exfiltrated.com/research-Instagram-RCE.php}} da mesma framework, no entanto, para evitar algum problema, decidiu-se gerar uma nova chave privada para este projeto. 
 
 \subsection{Django Rest Framework}
-A DRF\footnote{\label{url1} \url{http://www.django-rest-framework.org/}} tem uma "browsable API"\footnote{\label{url1} \url{http://www.django-rest-framework.org/topics/browsable-api/}} que é usada para o utilizador que pretender  usar a API poder procurar, no entanto expor dessa forma endpoints não é aconselhável, por isso mesmo, foi retirado.
+A DRF\footnote{\label{url1} \url{http://www.django-rest-framework.org/}} tem uma "browsable API"\footnote{\label{url1} \url{http://www.django-rest-framework.org/topics/browsable-api/}} que é usada para o utilizador que pretender  usar a API conseguir procurar, no entanto expor dessa forma endpoints não é aconselhável, por isso mesmo, foi retirado.
 
 \subsection{Melhoria do Debug do Player}
-Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falha-se fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham ficado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, sendo isto não aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
+Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falha-se, fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham ficado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, sendo isto não aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
 
 \subsection{Diffie Hellman na visualização de um livro}
 
@@ -368,19 +368,14 @@ Na implementação da primeira entrega do projeto, era possível o copy/paste do
 
 \begin{figure}[!htb]
 \center
- \includegraphics[width=100mm,scale=1]{Associate.png}
- \caption{\\Associar Cartão de Cidadão}
+ \includegraphics[width=50mm,scale=1]{Associate.png}
+ \includegraphics[width=50mm,scale=1]{AssociateError.png}
+ \caption{\\Associar Cartão de Cidadão e erro ao associar}
  \label{fig:associate}
 \end{figure}
 
-A cada conta é possível associar um Cartão de Cidadão, para isso o utilizador na sua página pessoal do Player deverá clicar no botão de "Associate Citizen Card" onde lhe será pedido, como manobra de segurança, que coloque a sua password da conta de utilizador (Figura  \ref{fig:associate}). Para isto, no servidor é guardada a chave pública do Cartão de Cidadão e o seu número de identificação, que deverá ser único tal como mostra a figura \ref{fig:errorassociate}. Depois da associação do cartão é efetuado logout automaticamente, e no próximo login aparecerá um botão de "Disassociate Citizen Card".
+A cada conta é possível associar um Cartão de Cidadão, para isso o utilizador na sua página pessoal do Player deverá clicar no botão de "Associate Citizen Card" onde lhe será pedido, como medida de segurança, que coloque a sua password da conta de utilizador (Figura \ref{fig:associate}). Depois disto, no servidor é guardada a chave pública do Cartão de Cidadão e o seu número de identificação, que deverá ser único tal como mostra a figura \ref{fig:associate}. Depois da associação do cartão é efetuado logout automaticamente, e no próximo login aparecerá um botão de "Disassociate Citizen Card".
 
-\begin{figure}[!htb]
-\center
- \includegraphics[width=100mm,scale=1]{AssociateError.png}
- \caption{\\Erro ao associar o mesmo cartão de cidadão a outra conta}
- \label{fig:errorassociate}
-\end{figure}
 
 \newpage
 \subsection{Desassociar Cartão de Cidadão de uma conta}
@@ -393,31 +388,26 @@ A cada conta é possível associar um Cartão de Cidadão, para isso o utilizado
 \end{figure}
 
 É possível, depois de associar um cartão a uma conta, desassociar o mesmo. Para esta função e como medida de segurança, é também pedido ao utilizador que coloque a sua password da conta de utilizador (Figura \ref{fig:disassociate}). É removida então a chave pública do Cartão de Cidadão e o número de identificação do mesmo no servidor. Posto isto é efetuado logout automaticamente, e no próximo login será possível associar um outro cartão.
+
 \newpage
 \subsection{Login com o Cartão de Cidadão}
 
 Depois de se associar um cartão passa a ser possível fazer login com o cartão de cidadão. 
 
-Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem de erro para o utilizador como se pode ver na figura \ref{fig:nocard}. Se um dado cartão não estiver associado a nenhuma conta de utilizador será então lançada a mensagem de erro que está na figura \ref{fig:noaccount}.
+Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem de erro para o utilizador como se pode ver na figura \ref{fig:nocard}. Se um dado cartão não estiver associado a nenhuma conta de utilizador será então lançada a mensagem de erro que está na figura \ref{fig:nocard}.
 
 \begin{figure}[!htb]
 \center
- \includegraphics[width=100mm,scale=1]{Nocard.png}
- \caption{\\Nenhum Cartão de Cidadão inserido}
+ \includegraphics[width=60mm,scale=1]{Nocard.png}
+ \includegraphics[width=60mm,scale=1]{Noaccount.png}
+ \caption{\\Nenhum Cartão de Cidadão inserido ou associado}
  \label{fig:nocard}
-\end{figure}
-
-\begin{figure}[!htb]
-\center
- \includegraphics[width=100mm,scale=1]{Noaccount.png}
- \caption{\\Nenhuma conta com o Cartão de Cidadão associado}
- \label{fig:noaccount}
 \end{figure}
 
 \newpage
 \subsection{Logout}
 
-Uma nova funcionalidade que não tínhamos disponibilizado na primeira entrega é a possibilidade de fazer logout para trocar de conta na nossa aplicação do Player.
+Uma nova funcionalidade que não se tinha implementado na primeira entrega, é a possibilidade de fazer logout para trocar de conta ou sair dela no Player.
 
 \section{Confinamento}
 Foram realizadas várias tentativas para fazer o confinamento da aplicação e limitar ao máximo o que a aplicação poderia fazer caso fosse comprometida e executasse código malicioso. Para isso, inicialmente, realizaram-se várias tentativas para implementar uma solução com \textit{chroot} e para a solução final usou-se Docker.
@@ -489,7 +479,7 @@ Apesar de não ter sido desenvolvido nenhuma solução para o isolamento da chav
 
 \subsubsection{Acesso ao container Docker apenas de dentro do servidor}
 
-Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fazer o forward dos pedidos HTTP) usou-se as iptables do Ubuntu para fazer deny a todos os pedidos para a porta 8002. No entanto, como estamos a usar um "Host-only adapter" o IP que o host da máquina virtual tem é o mesmo da máquina e impossibilitou que fosse testado de maneira simples.
+Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fazer o forward dos pedidos HTTP) usou-se as iptables do Ubuntu para fazer deny a todos os pedidos para a porta 8002. No entanto, como é usado um "Host-only adapter", o IP que o host e a máquina virtual têm são o mesmo, o impossibilitou que fosse testado de maneira mais simples.
 \shellcmd{iptables -I FORWARD  --dport 8002 -j DROP}
 \shellcmd{iptables -I DOCKER -p tcp --dport 8002 -j DROP}
 \shellcmd{iptables -I INPUT -p tcp --dport 8002 -j DROP}
@@ -499,7 +489,7 @@ Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fa
 Sendo este um requisito explícito do trabalho, os resultados não foram os esperados, pelo menos com a implementação que se foi conseguindo fazer. Usando o Java não foi conseguido negociar de forma correta o TLS para que obrigando o TLS client a autenticar-se junto do servidor, este se autenticasse.
 
 \subsection{Jar sign}
-Para que não seja possível alterações no código fonte do nosso Player, o ficheiro jar deste foi assinado por uma chave guardada na KeyStore JarSignature.KeyStore, de forma a que apenas seja possível correr o código do Player disponibilizado por nós e não por outra fonte desconhecida.
+Para que não seja possível alterações no código fonte do  Player, o ficheiro jar deste foi assinado por uma chave guardada na KeyStore JarSignature.KeyStore, de forma a que apenas seja possível correr o código do Player disponibilizado por nós e não por outra fonte desconhecida.
 
 \begin{figure}[!htb]
 \center
@@ -512,50 +502,39 @@ Para que não seja possível alterações no código fonte do nosso Player, o fi
 Se a assinatura é verificada e validada o programa corre sem qualquer problema, caso contrário, é impossibilitada a execução do mesmo por parte do utilizador.
 
 \subsection{Certificados assinados pela CA do IEDCS}
-Apesar das sucessivas tentativas que foram feitas para que a autenticação da negociação do TLS fosse efetuada com sucesso usando Java, não conseguimos implementar algo que o fizesse. Outro problema que teríamos se optássemos por usar certificados assinados pela CA do IEDCS é que teríamos de gerar uma chave única do Player junto com o Device para cada instalação e enviar a sua chave pública para o servidor que assinaria toda as chaves. Achamos que essa implementação teria poucos benefícios para além do que já foi implementado.
+Apesar das sucessivas tentativas que foram feitas para que a autenticação da negociação do TLS fosse efetuada com sucesso usando Java, não foi possível implementar algo que o fizesse. Outro problema que se teria se optasse por usar certificados assinados pela CA do IEDCS é que seria necessário gerar uma chave única do Player junto com o Device para cada instalação e enviar a sua chave pública para o servidor que assinaria toda as chaves. Concluiu-se  que essa implementação teria poucos benefícios para além do que já foi implementado.
 
+No entanto foi criada a nossa Certificate Authority para emitir certificados para cada chaves de cada versão do Player. Estas são usadas para assinar cada livro que é enviado para o player desde o servidor. A chave privada está no servidor e a chave pública está em cada implementação do Player, hardcoded para que não seja possível alterá-la, dado que o player está assinado.
+
+\subsubsection{Encrypt then MAC}
+
+A assinatura do conteúdo do livro é feita fazendo uma síntese usando o algoritmo SHA-256 do conteúdo cifrado e depois usando a chave privada do Player é assinada essa síntese e enviada junto com a mensagem do Player. Por sua vez, o Player, usando a chave pública irá verificar se o conteúdo que recebeu corresponde ao que foi assinado.
+Este mecanismo só pode ser comprometido se a private key do player saia do servidor ou alguém tenha acesso de forma indesejada a esta. Se um atacante conseguir meter no meio e pretender alterar o conteúdo da mensagem precisa da chave privada e pública para alterar o conteúdo além de todo o outro processo de cifra que já foi desenvolvido. 
+A chave pública que está guardada no código fonte do Player não pode ser alterada devido ao Jar Sign que se implementou.
 
 \subsection{Autenticação usando o Cartão de Cidadão}
-Um dos objectivos do nosso projeto era a existência de autenticação no servidor através do Cartão de Cidadão, tal como se tinha feito nas aulas com Web Authentication.
-Começou-se por fazer como nas aulas práticas, através do Browser, sendo que foi logo conseguido sem qualquer problema, contudo não era o que se queria. Passou-se então à implementação desta autenticação no lado do Player, onde foram efetuadas muitas tentativas de forma a que tal fosse possível. 
-Para esta autenticação é sempre necessária a keystore que possui o certificado do Servidor e a keystore PKCS11 proveniente do Cartão de Cidadão utilizada para a autenticação através do mesmo e que contém os certificados e as chaves do cartão.
+
+
+\subsection{Identificação do cidadão junto do servidor}
+Um dos objectivos do projeto era a identificação do cidadão no servidor usando o TLS Handshake e enviando uma "Client Authentication", depois o servidor verificaria se a autenticação ou identificação fornecida estaria correta. Pensou-se isto usando a "Web Authentication" tal como se tinha feito nas aulas.
+Começou-se por fazer como nas aulas práticas, através do Firefox, sendo que foi logo conseguido sem qualquer problema, contudo não era o que se queria, pois queria-se que houvesse uma autenticação de ambas as partes no negociamento do TLS. 
+Passou-se então à implementação desta autenticação no lado do Player, onde foram efetuadas muitas tentativas de forma a que tal fosse possível. 
+Para esta autenticação idealizada, em que ambas as partes se autenticam, é sempre necessária a KeyStore que possui o certificado do Servidor e a KeyStore PKCS11 proveniente do Cartão de Cidadão utilizada para a autenticação através do mesmo e que contém os certificados e as chaves do cartão.
 É necessário ainda a criação de um TrustManager que contém os certificados confiáveis e uma KeyManager, utilizada para certificados de autenticação.
 O primeiro problema surgiu quando na criação de um SSLContext se enviava um array de TrustManager, e apenas o primeiro elemento era utilizado, sendo que quando era carregado primeiro o certificado do Servidor, os pedidos que não requeriam autenticação do cartão de cidadão era efetuados com sucesso, contudo os que requeriam autenticação, davam sempre um erro de "handshake\_failure", pois os certificados do Cartão de Cidadão não estavam no primeiro elemento do array de TrustManager. Quando se colocava os certificados do Cartão de Cidadão no primeiro elemento do array e o certificado do Servidor no segundo, então obtinhamos outro erro que não nos permitia sequer fazer pedidos ao servidor, mais uma vez porque seriam apenas utilizados os certificados do primeiro elemento do array.
 Tentou-se então que o certificado do Servidor estivesse na KeyStore da JVM, mas depois de se ter colocado o certificado nessa mesma KeyStore o erro permaneceu, não conseguindo aceder ao Servidor.
 Com isto juntaram-se então os certificados todos numa KeyStore, de forma a existir apenas um TrustManager e assim carregar os certificados todos. Com isto deixou-se de ter o erro de handshake failure e passou-se a ter um de erro na verificação da assinatura, que segundo o professor, seria porque a cadeia de certificados não estaria completa.
-Posto isto pensou-se que poderia ser o facto de estarmos a juntar tudo numa única keystore, e então criámos o nosso próprio TrustManager que juntava os certificados de ambas as KeyStores e verificava as cadeias de certificação, contudo o erro persistia.
+Posto isto pensou-se que poderia ser o facto de se estar a juntar tudo numa única keystore, e então criou-se um TrustManager que juntava os certificados de ambas as KeyStores e verificava as cadeias de certificação, contudo o erro persistia.
 Numa última alternativa, foram colocados numa KeyStore todos os certificados obtidos pela MakeFile da aula prática que obtinha todos os certificados referentes ao Cartão de Cidadão, assim a cadeia à partida e juntando com os certificados do Cartão, estaria completa. No entanto o erro permaneceu.
 
-Depois de vários dias perdidos a investir nesta funcionalidade, decidiu-se desistir da ideia, de forma a ser possível avançar na realização do trabalho. Para isto através de uma classe criada pelo Professor André Zúquete e editada por nós de forma a adaptar-se ao nosso projeto, antes de cada pedido ao servidor onde é utilizado o Cartão de Cidadão, este é validado, percorrendo toda a cadeia de certificados e CRL’s de forma a verificar que nada no cartão está fora de validade, ou foi revogado.
+\subsection{Validação do cartão de cidadão usado pelo utilizador}
+Depois de vários dias perdidos a investir nesta funcionalidade, decidiu-se desistir da ideia, de forma a ser possível avançar na realização do trabalho. Para isto através de uma classe criada pelo Professor André Zúquete e editada por nós de forma a adaptar-se ao projeto, antes de cada pedido ao servidor onde é utilizado o Cartão de Cidadão, este é validado, percorrendo toda a cadeia de certificados e CRL’s de forma a verificar que nada no cartão está fora de validade, ou foi revogado.
 Posto isto, caso o cartão seja verificado com sucesso, a operação desejada é efectuada, caso contrário é apresentado o erro ao utilizador.
 
 \newpage
-\section{Instalação}
-
-Para uso e instalação do sistema, criou-se uma pasta /installation que tem um ficheiro \textit{Vagrantfile} que permite criar um servidor ubuntu trusty 64bits que cria uma pasta partilhada em /var/www que irá servir para lançar o servidor IEDCS com recurso ao Apache2. O ficheiro \textit{server-bootstrap.sh} servirá para instalar todas as bibliotecas necessárias, todos os pacotes do python, a configuração do Apache2 para o site que está no ficheiro \textit{iedcs.rafaelferreira.pt.conf} e \textit{default-ssl.conf}, também para instalar os certificados necessários para o HTTPS nas pastas usadas para esse efeito e para criar a base de dados com os livros e restrições exemplo.
-	
-O ficheiro \textit{iedcs.rafaelferreira.pt.conf} serve apenas para redirecionar todos os pedidos HTTP para HTTPS. O ficheiro \textit{default-ssl.conf} tem todas as configurações necessárias para o uso de HTTPS e para usar o modWSGI do Apache2 para o Django.
-
-Criou-se um package de settings para o Django para ter definições de development e outras de servidor. Usando o hostname do servidor sabe-se em que modo deve estar, sendo assim nesse servidor iniciado com Vagrant o servidor estará em modo produção, ou seja, não irá lançar output de debug para o utilizador.
-
-O \textit{install{\_}cert.sh} é usado para criar uma keystore que será usada pelo Java para armazenar os certificados em que ele confia ao usar HTTPS.	
-	
-Para usar o servidor, além de ter o \href{https://www.vagrantup.com/downloads.html}{Vagrant} intalado, é apenas necessário fazer:
-\shellcmd{vagrant up}
-
-A password caso seja pedida é sempre vagrant e para aceder à máquina é apenas necessário fazer: \shellcmd{vagrant ssh}
-
-O site pode ser acessível em: \url{https://iedcs.rafaelferreira.pt/}
-
-É necessário copiar o ficheiro que se encontra na pasta /installation/javalib para a pasta /Library/Java/Extensions no MacOS.
-
-Para fazer download do Player apenas é preciso registar na webstore e depois clicar em "Player" que será feito o download do Player. A implementação do Player está apenas disponível para Mac OS X, com uma aplicaçãnative application  tendo como base uma aplicação JavaFX. Testado com o java version "1.8.0{\_}60".
-
-
-
-
-\newpage
 \section{Conclusão}
+
+NOVA CONCLUSÃO
 
 Esta conclusão não é uma conclusão final, pois este projeto será realizado em duas partes.
 Sendo assim vai-se optar por nesta conclusão dizer principalmente as implementações futuras e problemas encontrados.
@@ -568,14 +547,6 @@ As implementações futuras que não se conseguiu implementar a tempo nesta fase
 \item A solução apresentada acima, obriga a que seja feita a cifra página a página, consoante a sessão do Player, Device e utilizador.
 \item Outra ideia que nos surgiu, foi apresentar ao utilizador as duas páginas iniciais de cada EBook (Sample) de forma gratuita.
 \end{itemize}
-
-\subsection{Certificate Authority IEDCS}
-Foi criada a nossa Certificate Authority para emitir certificados para cada chaves de cada versão do Player. Estas são usadas para assinar cada livro que é enviado para o player desde o servidor. A chave privada está no servidor e a chave pública está em cada implementação do Player.
-
-\subsubsection{Encrypt then MAC}
-
-A assinatura do conteúdo do livro é feita fazendo uma síntese usando o algoritmo SHA-256 do conteúdo cifrado e depois usando a chave privada do Player é assinada essa síntese e enviada junto com a mensagem do Player. Por sua vez, o Player, usando a chave pública irá verificar se o conteúdo que recebeu corresponde ao que foi assinado.
-Este mecanismo só pode ser comprometido se a private key do player saia do servidor ou alguém tenha acesso de forma indesejada a esta. Se um atacante conseguir meter no meio e pretender alterar o conteúdo da mensagem precisa da chave privada e pública para alterar o conteúdo além de todo o outro processo de cifra que já foi desenvolvido. 
 
 \renewcommand{\bibname}{Referências}
 
