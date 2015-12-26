@@ -1,7 +1,7 @@
 from base import *
 
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
