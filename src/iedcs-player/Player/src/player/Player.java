@@ -53,7 +53,7 @@ public class Player extends Application {
             
             File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             Utils.println(codeBase.getPath());
-            Process p = Runtime.getRuntime().exec("jarsigner -verify -keystore JarSignature.KeyStore " + codeBase.getPath());
+            Process p = Runtime.getRuntime().exec("jarsigner -verify -keystore keystore/JarSignature.KeyStore " + codeBase.getPath());
             BufferedReader stdinput  = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader stderror  = new BufferedReader(new InputStreamReader(p.getErrorStream()));
             Utils.println("Here is the standard output of the command:\n");
