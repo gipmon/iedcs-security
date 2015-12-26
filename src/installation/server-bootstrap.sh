@@ -3,8 +3,6 @@
 apt-get update
 apt-get install -y docker.io apache2 libapache2-mod-proxy-html libxml2-dev encfs
 
-cd /vagrant/Docker/python/site
-
 mkdir -p /opt/media-webstore/
 mv /vagrant/Docker/python/site/media/ /vagrant/Docker/python/site/media-tmp/
 mkdir -p /vagrant/Docker/python/site/media/
@@ -26,12 +24,16 @@ $password
 $password
 EOF
 
-cp -r /vagrant/Docker/python/site/media-tmp/* /vagrant/Docker/python/site/media/
+cp -r /vagrant/Docker/python/site/media-tmp/ /vagrant/Docker/python/site/media/
 sleep 2
 rm -rf /vagrant/Docker/python/site/media-tmp/
 
+cd /vagrant/Docker/python/site
+
 # database
 if [ ! -f db.sqlite3 ]; then
+  apt-get install -y python python-pip python-dev
+  pip install -r requirements.txt
   python manage.py migrate
   python manage.py insert_books
   python manage.py restriction add restriction 'restriction_country' 'restriction_country' 'You are restricted by country!'
@@ -44,14 +46,12 @@ fi
 
 cd /vagrant/Docker/python
 docker build -t ubuntu/iedcs .
-docker run -d -it --cap-add SYS_ADMIN -p 8002:80 --name apache -t ubuntu/iedcs
+docker run -d -it -p 8002:80 --name apache -t ubuntu/iedcs
 docker start apache
-docker exec apache sh /opt/encfs.sh
-docker exec apache rm /opt/encfs.sh
 docker exec apache service apache2 start
 
 #IPTABLES
-iptables -I FORWARD  --dport 8002 -j DROP
+iptables -I FORWARD -p tcp --dport 8002 -j DROP
 iptables -I DOCKER -p tcp --dport 8002 -j DROP
 iptables -I INPUT -p tcp --dport 8002 -j DROP
 
@@ -93,3 +93,5 @@ sudo a2enmod proxy_html
 sudo a2enmod xml2enc
 
 sudo service apache2 restart
+
+sh /vagrant/reload-apache.sh

@@ -343,10 +343,8 @@ Foram tidas em conta algumas considerações sobre o servidor Django. Muitas apl
 \subsection{Django Rest Framework}
 A DRF\footnote{\label{url1} \url{http://www.django-rest-framework.org/}} tem uma "browsable API"\footnote{\label{url1} \url{http://www.django-rest-framework.org/topics/browsable-api/}} que é usada para o utilizador que pretender  usar a API poder procurar, no entanto expor dessa forma endpoints não é aconselhável, por isso mesmo, foi retirado.
 
-
 \subsection{Melhoria do Debug do Player}
 Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falha-se fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham ficado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, sendo isto não aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
-
 
 \subsection{Diffie Hellman na visualização de um livro}
 
@@ -361,7 +359,6 @@ O servidor calcula então o resultado final, da mesma maneira que o Player, e co
  \caption{\\Processo de Challenge Diffie-Hellman}
  \label{fig:eer}
 \end{figure}
-
 
 \subsection{Copy/ Paste da janela do Player}
 Na implementação da primeira entrega do projeto, era possível o copy/paste do texto que era apresentado ao utilizador. Para que isso não acontecesse foram efetuadas algumas alterações no JavaFx, para que não seja possível copiar o texto.
@@ -424,6 +421,10 @@ Foram realizados alguns testes com código python inserido de forma intencional 
 
 Foi tida em conta a preocupação para que o utilizador apenas conseguisse usar os endpoints para o Player na porta destinada isso, a porta 8080, para isso foi criada uma regra na porta 443 para que pedidos para os endpoints que são utilizados pelo Player fossem descartados e não fosse feito o forward para o Docker container.
 
+\subsubsection{Isolamento da chave privada do Player}
+
+Apesar de não ter sido desenvolvido nenhuma solução para o isolamento da chave do Player, por falta de tempo, tinha sido idealizado uma solução baseada num container que apenas guardaria a chave privada do Player e um endpoint para assinar o que lhe fosse pedido para assinar internamente. Retirando assim a chave privada do container onde está a correr o web service Python.
+
 \begin{figure}[!htb]
 \center
  \includegraphics[width=60mm,scale=1]{player_denied.png}
@@ -440,6 +441,8 @@ Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fa
 
 \section{Autenticação do Player junto do Servidor}
 
+Sendo este um requisito explícito do trabalho, os resultados não foram os esperados, pelo menos com a implementação que se foi conseguindo fazer. Usando o Java não foi conseguido negociar de forma correta o TLS para que obrigando o TLS client a autenticar-se junto do servidor, este se autenticasse.
+
 \subsection{Jar sign}
 Para que não seja possível alterações no código fonte do nosso Player, o ficheiro jar deste foi assinado por uma chave guardada na KeyStore JarSignature.KeyStore, de forma a que apenas seja possível correr o código do Player disponibilizado por nós e não por outra fonte desconhecida.
 
@@ -454,7 +457,8 @@ Para que não seja possível alterações no código fonte do nosso Player, o fi
 Se a assinatura é verificada e validada o programa corre sem qualquer problema, caso contrário, é impossibilitada a execução do mesmo por parte do utilizador.
 
 \subsection{Certificados assinados pela CA do IEDCS}
-Apesar das sucessivas tentativas que foram feitas para que apenas o Player conseguisse fazer pedidos ao servidor nos endpoints "api/v1/player/*" através de certificados assinados pela CA do IEDCS, não foi possível a conclusão deste mesmo processo, pois quando se tentava fazer um pedido 
+Apesar das sucessivas tentativas que foram feitas para que a autenticação da negociação do TLS fosse efetuada com sucesso usando Java, não conseguimos implementar algo que o fizesse. Outro problema que teríamos se optássemos por usar certificados assinados pela CA do IEDCS é que teríamos de gerar uma chave única do Player junto com o Device para cada instalação e enviar a sua chave pública para o servidor que assinaria toda as chaves. Achamos que essa implementação teria poucos benefícios para além do que já foi implementado.
+
 
 \subsection{Autenticação usando o Cartão de Cidadão}
 Um dos objectivos do nosso projeto era a existência de autenticação no servidor através do Cartão de Cidadão, tal como se tinha feito nas aulas com Web Authentication.
@@ -484,6 +488,14 @@ As implementações futuras que não se conseguiu implementar a tempo nesta fase
 \item A solução apresentada acima, obriga a que seja feita a cifra página a página, consoante a sessão do Player, Device e utilizador.
 \item Outra ideia que nos surgiu, foi apresentar ao utilizador as duas páginas iniciais de cada EBook (Sample) de forma gratuita.
 \end{itemize}
+
+\subsection{Certificate Authority IEDCS}
+Foi criada a nossa Certificate Authority para emitir certificados para cada chaves de cada versão do Player. Estas são usadas para assinar cada livro que é enviado para o player desde o servidor. A chave privada está no servidor e a chave pública está em cada implementação do Player.
+
+\subsubsection{Encrypt then MAC}
+
+A assinatura do conteúdo do livro é feita fazendo uma síntese usando o algoritmo SHA-256 do conteúdo cifrado e depois usando a chave privada do Player é assinada essa síntese e enviada junto com a mensagem do Player. Por sua vez, o Player, usando a chave pública irá verificar se o conteúdo que recebeu corresponde ao que foi assinado.
+Este mecanismo só pode ser comprometido se a private key do player saia do servidor ou alguém tenha acesso de forma indesejada a esta. Se um atacante conseguir meter no meio e pretender alterar o conteúdo da mensagem precisa da chave privada e pública para alterar o conteúdo além de todo o outro processo de cifra que já foi desenvolvido. 
 
 \renewcommand{\bibname}{Referências}
 
