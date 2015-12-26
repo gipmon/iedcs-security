@@ -149,7 +149,7 @@ public class MyBooksPageController implements Initializable {
     @FXML
     private void handleWebStoreBtn(ActionEvent event) {
         try {
-            Utils.openBrowser(IEDCSPlayer.getBaseUrl());
+            Utils.openBrowser(IEDCSPlayer.getRegisterUrl());
         } catch (IOException | URISyntaxException ex) {
             Logger.getLogger(MyBooksPageController.class.getName()).log(Level.SEVERE, null, ex);
         }

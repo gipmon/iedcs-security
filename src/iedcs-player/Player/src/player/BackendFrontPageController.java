@@ -169,7 +169,7 @@ public class BackendFrontPageController implements Initializable {
     @FXML
     private void handleWebStoreBtn(ActionEvent event) {
         try {
-            Utils.openBrowser(IEDCSPlayer.getBaseUrl());
+            Utils.openBrowser(IEDCSPlayer.getRegisterUrl());
         } catch (IOException ex) {
             Logger.getLogger(BackendFrontPageController.class.getName()).log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
