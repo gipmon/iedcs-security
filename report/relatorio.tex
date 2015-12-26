@@ -431,12 +431,22 @@ Foi tida em conta a preocupação para que o utilizador apenas conseguisse usar 
  \label{fig:docker_c}
 \end{figure}
 
-\subsubsection{Acesso ao container Docker apenas de dentro}
+\subsubsection{Acesso ao container Docker apenas de dentro do servidor}
 
 Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fazer o forward dos pedidos HTTP) usou-se as iptables do Ubuntu para fazer deny a todos os pedidos para a porta 8002. No entanto, como estamos a usar um "Host-only adapter" o IP que o host da máquina virtual tem é o mesmo da máquina e impossibilitou que fosse testado de maneira simples.
 \shellcmd{iptables -I FORWARD  --dport 8002 -j DROP}
 \shellcmd{iptables -I DOCKER -p tcp --dport 8002 -j DROP}
 \shellcmd{iptables -I INPUT -p tcp --dport 8002 -j DROP}
+
+\section{Autenticação do Player junto do Servidor}
+
+\subsection{Jar sign}
+RODRIGO AQUI
+
+\subsection{Certificados assinados pela CA do IEDCS}
+Apesar das sucessivas tentativas que foram feitas para que 
+
+\subsection{Autenticação usando o Cartão de Cidadão}
 
 \newpage
 \section{Conclusão}

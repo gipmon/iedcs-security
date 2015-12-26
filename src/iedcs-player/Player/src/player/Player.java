@@ -50,7 +50,7 @@ public class Player extends Application {
             // verificar assinatura
             
             String s = null;
-            /*
+            
             File codeBase = new File(Player.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             Utils.println(codeBase.getPath());
             Process p = Runtime.getRuntime().exec("jarsigner -verify -keystore JarSignature.KeyStore " + codeBase.getPath());
@@ -65,7 +65,7 @@ public class Player extends Application {
             }else if(s.toLowerCase().contains("jar verified".toLowerCase())){
                 Utils.println("esta assinado");
             }
-            */
+            
 
             // if private key don't exists
             if(!PlayerKeyStore.exists("privateKeyDevice")){
