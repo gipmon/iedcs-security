@@ -4,7 +4,7 @@ apt-get update
 apt-get install -y docker.io apache2 libapache2-mod-proxy-html libxml2-dev encfs
 
 mkdir -p /opt/media-webstore/
-mv /vagrant/Docker/python/site/media/ /vagrant/Docker/python/site/media-tmp/
+mv /vagrant/Docker/python/site/media /vagrant/Docker/python/site/media-tmp
 mkdir -p /vagrant/Docker/python/site/media/
 
 password="p4g1rr"
@@ -24,7 +24,7 @@ $password
 $password
 EOF
 
-cp -r /vagrant/Docker/python/site/media-tmp/ /vagrant/Docker/python/site/media/
+cp -r /vagrant/Docker/python/site/media-tmp/* /vagrant/Docker/python/site/media/
 sleep 2
 rm -rf /vagrant/Docker/python/site/media-tmp/
 
@@ -93,5 +93,3 @@ sudo a2enmod proxy_html
 sudo a2enmod xml2enc
 
 sudo service apache2 restart
-
-sh /vagrant/reload-apache.sh

@@ -343,8 +343,10 @@ Foram tidas em conta algumas considerações sobre o servidor Django. Muitas apl
 \subsection{Django Rest Framework}
 A DRF\footnote{\label{url1} \url{http://www.django-rest-framework.org/}} tem uma "browsable API"\footnote{\label{url1} \url{http://www.django-rest-framework.org/topics/browsable-api/}} que é usada para o utilizador que pretender  usar a API poder procurar, no entanto expor dessa forma endpoints não é aconselhável, por isso mesmo, foi retirado.
 
+
 \subsection{Melhoria do Debug do Player}
 Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falha-se fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham ficado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, sendo isto não aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
+
 
 \subsection{Diffie Hellman na visualização de um livro}
 
@@ -362,6 +364,7 @@ O servidor calcula então o resultado final, da mesma maneira que o Player, e co
 
 \subsection{Copy/ Paste da janela do Player}
 Na implementação da primeira entrega do projeto, era possível o copy/paste do texto que era apresentado ao utilizador. Para que isso não acontecesse foram efetuadas algumas alterações no JavaFx, para que não seja possível copiar o texto.
+
 \newpage
 \section{Novas funcionalidades}
 \subsection{Associar Cartão de Cidadão a uma conta}
@@ -416,7 +419,6 @@ Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem 
 
 \newpage
 \subsection{Logout}
-
 
 \section{Confinamento}
 Foram realizadas várias tentativas para fazer o confinamento da aplicação e limitar ao máximo o que a aplicação poderia fazer caso fosse comprometida e executasse código malicioso. Para isso, inicialmente, realizaram-se várias tentativas para implementar uma solução com \textit{chroot} e para a solução final usou-se Docker.
@@ -498,35 +500,21 @@ Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fa
 Sendo este um requisito explícito do trabalho, os resultados não foram os esperados, pelo menos com a implementação que se foi conseguindo fazer. Usando o Java não foi conseguido negociar de forma correta o TLS para que obrigando o TLS client a autenticar-se junto do servidor, este se autenticasse.
 
 \subsection{Jar sign}
-Para que não seja possível alterações no código fonte do nosso Player, o ficheiro jar deste foi assinado por uma chave guardada na KeyStore JarSignature.KeyStore, de forma a que apenas seja possível correr o código do Player disponibilizado por nós e não por outra fonte desconhecida.
-
-\begin{figure}[!htb]
-\center
- \includegraphics[width=25mm,scale=1]{jarsigned.png}
- \includegraphics[width=60mm,scale=1]{jarunsigned.png}
- \caption{\\Verificação da assinatura}
- \label{fig:docker_c}
-\end{figure}
-
-Se a assinatura é verificada e validada o programa corre sem qualquer problema, caso contrário, é impossibilitada a execução do mesmo por parte do utilizador.
+RODRIGO AQUI
 
 \subsection{Certificados assinados pela CA do IEDCS}
 Apesar das sucessivas tentativas que foram feitas para que a autenticação da negociação do TLS fosse efetuada com sucesso usando Java, não conseguimos implementar algo que o fizesse. Outro problema que teríamos se optássemos por usar certificados assinados pela CA do IEDCS é que teríamos de gerar uma chave única do Player junto com o Device para cada instalação e enviar a sua chave pública para o servidor que assinaria toda as chaves. Achamos que essa implementação teria poucos benefícios para além do que já foi implementado.
 
-
 \subsection{Autenticação usando o Cartão de Cidadão}
-Um dos objectivos do nosso projeto era a existência de autenticação no servidor através do Cartão de Cidadão, tal como se tinha feito nas aulas com Web Authentication.
-Começou-se por fazer como nas aulas práticas, através do Browser, sendo que foi logo conseguido sem qualquer problema, contudo não era o que se queria. Passou-se então à implementação desta autenticação no lado do Player, onde foram efetuadas muitas tentativas de forma a que tal fosse possível. 
-Para esta autenticação é sempre necessária a keystore que possui o certificado do Servidor e a keystore PKCS11 proveniente do Cartão de Cidadão utilizada para a autenticação através do mesmo e que contém os certificados e as chaves do cartão.
-É necessário ainda a criação de um TrustManager que contém os certificados confiáveis e uma KeyManager, utilizada para certificados de autenticação.
-O primeiro problema surgiu quando na criação de um SSLContext se enviava um array de TrustManager, e apenas o primeiro elemento era utilizado, sendo que quando era carregado primeiro o certificado do Servidor, os pedidos que não requeriam autenticação do cartão de cidadão era efetuados com sucesso, contudo os que requeriam autenticação, davam sempre um erro de "handshake\_failure", pois os certificados do Cartão de Cidadão não estavam no primeiro elemento do array de TrustManager. Quando se colocava os certificados do Cartão de Cidadão no primeiro elemento do array e o certificado do Servidor no segundo, então obtinhamos outro erro que não nos permitia sequer fazer pedidos ao servidor, mais uma vez porque seriam apenas utilizados os certificados do primeiro elemento do array.
-Tentou-se então que o certificado do Servidor estivesse na KeyStore da JVM, mas depois de se ter colocado o certificado nessa mesma KeyStore o erro permaneceu, não conseguindo aceder ao Servidor.
-Com isto juntaram-se então os certificados todos numa KeyStore, de forma a existir apenas um TrustManager e assim carregar os certificados todos. Com isto deixou-se de ter o erro de handshake failure e passou-se a ter um de erro na verificação da assinatura, que segundo o professor, seria porque a cadeia de certificados não estaria completa.
-Posto isto pensou-se que poderia ser o facto de estarmos a juntar tudo numa única keystore, e então criámos o nosso próprio TrustManager que juntava os certificados de ambas as KeyStores e verificava as cadeias de certificação, contudo o erro persistia.
-Numa última alternativa, foram colocados numa KeyStore todos os certificados obtidos pela MakeFile da aula prática que obtinha todos os certificados referentes ao Cartão de Cidadão, assim a cadeia à partida e juntando com os certificados do Cartão, estaria completa. No entanto o erro permaneceu.
 
-Depois de vários dias perdidos a investir nesta funcionalidade, decidiu-se desistir da ideia, de forma a ser possível avançar na realização do trabalho. Para isto através de uma classe criada pelo Professor André Zúquete e editada por nós de forma a adaptar-se ao nosso projeto, antes de cada pedido ao servidor onde é utilizado o Cartão de Cidadão, este é validado, percorrendo toda a cadeia de certificados e CRL’s de forma a verificar que nada no cartão está fora de validade, ou foi revogado.
-Posto isto, caso o cartão seja verificado com sucesso, a operação desejada é efectuada, caso contrário é apresentado o erro ao utilizador.
+\subsection{Certificate Authority IEDCS}
+Foi criada a nossa Certificate Authority para emitir certificados para cada chaves de cada versão do Player. Estas são usadas para assinar cada livro que é enviado para o player desde o servidor. A chave privada está no servidor e a chave pública está em cada implementação do Player.
+
+\subsubsection{Encrypt then MAC}
+
+A assinatura do conteúdo do livro é feita fazendo uma síntese usando o algoritmo SHA-256 do conteúdo cifrado e depois usando a chave privada do Player é assinada essa síntese e enviada junto com a mensagem do Player. Por sua vez, o Player, usando a chave pública irá verificar se o conteúdo que recebeu corresponde ao que foi assinado.
+Este mecanismo só pode ser comprometido se a private key do player saia do servidor ou alguém tenha acesso de forma indesejada a esta. Se um atacante conseguir meter no meio e pretender alterar o conteúdo da mensagem precisa da chave privada e pública para alterar o conteúdo além de todo o outro processo de cifra que já foi desenvolvido. 
+A chave pública que está guardada no código fonte do Player não pode ser alterada devido ao Jar Sign que se implementou.
 
 \newpage
 \section{Conclusão}
@@ -542,14 +530,6 @@ As implementações futuras que não se conseguiu implementar a tempo nesta fase
 \item A solução apresentada acima, obriga a que seja feita a cifra página a página, consoante a sessão do Player, Device e utilizador.
 \item Outra ideia que nos surgiu, foi apresentar ao utilizador as duas páginas iniciais de cada EBook (Sample) de forma gratuita.
 \end{itemize}
-
-\subsection{Certificate Authority IEDCS}
-Foi criada a nossa Certificate Authority para emitir certificados para cada chaves de cada versão do Player. Estas são usadas para assinar cada livro que é enviado para o player desde o servidor. A chave privada está no servidor e a chave pública está em cada implementação do Player.
-
-\subsubsection{Encrypt then MAC}
-
-A assinatura do conteúdo do livro é feita fazendo uma síntese usando o algoritmo SHA-256 do conteúdo cifrado e depois usando a chave privada do Player é assinada essa síntese e enviada junto com a mensagem do Player. Por sua vez, o Player, usando a chave pública irá verificar se o conteúdo que recebeu corresponde ao que foi assinado.
-Este mecanismo só pode ser comprometido se a private key do player saia do servidor ou alguém tenha acesso de forma indesejada a esta. Se um atacante conseguir meter no meio e pretender alterar o conteúdo da mensagem precisa da chave privada e pública para alterar o conteúdo além de todo o outro processo de cifra que já foi desenvolvido. 
 
 \renewcommand{\bibname}{Referências}
 
