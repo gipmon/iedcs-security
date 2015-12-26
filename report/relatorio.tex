@@ -364,7 +364,7 @@ O servidor calcula então o resultado final, da mesma maneira que o Player, e co
 
 
 \subsection{Copy/ Paste da janela do Player}
-ALGO
+Na implementação da primeira entrega do projeto, era possível o copy/paste do texto que era apresentado ao utilizador. Para que isso não acontecesse foram efetuadas algumas alterações no JavaFx, para que não seja possível copiar o texto.
 
 
 \section{Confinamento}
@@ -441,12 +441,34 @@ Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fa
 \section{Autenticação do Player junto do Servidor}
 
 \subsection{Jar sign}
-RODRIGO AQUI
+Para que não seja possível alterações no código fonte do nosso Player, o ficheiro jar deste foi assinado por uma chave guardada na KeyStore JarSignature.KeyStore, de forma a que apenas seja possível correr o código do Player disponibilizado por nós e não por outra fonte desconhecida.
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=25mm,scale=1]{jarsigned.png}
+ \includegraphics[width=60mm,scale=1]{jarunsigned.png}
+ \caption{\\Verificação da assinatura}
+ \label{fig:docker_c}
+\end{figure}
+
+Se a assinatura é verificada e validada o programa corre sem qualquer problema, caso contrário, é impossibilitada a execução do mesmo por parte do utilizador.
 
 \subsection{Certificados assinados pela CA do IEDCS}
-Apesar das sucessivas tentativas que foram feitas para que 
+Apesar das sucessivas tentativas que foram feitas para que apenas o Player conseguisse fazer pedidos ao servidor nos endpoints "api/v1/player/*" através de certificados assinados pela CA do IEDCS, não foi possível a conclusão deste mesmo processo, pois quando se tentava fazer um pedido 
 
 \subsection{Autenticação usando o Cartão de Cidadão}
+Um dos objectivos do nosso projeto era a existência de autenticação no servidor através do Cartão de Cidadão, tal como se tinha feito nas aulas com Web Authentication.
+Começou-se por fazer como nas aulas práticas, através do Browser, sendo que foi logo conseguido sem qualquer problema, contudo não era o que se queria. Passou-se então à implementação desta autenticação no lado do Player, onde foram efetuadas muitas tentativas de forma a que tal fosse possível. 
+Para esta autenticação é sempre necessária a keystore que possui o certificado do Servidor e a keystore PKCS11 proveniente do Cartão de Cidadão utilizada para a autenticação através do mesmo e que contém os certificados e as chaves do cartão.
+É necessário ainda a criação de um TrustManager que contém os certificados confiáveis e uma KeyManager, utilizada para certificados de autenticação.
+O primeiro problema surgiu quando na criação de um SSLContext se enviava um array de TrustManager, e apenas o primeiro elemento era utilizado, sendo que quando era carregado primeiro o certificado do Servidor, os pedidos que não requeriam autenticação do cartão de cidadão era efetuados com sucesso, contudo os que requeriam autenticação, davam sempre um erro de "handshake\_failure", pois os certificados do Cartão de Cidadão não estavam no primeiro elemento do array de TrustManager. Quando se colocava os certificados do Cartão de Cidadão no primeiro elemento do array e o certificado do Servidor no segundo, então obtinhamos outro erro que não nos permitia sequer fazer pedidos ao servidor, mais uma vez porque seriam apenas utilizados os certificados do primeiro elemento do array.
+Tentou-se então que o certificado do Servidor estivesse na KeyStore da JVM, mas depois de se ter colocado o certificado nessa mesma KeyStore o erro permaneceu, não conseguindo aceder ao Servidor.
+Com isto juntaram-se então os certificados todos numa KeyStore, de forma a existir apenas um TrustManager e assim carregar os certificados todos. Com isto deixou-se de ter o erro de handshake failure e passou-se a ter um de erro na verificação da assinatura, que segundo o professor, seria porque a cadeia de certificados não estaria completa.
+Posto isto pensou-se que poderia ser o facto de estarmos a juntar tudo numa única keystore, e então criámos o nosso próprio TrustManager que juntava os certificados de ambas as KeyStores e verificava as cadeias de certificação, contudo o erro persistia.
+Numa última alternativa, foram colocados numa KeyStore todos os certificados obtidos pela MakeFile da aula prática que obtinha todos os certificados referentes ao Cartão de Cidadão, assim a cadeia à partida e juntando com os certificados do Cartão, estaria completa. No entanto o erro permaneceu.
+
+Depois de vários dias perdidos a investir nesta funcionalidade, decidiu-se desistir da ideia, de forma a ser possível avançar na realização do trabalho. Para isto através de uma classe criada pelo Professor André Zúquete e editada por nós de forma a adaptar-se ao nosso projeto, antes de cada pedido ao servidor onde é utilizado o Cartão de Cidadão, este é validado, percorrendo toda a cadeia de certificados e CRL’s de forma a verificar que nada no cartão está fora de validade, ou foi revogado.
+Posto isto, caso o cartão seja verificado com sucesso, a operação desejada é efectuada, caso contrário é apresentado o erro ao utilizador.
 
 \newpage
 \section{Conclusão}

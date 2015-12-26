@@ -10,7 +10,7 @@ public class IEDCSPlayer {
 
     // change here to http or https
     private static final boolean https = true;
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
             
     public static String getBaseUrl(){
         return (https)?baseURL_https:baseURL_http;
