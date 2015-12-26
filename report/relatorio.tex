@@ -357,11 +357,65 @@ O servidor calcula então o resultado final, da mesma maneira que o Player, e co
 \center
  \includegraphics[width=100mm,scale=1]{diffie-hellman.pdf}
  \caption{\\Processo de Challenge Diffie-Hellman}
- \label{fig:eer}
+ \label{fig:diffie}
 \end{figure}
 
 \subsection{Copy/ Paste da janela do Player}
 Na implementação da primeira entrega do projeto, era possível o copy/paste do texto que era apresentado ao utilizador. Para que isso não acontecesse foram efetuadas algumas alterações no JavaFx, para que não seja possível copiar o texto.
+\newpage
+\section{Novas funcionalidades}
+\subsection{Associar Cartão de Cidadão a uma conta}
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=100mm,scale=1]{Associate.png}
+ \caption{\\Associar Cartão de Cidadão}
+ \label{fig:associate}
+\end{figure}
+
+A cada conta é possível associar um Cartão de Cidadão, para isso o utilizador na sua página pessoal do Player deverá clicar no botão de "Associate Citizen Card" onde lhe será pedido, como manobra de segurança, que coloque a sua password da conta de utilizador (Figura  \ref{fig:associate}). Para isto, no servidor é guardada a chave pública do Cartão de Cidadão e o seu número de identificação, que deverá ser único tal como mostra a figura \ref{fig:errorassociate}. Depois da associação do cartão é efetuado logout automaticamente, e no próximo login aparecerá um botão de "Disassociate Citizen Card".
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=100mm,scale=1]{AssociateError.png}
+ \caption{\\Erro ao associar o mesmo cartão de cidadão a outra conta}
+ \label{fig:errorassociate}
+\end{figure}
+
+\newpage
+\subsection{Desassociar Cartão de Cidadão de uma conta}
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=100mm,scale=1]{Disassociate.png}
+ \caption{\\Desassociar Cartão de Cidadão}
+ \label{fig:disassociate}
+\end{figure}
+
+É possível, depois de associar um cartão a uma conta, desassociar o mesmo. Para esta função e como medida de segurança, é também pedido ao utilizador que coloque a sua password da conta de utilizador (Figura \ref{fig:disassociate}). É removida então a chave pública do Cartão de Cidadão e o número de identificação do mesmo no servidor. Posto isto é efetuado logout automaticamente, e no próximo login será possível associar um outro cartão.
+\newpage
+\subsection{Login com o Cartão de Cidadão}
+
+Depois de se associar um cartão passa a ser possível fazer login com o cartão de cidadão. 
+
+Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem de erro para o utilizador como se pode ver na figura \ref{fig:nocard}. Se um dado cartão não estiver associado a nenhuma conta de utilizador será então lançada a mensagem de erro que está na figura \ref{fig:noaccount}.
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=100mm,scale=1]{Nocard.png}
+ \caption{\\Nenhum Cartão de Cidadão inserido}
+ \label{fig:nocard}
+\end{figure}
+
+\begin{figure}[!htb]
+\center
+ \includegraphics[width=100mm,scale=1]{Noaccount.png}
+ \caption{\\Nenhuma conta com o Cartão de Cidadão associado}
+ \label{fig:noaccount}
+\end{figure}
+
+\newpage
+\subsection{Logout}
 
 
 \section{Confinamento}
