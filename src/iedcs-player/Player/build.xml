@@ -66,11 +66,6 @@
         <copy todir="${dist.dir}/citizen">
             <fileset dir="citizen" includes="**"/>
         </copy>
-        <echo>Copying iaikPkcs11mac cfg...</echo>
-        <mkdir dir="${dist.dir}/iaikPkcs11mac"/>
-        <copy todir="${dist.dir}/iaikPkcs11mac">
-            <fileset dir="lib/iaikPkcs11mac" includes="**"/>
-        </copy>
     </target>
     <target name="-post-jfx-native">
       <mkdir dir="${basedir}/dist/bundles/IEDCS Player.app/Contents/Java/sigar"/>

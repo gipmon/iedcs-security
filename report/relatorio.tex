@@ -347,22 +347,6 @@ A DRF\footnote{\label{url1} \url{http://www.django-rest-framework.org/}} tem uma
 \subsection{Melhoria do Debug do Player}
 Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falha-se fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham ficado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, sendo isto não aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
 
-
-\subsection{Diffie Hellman na visualização de um livro}
-
-Quando um utilizador pede ao servidor para obter o conteúdo de um livro, é agora iniciado um processo de challenge baseado na troca de chaves Diffie Hellman. O utilizador ao fazer o pedido, é efetuado um update da informação do Device, sendo que na resposta do servidor a este update, este devolve dois números partilhados \textbf{p} e \textbf{g}, e ainda um número \textbf{n}, calculado com base nos números primos partilhados e num \textbf{número primo secreto}, apenas conhecido pelo servidor.
-O Player ao receber a resposta do servidor com os números \textbf{p, g e n}, gera um n próprio baseado nos números \textbf{p} e \textbf{g} partilhados e num \textbf{segredo} que apenas ele conhece, sendo \textbf{n} enviado para o servidor para poder calcular o resultado final do challenge. É calculado ainda o resultado final do lado do Player, com base no número partilhado \textbf{p, n} e ainda no \textbf{segredo} do Player. Este resultado final é enviado juntamente com o \textbf{n} calculado para o servidor no pedido de getBook.
-O servidor calcula então o resultado final, da mesma maneira que o Player, e compara os valores dos dois resultados finais. Se forem iguais o conteúdo do livro é enviado para o Player, caso contrário não envia nada.
-
-
-\begin{figure}[!htb]
-\center
- \includegraphics[width=100mm,scale=1]{diffie-hellman.pdf}
- \caption{\\Processo de Challenge Diffie-Hellman}
- \label{fig:eer}
-\end{figure}
-
-
 \subsection{Copy/ Paste da janela do Player}
 ALGO
 
@@ -423,6 +407,10 @@ Foram realizados alguns testes com código python inserido de forma intencional 
 \subsubsection{Proibição de determinados URL no Apache}
 
 Foi tida em conta a preocupação para que o utilizador apenas conseguisse usar os endpoints para o Player na porta destinada isso, a porta 8080, para isso foi criada uma regra na porta 443 para que pedidos para os endpoints que são utilizados pelo Player fossem descartados e não fosse feito o forward para o Docker container.
+
+\subsubsection{Isolamento da chave privada do Player}
+
+Apesar de não ter sido desenvolvido nenhuma solução para o isolamento da chave do Player, por falta de tempo, tinha sido idealizado uma solução baseada num container que apenas guardaria a chave privada do Player e um endpoint para assinar o que lhe fosse pedido para assinar internamente. Retirando assim a chave privada do container onde está a correr o web service Python.
 
 \begin{figure}[!htb]
 \center
