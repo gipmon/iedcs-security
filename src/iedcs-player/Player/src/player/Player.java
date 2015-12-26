@@ -59,8 +59,8 @@ public class Player extends Application {
             Utils.println("Here is the standard output of the command:\n");
             s = stdinput.readLine();
             Utils.println(s);
-              
-            if(s.toLowerCase().contains("jar is unsigned".toLowerCase())){
+            System.out.println(s);
+            if(s.toLowerCase().contains("jar is unsigned".toLowerCase()) || s.toLowerCase().contains("jarsigner error".toLowerCase())){
                 System.exit(0);
             }else if(s.toLowerCase().contains("jar verified".toLowerCase())){
                 Utils.println("esta assinado");
