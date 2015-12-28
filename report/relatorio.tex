@@ -315,8 +315,9 @@ Outra possibilidade seria um atacante/cliente que usasse ferramentas de análise
 
 \section{Segunda entrega, síntese de melhorias}
 
-um género de introdução para a segunda entrega do trabalho <====
+Nesta segunda entrega, os principais objetivos eram a utilização do cartão de cidadão, confinamento e cifragem dos conteúdos do servidor. Juntamente com estas novas funcionalidades foram implementadas ainda pequenas melhorias, tais como, a introdução de um challenge Diffie-Hellman no momento em que se pretende ler um livro, aumentando assim a segurança existente da primeira parte do trabalho.
 
+É possível nesta segunda parte do relatório perceber-se todas as decisões tomadas, tecnologias e métodos utilizados na elaboração destas novas funcionalidades.
 \section{Pequenas melhorias implementadas}
 
 \subsection{New Secret Key}
@@ -464,10 +465,11 @@ Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fa
 \shellcmd{iptables -I INPUT -p tcp --dport 8002 -j DROP}
 
 \subsection{Conteúdo cifrado no servidor}
-Os livros são cifrados => cifrado o media => os livros nunca estão guardados de forma não cifrada
-=> explicar as opções que estão no server bootstrap, linha 6
+Todo o conteúdo existente no servidor, desde livros a chaves públicas, está cifrado no mesmo, de forma a que caso o servidor sofra algum ataque que comprometa informação, seja impossível chegar a este conteúdo.
 
-AQUI RODRIGO
+Para isso criou-se uma pasta media-webstore, que armazena o conteúdo da pasta media cifrado. Recorreu-se então ao comando utilizado nas aulas práticas encfs, para configuração do sistema de ficheiros cifrado. Na criação do volume cifrado optou-se pelo modo "expert" de configuração (utilizado nas aulas práticas), onde o algoritmo de cifra escolhido foi o AES e o tamanho da chave de 256 bits. O tamanho do bloco do sistema de ficheiros é de 1024 bytes, valor por defeito, e o algoritmo de codificação é por blocos. O nome do ficheiro codificado não é dependente do path completo e são adicionados 8 bytes por ficheiro para armazenar alguns 'requirements'. São adicionados ainda 8 bytes random a cada blcok header. Não permite ainda a escrita em blocos cifrados quando são criados "file holes".
+
+Com isto, todo o conteúdo da pasta media, encontra-se cifrado, e totalmente protegido no servidor.
 
 \section{Autenticação do Player junto do Servidor}
 
@@ -551,6 +553,9 @@ O site pode ser acessível em: \url{https://iedcs.rafaelferreira.pt/}
 
 Para fazer download do Player apenas é preciso registar na webstore e depois clicar em "Player" que será feito o download do Player. A implementação do Player está apenas disponível para Mac OS X, com uma aplicaçãnative application  tendo como base uma aplicação JavaFX. Testado com o java version "1.8.0{\_}60".
 
+\subsection{Library Cartão de Cidadão}
+É necessário mover o ficheiro  \textit{'libpkcs11wrapper.jnilib'} que se encontra na pasta  \textit{"/installation/javalib/"} para a pasta  \textit{"/Library/Java/Extensions/"}.
+
 \subsubsection{Docker}
 Quando se inicia a máquina depois de fazer um "vagrant halt" deve-se executar o script "/vagrant/start-up.sh". Se necessitar de fazer reload do apache foi criado um script para esse efeito em "/vagrant/reload-apache.sh".
 
@@ -558,19 +563,14 @@ A Dockerfile está disponível em \textit{/installation/Docker/python}.
 
 \section{Conclusão}
 
-NOVA CONCLUSÃO
+Este projeto no âmbito da unidade curricular de Segurança, foi um projeto desafiante, que nos proporcionou uma aprendizagem mais detalhada e aprofundada dos temas abordados ao longo das Aulas Práticas e Teóricas. Proporcionou ainda uma aprendizagem sobre temas que nos eram desconhecidos, mas que rapidamente com algum trabalho de procura de informação se tornaram uma mais valia no nosso conhecimento.
 
-Esta conclusão não é uma conclusão final, pois este projeto será realizado em duas partes.
-Sendo assim vai-se optar por nesta conclusão dizer principalmente as implementações futuras e problemas encontrados.
+Tal como já tinha sido referido na primeira parte deste relatório foram sentidas algumas dificuldades, tais como na decifra no lado Java depois de a cifra estar feita do lado do Python, pois as tecnologias disponibilizadas por este não estão diretamente no Java, obrigando à utilização de bibliotecas externas, o que nem sempre é bom, pois pode-se estar a acrescentar problemas ao sistema.
+Já nesta segunda parte, a grande dificuldade esteve, como referido acima, na autenticação com o Cartão de Cidadão no servidor e no chroot, que se acabou por optar pela utilização do Docker. O tempo disponível, devido à carga horária que os vários trabalhos das outras disciplinas acrescentam, foi também um problema, que nos impediu de acrescentar pequenas funcionalidades que gostaríamos de ter implementado.
 
-O principal problema encontrado, foi fazer a decifra no lado do Java, depois de a cifra estar feita do lado do Python, pois muitas tecnologias disponibilizadas por este não estão disponíveis diretamente no Java, o que nos obriga a utilizar bibliotecas externas o que nem sempre é bom, pois pode-se estar a acrescentar problemas ao sistema. 
+Já nesta segunda parte foram implementadas  algumas das funcionalidades que tinham sido referidas na entrega anterior como "implementações futuras".
 
-As implementações futuras que não se conseguiu implementar a tempo nesta fase do projeto, mas que contudo poderão fazer parte da próxima são:
-\begin{itemize}
-\item Uma sessão única sempre o device atualiza os seus dados. Este atualiza os seus dados sempre que o utilizador efetua um inicio de sessão, tenta ler um livro e muda de página. Esta solução faria com que a cifra do conteúdo do livro apenas fosse válida durante a sessão, pois assim que fosse efetuado um outro challenge com o servidor a sessão iria mudar e o Player não iria conseguir fazer a decifra.
-\item A solução apresentada acima, obriga a que seja feita a cifra página a página, consoante a sessão do Player, Device e utilizador.
-\item Outra ideia que nos surgiu, foi apresentar ao utilizador as duas páginas iniciais de cada EBook (Sample) de forma gratuita.
-\end{itemize}
+Contudo este projeto, foi um projeto interessante de realizar pois o tema abordado é um tema que a todos nos é familiar, devido às aplicações que usamos no nosso dia-a-dia. Foi possível então,  através deste sentir as dificuldades, adquirir os conhecimentos e alguma da experiência necessária para um trabalho deste género.
 
 \renewcommand{\bibname}{Referências}
 
