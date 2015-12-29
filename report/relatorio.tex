@@ -315,19 +315,19 @@ Outra possibilidade seria um atacante/cliente que usasse ferramentas de análise
 
 \section{Segunda entrega, síntese de melhorias}
 
-Nesta segunda entrega, os principais objetivos eram a utilização do cartão de cidadão, confinamento e cifragem dos conteúdos do servidor. Juntamente com estas novas funcionalidades foram implementadas ainda pequenas melhorias, tais como, a introdução de um challenge Diffie-Hellman no momento em que se pretende ler um livro, aumentando assim a segurança existente da primeira parte do trabalho.
+Nesta segunda entrega, os principais objetivos eram a utilização do cartão de cidadão, confinamento e cifragem dos conteúdos do servidor. Juntamente com estas novas funcionalidades foram implementadas ainda pequenas melhorias, tais como, a introdução de um challenge Diffie-Hellman no momento em que se pretende ler um livro, aumentando assim a segurança existente da primeira parte do trabalho, e introduzindo assim o conceito de sessão por cada pedido ao servidor.
 
 É possível nesta segunda parte do relatório perceber-se todas as decisões tomadas, tecnologias e métodos utilizados na elaboração destas novas funcionalidades.
 \section{Pequenas melhorias implementadas}
 
 \subsection{New Secret Key}
-Foram tidas em conta algumas considerações sobre o servidor Django. Muitas aplicações Django mantêm a "Secret Key" \footnote{\label{url1} \url{https://docs.djangoproject.com/en/1.9/ref/settings/\#secret-key}} a inicial que vem com outras instalações \footnote{\label{url1} \url{http://exfiltrated.com/research-Instagram-RCE.php}} da mesma framework, no entanto, para evitar algum problema, decidiu-se gerar uma nova chave privada para este projeto. 
+Foram tidas em conta algumas considerações sobre o servidor Django. Muitas aplicações Django mantêm a "Secret Key" \footnote{\label{url1} \url{https://docs.djangoproject.com/en/1.9/ref/settings/\#secret-key}} inicial que vem com outras instalações \footnote{\label{url1} \url{http://exfiltrated.com/research-Instagram-RCE.php}} da mesma framework, no entanto, para evitar algum problema, decidiu-se gerar uma nova chave privada para este projeto. 
 
 \subsection{Django Rest Framework}
 A DRF\footnote{\label{url1} \url{http://www.django-rest-framework.org/}} tem uma "browsable API"\footnote{\label{url1} \url{http://www.django-rest-framework.org/topics/browsable-api/}} que é usada para o utilizador que pretender  usar a API conseguir procurar, no entanto expor dessa forma endpoints não é aconselhável, por isso mesmo, foi retirado.
 
 \subsection{Melhoria do Debug do Player}
-Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falha-se, fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham ficado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, sendo isto não aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
+Para o Player tinha-se desenvolvido uma interface para que quando a aplicação falhasse, fosse possível fazer debug rapidamente do que se tinha passado, no entanto, tinham restado falhas para o modo produção, sendo uma delas que em alguns casos era exposto para o utilizador os dados recebidos nos endpoints, não sendo isto aconselhável, melhorou-se a forma como é gerido o debug e o modo produção no Player. Sendo esta melhoria não muito importante, não se irá entrar em detalhes sobre a sua implementação.
 
 \subsection{Diffie Hellman na visualização de um livro}
 
@@ -377,7 +377,7 @@ A cada conta é possível associar um Cartão de Cidadão, para isso o utilizado
 
 Depois de se associar um cartão passa a ser possível fazer login com o cartão de cidadão. 
 
-Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem de erro para o utilizador como se pode ver na figura \ref{fig:nocard}. Se um dado cartão não estiver associado a nenhuma conta de utilizador será então lançada a mensagem de erro que está na figura \ref{fig:nocard}.
+Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem de erro para o utilizador como se pode ver na figura \ref{fig:nocard}. Se um dado cartão não estiver associado a nenhuma conta de utilizador será então lançada a mensagem de erro referida na figura \ref{fig:nocard}.
 
 \begin{figure}[!htb]
 \center
@@ -390,7 +390,7 @@ Quando não está nenhum cartão de cidadão inserido, é lançada uma mensagem 
 \newpage
 \subsection{Logout}
 
-Uma nova funcionalidade que não se tinha implementado na primeira entrega, é a possibilidade de fazer logout para trocar de conta ou sair dela no Player.
+Uma nova funcionalidade que não se tinha implementado na primeira entrega, é a possibilidade de fazer logout para trocar de conta ou sair da mesma no Player.
 
 \section{Confinamento}
 Foram realizadas várias tentativas para fazer o confinamento da aplicação e limitar ao máximo o que a aplicação poderia fazer caso fosse comprometida e executasse código malicioso. Para isso, inicialmente, realizaram-se várias tentativas para implementar uma solução com \textit{chroot} e para a solução final usou-se Docker.
@@ -405,7 +405,7 @@ O mod\_wsg\footnote{\label{url1} \url{https://code.google.com/p/modwsgi/}} na ve
  \label{fig:apache_chroot_config}
 \end{figure}
 
-No entanto, tentou-se a implementação, representada na figura \ref{fig:apache_chroot_config}, usando esta diretiva, os resultados obtidos usando a configuração, estão apresentados na figura ~ 
+No entanto, tentou-se a implementação, representada na figura \ref{fig:apache_chroot_config}, usando esta diretiva, os resultados obtidos usando a configuração, estão apresentados na figura \ref{fig:import_Error}.
 
 \begin{figure}[!htb]
 \center
@@ -414,11 +414,11 @@ No entanto, tentou-se a implementação, representada na figura \ref{fig:apache_
  \label{fig:import_Error}
 \end{figure}
 
-Com isto, foi abandonada a implementação de chroot com o apache para impedir que o python executa-se código de forma maliciosa e procurou-se outra solução.
+Com isto, foi abandonada a implementação de chroot com o apache para impedir que o python executasse código de forma maliciosa e procurou-se outra solução.
 
 \newpage
 \subsection{Docker}
-Para obter resultados semelhantes a um chroot pensou-se em usar o Docker. No entanto não se pode pensar só em usar Docker, teve-se de pensar numa arquitetura para o servidor e o contentor docker. Para isso, a principal preocupação, foi em ter as chaves privadas do servidor usadas para o HTTPS, fora do contentor, retirando assim possibilidades a que o script python, que disponibiliza o serviço web tivesse possibilidades de aceder a tais chaves.
+Para obter resultados semelhantes a um chroot pensou-se em usar o Docker. Além disso, não se pode pensar só em usar Docker, teve-se de pensar numa arquitetura para o servidor e o contentor docker. Para isso, a principal preocupação, foi em ter as chaves privadas do servidor usadas para o HTTPS, fora do contentor, retirando assim possibilidades a que o script python, que disponibiliza o serviço web tivesse possibilidades de aceder a tais chaves.
 
 \begin{figure}[!htb]
 \center
@@ -429,7 +429,8 @@ Para obter resultados semelhantes a um chroot pensou-se em usar o Docker. No ent
 
 Quando um cliente acede pelo browser ao site da loja, é-lhe fornecido um certificado assinado pela COMODO, Free SSL, que o cliente usará para navegar no site sem problemas. Este pedido, que é negociado com o Apache no servidor principal, é depois redirecionado por HTTP para o Docker container que é responsável por receber e tratar os pedidos junto com o código python (Django). Desta forma, como os pedidos apenas são tratados no container e a negociação para o HTTPS é negociada fora do container, as chaves privadas estão seguras em relação ao container.
 
-Já quando o Player comunica com o servidor, apenas aceita pedidos do servidor que lhe apresente um certificado específico que foi anteriormente assinado pela nossa entidade certificadora criada para o efeito. Estes pedidos são depois encaminhados de igual modo para o container Docker.
+Já quando o Player comunica com o servidor, apenas aceita pedidos do servidor que lhe apresente um certificado específico que foi anteriormente assinado pela nossa entidade certificadora criada para o efeito. Estes pedidos são depois encaminhados de igual modo para 
+o container Docker.
 
 \subsubsection{Comportamentos observados}
 Foram realizados alguns testes com código python inserido de forma intencional no código do servidor e observou-se:
@@ -444,11 +445,11 @@ Foram realizados alguns testes com código python inserido de forma intencional 
 
 \subsubsection{Proibição de determinados URL no Apache}
 
-Foi tida em conta a preocupação para que o utilizador apenas conseguisse usar os endpoints para o Player na porta destinada isso, a porta 8080, para isso foi criada uma regra na porta 443 para que pedidos para os endpoints que são utilizados pelo Player fossem descartados e não fosse feito o forward para o Docker container.
+Foi tida em conta que o utilizador apenas conseguisse usar os endpoints para o Player na porta destinada isso, a porta 8080, para isso foi criada uma regra na porta 443 para que pedidos para os endpoints que são utilizados pelo Player fossem descartados e não fosse feito o forward para o Docker container.
 
 \subsubsection{Isolamento da chave privada do Player}
 
-Apesar de não ter sido desenvolvido nenhuma solução para o isolamento da chave do Player, por falta de tempo, tinha sido idealizado uma solução baseada num container que apenas guardaria a chave privada do Player e um endpoint para assinar o que lhe fosse pedido para assinar internamente. Retirando assim a chave privada do container onde está a correr o web service Python.
+Apesar de não ter sido desenvolvida nenhuma solução para o isolamento da chave do Player, por falta de tempo, tinha sido idealizado uma solução baseada num container que apenas guardaria a chave privada do Player e um endpoint para assinar o que lhe fosse pedido para assinar internamente. Retirando assim a chave privada do container onde está a correr o web service Python.
 
 \begin{figure}[!htb]
 \center
@@ -459,7 +460,7 @@ Apesar de não ter sido desenvolvido nenhuma solução para o isolamento da chav
 
 \subsubsection{Acesso ao container Docker apenas de dentro do servidor}
 
-Para apenas permitir o acesso de dentro do servidor principal ao Docker (para fazer o forward dos pedidos HTTP) usou-se as iptables do Ubuntu para fazer deny a todos os pedidos para a porta 8002. No entanto, como é usado um "Host-only adapter", o IP que o host e a máquina virtual têm são o mesmo, o impossibilitou que fosse testado de maneira mais simples.
+Para apenas permitir o acesso dentro do servidor principal ao Docker (para fazer o forward dos pedidos HTTP) usou-se as iptables do Ubuntu para fazer deny a todos os pedidos para a porta 8002. No entanto, como é usado um "Host-only adapter", o IP que o host e a máquina virtual têm são o mesmo, o que impossibilitou que fosse testado de maneira mais simples.
 \shellcmd{iptables -I FORWARD  --dport 8002 -j DROP}
 \shellcmd{iptables -I DOCKER -p tcp --dport 8002 -j DROP}
 \shellcmd{iptables -I INPUT -p tcp --dport 8002 -j DROP}
@@ -476,7 +477,7 @@ Com isto, todo o conteúdo da pasta media, encontra-se cifrado, e totalmente pro
 Sendo este um requisito explícito do trabalho, os resultados não foram os esperados, pelo menos com a implementação que se foi conseguindo fazer. Usando o Java não foi conseguido negociar de forma correta o TLS para que obrigando o TLS client a autenticar-se junto do servidor, este se autenticasse.
 
 \subsection{Jar sign}
-Para que não seja possível alterações no código fonte do  Player, o ficheiro jar deste foi assinado por uma chave guardada na KeyStore JarSignature.KeyStore, de forma a que apenas seja possível correr o código do Player disponibilizado por nós e não por outra fonte desconhecida.
+Para que não seja possível alterações no código fonte do  Player, o ficheiro jar deste foi assinado por uma chave guardada na KeyStore JarSignature.KeyStore, de forma a que apenas seja possível correr o código do Player disponibilizado pelo serviço e não por outra fonte desconhecida.
 
 \begin{figure}[!htb]
 \center
@@ -496,7 +497,7 @@ No entanto foi criada a nossa Certificate Authority para emitir certificados par
 \subsubsection{Encrypt then MAC}
 
 A assinatura do conteúdo do livro é feita fazendo uma síntese usando o algoritmo SHA-256 do conteúdo cifrado e depois usando a chave privada do Player é assinada essa síntese e enviada junto com a mensagem do Player. Por sua vez, o Player, usando a chave pública irá verificar se o conteúdo que recebeu corresponde ao que foi assinado.
-Este mecanismo só pode ser comprometido se a private key do player saia do servidor ou alguém tenha acesso de forma indesejada a esta. Se um atacante conseguir meter no meio e pretender alterar o conteúdo da mensagem precisa da chave privada e pública para alterar o conteúdo além de todo o outro processo de cifra que já foi desenvolvido. 
+Este mecanismo só pode ser comprometido se a private key do player sair do servidor ou alguém tenha acesso de forma indesejada a esta. Se um atacante conseguir meter no meio e pretender alterar o conteúdo da mensagem precisa da chave privada e pública para alterar o conteúdo além de todo o outro processo de cifra que já foi desenvolvido. 
 A chave pública que está guardada no código fonte do Player não pode ser alterada devido ao Jar Sign que se implementou.
 
 \newpage
@@ -514,9 +515,9 @@ A autenticação do cartão de cidadão baseia-se num pedido ao servidor de um n
 
 Esse mesmo número é gravado na base de dados para que  quando o Player iniciar o pedido de Login seja verificado se esse valor único existe na base de dados, se não existir, a autenticação falha, se existir e a assinatura corresponder ao valor que se pretendeu que fosse assinado, o utilizador faz Login.
 
-A validação da assinatura é realizado usando a chave pública de autenticação do Cartão de Cidadão que irá verificar a assinatura produzida no Player, e sendo isto tudo no lado do servidor. 
+A validação da assinatura é realizada usando a chave pública de autenticação do Cartão de Cidadão que irá verificar a assinatura produzida no Player, e sendo isto tudo no lado do servidor. 
 
-O servidor sabe que chave pública usar para cada situação porque é-lhe enviado o número de identificação do Cartão de Cidadão, que também é único. Assumimos que o utilizador associou o seu cartão de cidadão à sua conta posteriormente.
+O servidor sabe que chave pública usar para cada situação porque é-lhe enviado o número de identificação do Cartão de Cidadão, que também é único. Assume-se que o utilizador associou o seu cartão de cidadão à sua conta posteriormente.
 
 \subsection{Identificação do cidadão junto do servidor}
 Um dos objectivos do projeto era a identificação do cidadão no servidor usando o TLS Handshake e enviando uma "Client Authentication", depois o servidor verificaria se a autenticação ou identificação fornecida estaria correta. Pensou-se isto usando a "Web Authentication" tal como se tinha feito nas aulas.
@@ -563,14 +564,14 @@ A Dockerfile está disponível em \textit{/installation/Docker/python}.
 
 \section{Conclusão}
 
-Este projeto no âmbito da unidade curricular de Segurança, foi um projeto desafiante, que nos proporcionou uma aprendizagem mais detalhada e aprofundada dos temas abordados ao longo das Aulas Práticas e Teóricas. Proporcionou ainda uma aprendizagem sobre temas que nos eram desconhecidos, mas que rapidamente com algum trabalho de procura de informação se tornaram uma mais valia no nosso conhecimento.
+Este projeto no âmbito da unidade curricular de Segurança, foi um projeto desafiante, que  proporcionou uma aprendizagem mais detalhada e aprofundada dos temas abordados ao longo das Aulas Práticas e Teóricas. Proporcionou ainda uma aprendizagem sobre temas que eram desconhecidos, mas que rapidamente com algum trabalho de procura de informação se tornaram uma mais valia para o conhecimento do grupo.
 
 Tal como já tinha sido referido na primeira parte deste relatório foram sentidas algumas dificuldades, tais como na decifra no lado Java depois de a cifra estar feita do lado do Python, pois as tecnologias disponibilizadas por este não estão diretamente no Java, obrigando à utilização de bibliotecas externas, o que nem sempre é bom, pois pode-se estar a acrescentar problemas ao sistema.
-Já nesta segunda parte, a grande dificuldade esteve, como referido acima, na autenticação com o Cartão de Cidadão no servidor e no chroot, que se acabou por optar pela utilização do Docker. O tempo disponível, devido à carga horária que os vários trabalhos das outras disciplinas acrescentam, foi também um problema, que nos impediu de acrescentar pequenas funcionalidades que gostaríamos de ter implementado.
+Já nesta segunda parte, a grande dificuldade esteve, como referido acima, na autenticação com o Cartão de Cidadão no servidor e no chroot, que se acabou por optar pela utilização do Docker. O tempo disponível, devido à carga horária que os vários trabalhos das outras disciplinas acrescentam, foi também um problema, que impediu de acrescentar pequenas funcionalidades que se gostaria de ter implementado.
 
 Já nesta segunda parte foram implementadas  algumas das funcionalidades que tinham sido referidas na entrega anterior como "implementações futuras".
 
-Contudo este projeto, foi um projeto interessante de realizar pois o tema abordado é um tema que a todos nos é familiar, devido às aplicações que usamos no nosso dia-a-dia. Foi possível então,  através deste sentir as dificuldades, adquirir os conhecimentos e alguma da experiência necessária para um trabalho deste género.
+Contudo este projeto, foi um projeto interessante de realizar pois o tema abordado é um tema que a todos é familiar, devido às aplicações que são usadas no dia-a-dia. Foi possível então,  através deste sentir as dificuldades, adquirir os conhecimentos e alguma da experiência necessária para um trabalho deste género.
 
 \renewcommand{\bibname}{Referências}
 
