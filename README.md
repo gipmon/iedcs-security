@@ -1,6 +1,6 @@
 ### IEDCS
 
-ATTENTION: edit your sudo vim /etc/hosts; 192.168.33.10   iedcs.rafaelferreira.pt
+**ATTENTION: edit your sudo vim /etc/hosts; 192.168.33.10   iedcs.rafaelferreira.pt**
 
 
 O trabalho proposto para o projeto da unidade curricular de Segurança é um IEDCS: Identity Enabled Distribution Control System. Para o efeito foi necessário implementar uma Ebook Webstore, um WebService e um Player de reprodução dos Ebooks em formato de texto.
